@@ -110,7 +110,6 @@ export default buildConfig({
   jobs: {
     access: {
       run: ({ req }: { req: PayloadRequest }): boolean => {
-        console.log('Origin:', req.headers.get('origin'))
         // Allow logged in users to execute this endpoint (default)
         if (req.user) return true
 

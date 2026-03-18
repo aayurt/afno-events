@@ -294,7 +294,6 @@ export const plugins: Plugin[] = [
       access: {
         read: () => true,
         update: ({ req }: { req: PayloadRequest }) => {
-          console.log('Origin:', req.headers.get('origin'))
           if (isSuperAdmin(req.user)) {
             return true
           }
