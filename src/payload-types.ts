@@ -863,7 +863,7 @@ export interface Event {
   pricing?: {
     type?: ('free' | 'paid') | null;
     /**
-     * Display price (e.g., "Rs. 500 - Rs. 1500" or "Free")
+     * Display price (e.g., "£5.00 - £15.00" or "Free")
      */
     priceRange?: string | null;
     ticketTypes?:
@@ -871,10 +871,12 @@ export interface Event {
           name: string;
           price: number;
           description?: string | null;
+          stripePriceID?: string | null;
           id?: string | null;
         }[]
       | null;
   };
+  stripeProductID?: string | null;
   /**
    * Enable or disable this event
    */
@@ -893,6 +895,13 @@ export interface Order {
   totalAmount?: number | null;
   status?: ('pending' | 'paid' | 'cancelled' | 'refunded') | null;
   tickets?: (number | Ticket)[] | null;
+  stripeCheckoutSessionID?: string | null;
+  items: {
+    ticketType: string;
+    quantity: number;
+    price: number;
+    id?: string | null;
+  }[];
   updatedAt: string;
   createdAt: string;
 }
@@ -1676,9 +1685,11 @@ export interface EventsSelect<T extends boolean = true> {
               name?: T;
               price?: T;
               description?: T;
+              stripePriceID?: T;
               id?: T;
             };
       };
+  stripeProductID?: T;
   enabled?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1693,6 +1704,15 @@ export interface OrdersSelect<T extends boolean = true> {
   totalAmount?: T;
   status?: T;
   tickets?: T;
+  stripeCheckoutSessionID?: T;
+  items?:
+    | T
+    | {
+        ticketType?: T;
+        quantity?: T;
+        price?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }

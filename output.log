@@ -1,0 +1,21 @@
+
+> afno-payload@1.0.0 generate:types /Users/aayurtshrestha/projects/self/web/payload/afno-event
+> cross-env NODE_OPTIONS=--no-deprecation payload generate:types
+
+file:///Users/aayurtshrestha/projects/self/web/payload/afno-event/node_modules/.pnpm/stripe@20.4.1_@types+node@22.5.4/node_modules/stripe/esm/stripe.core.js?tsx-namespace=1774337325986:159
+                throw new Error('Neither apiKey nor config.authenticator provided');
+                      ^
+
+Error: Neither apiKey nor config.authenticator provided
+    at Stripe._setAuthenticator (file:///Users/aayurtshrestha/projects/self/web/payload/afno-event/node_modules/.pnpm/stripe@20.4.1_@types+node@22.5.4/node_modules/stripe/esm/stripe.core.js?tsx-namespace=1774337325986:159:23)
+    at new Stripe (file:///Users/aayurtshrestha/projects/self/web/payload/afno-event/node_modules/.pnpm/stripe@20.4.1_@types+node@22.5.4/node_modules/stripe/esm/stripe.core.js?tsx-namespace=1774337325986:97:14)
+    at <anonymous> (/Users/aayurtshrestha/projects/self/web/payload/afno-event/src/utilities/stripe.ts:7:22)
+    at <anonymous> (/Users/aayurtshrestha/projects/self/web/payload/afno-event/src/utilities/stripe.ts:12:1)
+    at ModuleJob.run (node:internal/modules/esm/module_job:274:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:644:26)
+    at async runBinScript (/Users/aayurtshrestha/projects/self/web/payload/afno-event/node_modules/.pnpm/payload@3.75.0_graphql@16.12.0_typescript@5.7.3/node_modules/payload/dist/bin/index.js:86:27)
+    at async bin (/Users/aayurtshrestha/projects/self/web/payload/afno-event/node_modules/.pnpm/payload@3.75.0_graphql@16.12.0_typescript@5.7.3/node_modules/payload/dist/bin/index.js:44:29)
+    at async start (file:///Users/aayurtshrestha/projects/self/web/payload/afno-event/node_modules/.pnpm/payload@3.75.0_graphql@16.12.0_typescript@5.7.3/node_modules/payload/bin.js:30:7)
+
+Node.js v23.10.0
+ ELIFECYCLE  Command failed with exit code 1.

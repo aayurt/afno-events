@@ -2,6 +2,7 @@ import { isAdmin } from '@/access/admin'
 import { sendFCMTopicNotification } from '@/utilities/sendFCMNotification'
 import { getCachedEvents, invalidateEventsCache } from '@/utilities/cache'
 import type { CollectionConfig } from 'payload'
+import { getStripe } from '@/utilities/stripe'
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -31,6 +32,58 @@ export const Events: CollectionConfig = {
     },
   ],
   hooks: {
+    beforeChange: [
+      async ({ data, operation, req }) => {
+        // Sync with Stripe only if it's a paid event
+        if (data?.pricing?.type === 'paid') {
+          try {
+            const stripe = getStripe()
+            // 1. Ensure Stripe Product exists for the Event
+            let stripeProductID = data.stripeProductID
+
+            if (!stripeProductID) {
+              const product = await stripe.products.create({
+                name: data.title,
+                description: data.description || '',
+              })
+              stripeProductID = product.id
+              data.stripeProductID = stripeProductID
+            } else {
+              await stripe.products.update(stripeProductID, {
+                name: data.title,
+                description: data.description || '',
+              })
+            }
+
+            // 2. Sync Ticket Types to Stripe Prices
+            if (data.pricing?.ticketTypes && Array.isArray(data.pricing.ticketTypes)) {
+              for (const ticketType of data.pricing.ticketTypes) {
+                // If price changed or it's a new ticket type, create/update Stripe Price
+                // Note: Stripe Prices are immutable, so we create a new one if amount changes
+                // But for simplicity, we just create a price if it doesn't exist.
+                if (!ticketType.stripePriceID) {
+                  const price = await stripe.prices.create({
+                    unit_amount: Math.round(ticketType.price * 100), // Stripe expects cents
+                    currency: 'gbp', // Defaulting to GBP for now, can be made dynamic
+                    product: stripeProductID,
+                    metadata: {
+                      name: ticketType.name,
+                    },
+                  })
+                  ticketType.stripePriceID = price.id
+                }
+                // If we want to handle price updates, we'd need to compare and create new prices
+                // and archive old ones, which is standard Stripe practice.
+              }
+            }
+          } catch (error) {
+            req.payload.logger.error(`Error syncing with Stripe: ${error}`)
+            // We can decide whether to block the save or just log the error
+          }
+        }
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }) => {
         if ((operation === 'create' || operation === 'update') && req?.payload) {
@@ -208,7 +261,7 @@ export const Events: CollectionConfig = {
           type: 'text',
           defaultValue: 'Free',
           admin: {
-            description: 'Display price (e.g., "Rs. 500 - Rs. 1500" or "Free")',
+            description: 'Display price (e.g., "£5.00 - £15.00" or "Free")',
           },
         },
         {
@@ -228,12 +281,20 @@ export const Events: CollectionConfig = {
               type: 'number',
               required: true,
               admin: {
-                placeholder: 'e.g. 500',
+                placeholder: 'e.g. 10',
               },
             },
             {
               name: 'description',
               type: 'textarea',
+            },
+            {
+              name: 'stripePriceID',
+              type: 'text',
+              admin: {
+                readOnly: true,
+                position: 'sidebar',
+              },
             },
           ],
           admin: {
@@ -241,6 +302,14 @@ export const Events: CollectionConfig = {
           },
         },
       ],
+    },
+    {
+      name: 'stripeProductID',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+      },
     },
     {
       name: 'enabled',

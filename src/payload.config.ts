@@ -1,5 +1,5 @@
-// storage-adapter-import-placeholder
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { stripePlugin } from '@payloadcms/plugin-stripe'
 
 import sharp from 'sharp' // sharp-import
 import path from 'path'
@@ -100,6 +100,29 @@ export default buildConfig({
   globals: [Header, Footer],
   plugins: [
     ...plugins,
+    stripePlugin({
+      stripeSecretKey: process.env.STRIPE_SECRET_KEY || '',
+      isTestKey: true, // Set to false in production
+      stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOK_SECRET,
+      webhooks: {
+        'checkout.session.completed': async ({ event, payload, req }) => {
+          const session = event.data.object as any
+          const orderId = session.metadata?.orderId
+
+          if (orderId) {
+            await payload.update({
+              collection: 'orders',
+              id: orderId,
+              data: {
+                status: 'paid',
+                stripeCheckoutSessionID: session.id,
+              },
+              req,
+            })
+          }
+        },
+      },
+    }),
     // storage-adapter-placeholder
   ],
   secret: process.env.PAYLOAD_SECRET,
