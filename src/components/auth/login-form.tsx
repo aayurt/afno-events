@@ -124,10 +124,10 @@ export default function LoginForm({
         setError((result as any).error?.message || 'Failed to sign in')
         return
       }
+      console.log("result", { result })
 
       // Success - redirect to admin/dashboard depending on role
-      router.push('/admin')
-      router.refresh()
+      window.location.href = afterLoginPath
     } catch (err: any) {
       setError(err?.message || 'An unexpected error occurred')
     } finally {

@@ -80,6 +80,13 @@ export const Tenants: CollectionConfig = {
         description: 'Used for domain-based tenant handling',
       },
     },
+    {
+      name: 'paymentExternalLink',
+      type: 'text',
+      admin: {
+        description: 'Used for external link redirection for payment',
+      },
+    },
 
     {
       name: 'slug',

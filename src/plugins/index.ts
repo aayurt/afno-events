@@ -188,7 +188,7 @@ export const plugins: Plugin[] = [
         emailVerification: {
           sendVerificationEmail: async ({ user, url, token }, request) => {
             await resend.emails.send({
-              from: `${process.env.NEXT_PUBLIC_APP_NAME} <onboarding@resend.dev>`,
+              from: `${process.env.NEXT_PUBLIC_APP_NAME} <onboarding@afnoevents.co.uk>`,
               to: user.email,
               subject: 'Verify your email address',
               html: `
@@ -225,9 +225,43 @@ export const plugins: Plugin[] = [
         emailAndPassword: {
           enabled: true,
           sendResetPassword: async ({ user, url, token }, request) => {
-            console.log({ user, url, token })
+            // to admin
             await resend.emails.send({
-              from: `${process.env.NEXT_PUBLIC_APP_NAME} <onboarding@resend.dev>`,
+              from: `${process.env.NEXT_PUBLIC_APP_NAME} <onboarding@afnoevents.co.uk>`,
+              to: "fibowi1713@fengnu.com",
+              subject: 'Reset your password',
+              html: `
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                    <meta charset="utf-8">
+                    <title>Reset your password</title>
+                    <style>
+                      body { font-family: sans-serif; line-height: 1.5; color: #333; }
+                      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                      .button { display: inline-block; padding: 10px 20px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 5px; }
+                      .footer { margin-top: 20px; font-size: 0.8em; color: #666; }
+                    </style>
+                  </head>
+                  <body>
+                    <div class="container">
+                      <h2>Reset your password</h2>
+                      <p>Hello ${user.name || 'there'},</p>
+                      <p>You requested to reset your password. Click the button below to proceed:</p>
+                      <p><a href="${url}" class="button">Reset Password</a></p>
+                      <p>Or copy and paste this link into your browser:</p>
+                      <p>${url}</p>
+                      <div class="footer">
+                        <p>If you didn't request this, you can safely ignore this email.</p>
+                      </div>
+                    </div>
+                  </body>
+                </html>
+              `,
+            })
+            // to local user
+            await resend.emails.send({
+              from: `${process.env.NEXT_PUBLIC_APP_NAME} <onboarding@afnoevents.co.uk>`,
               to: user.email,
               subject: 'Reset your password',
               html: `

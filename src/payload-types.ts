@@ -296,6 +296,10 @@ export interface Tenant {
    */
   domain?: string | null;
   /**
+   * Used for external link redirection for payment
+   */
+  paymentExternalLink?: string | null;
+  /**
    * Used for url paths, example: /tenant-slug/page-slug
    */
   slug: string;
@@ -1745,6 +1749,7 @@ export interface TenantsSelect<T extends boolean = true> {
         email?: T;
       };
   domain?: T;
+  paymentExternalLink?: T;
   slug?: T;
   allowPublicRead?: T;
   updatedAt?: T;
