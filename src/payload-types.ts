@@ -296,10 +296,6 @@ export interface Tenant {
    */
   domain?: string | null;
   /**
-   * Used for external link redirection for payment
-   */
-  paymentExternalLink?: string | null;
-  /**
    * Used for url paths, example: /tenant-slug/page-slug
    */
   slug: string;
@@ -864,6 +860,10 @@ export interface Event {
         | 'fitness'
       )[]
     | null;
+  /**
+   * Used for external link redirection for payment
+   */
+  paymentExternalLink?: string | null;
   pricing?: {
     type?: ('free' | 'paid') | null;
     /**
@@ -1678,6 +1678,7 @@ export interface EventsSelect<T extends boolean = true> {
   startDatetime?: T;
   endDatetime?: T;
   tags?: T;
+  paymentExternalLink?: T;
   pricing?:
     | T
     | {
@@ -1749,7 +1750,6 @@ export interface TenantsSelect<T extends boolean = true> {
         email?: T;
       };
   domain?: T;
-  paymentExternalLink?: T;
   slug?: T;
   allowPublicRead?: T;
   updatedAt?: T;

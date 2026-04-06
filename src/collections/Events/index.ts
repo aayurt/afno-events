@@ -244,6 +244,13 @@ export const Events: CollectionConfig = {
       },
     },
     {
+      name: 'paymentExternalLink',
+      type: 'text',
+      admin: {
+        description: 'Used for external link redirection for payment',
+      },
+    },
+    {
       name: 'pricing',
       type: 'group',
       fields: [

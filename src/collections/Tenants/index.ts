@@ -81,14 +81,6 @@ export const Tenants: CollectionConfig = {
       },
     },
     {
-      name: 'paymentExternalLink',
-      type: 'text',
-      admin: {
-        description: 'Used for external link redirection for payment',
-      },
-    },
-
-    {
       name: 'slug',
       type: 'text',
       admin: {
