@@ -860,11 +860,11 @@ export interface Event {
         | 'fitness'
       )[]
     | null;
-  /**
-   * Used for external link redirection for payment
-   */
-  paymentExternalLink?: string | null;
   pricing?: {
+    /**
+     * Used for external link redirection for payment
+     */
+    paymentExternalLink?: string | null;
     type?: ('free' | 'paid') | null;
     /**
      * Display price (e.g., "£5.00 - £15.00" or "Free")
@@ -1678,10 +1678,10 @@ export interface EventsSelect<T extends boolean = true> {
   startDatetime?: T;
   endDatetime?: T;
   tags?: T;
-  paymentExternalLink?: T;
   pricing?:
     | T
     | {
+        paymentExternalLink?: T;
         type?: T;
         priceRange?: T;
         ticketTypes?:
