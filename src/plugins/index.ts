@@ -228,7 +228,7 @@ export const plugins: Plugin[] = [
             // to admin
             await resend.emails.send({
               from: `${process.env.NEXT_PUBLIC_APP_NAME} <onboarding@afnoevents.co.uk>`,
-              to: "fibowi1713@fengnu.com",
+              to: "afnoapplication@gmail.com",
               subject: 'Reset your password',
               html: `
                 <!DOCTYPE html>
