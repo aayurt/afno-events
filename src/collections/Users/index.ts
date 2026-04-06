@@ -41,7 +41,7 @@ export const Users: CollectionConfig = {
     delete: updateAndDeleteAccess,
     read: readAccess,
     update: updateAndDeleteAccess,
-    // admin: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'super-admin',
+    admin: isAdmin,
   },
   admin: {
     group: 'Users',
