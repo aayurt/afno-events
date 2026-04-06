@@ -86,6 +86,7 @@ export const Users: CollectionConfig = {
         { label: 'Prefer Not to Say', value: 'prefer-not-to-say' },
       ],
       defaultValue: 'prefer-not-to-say',
+      hidden: true,
     },
     {
       ...defaultTenantArrayField,

@@ -6,8 +6,8 @@ export const Favorites: CollectionConfig = {
         useAsTitle: 'id',
         group: 'Users',
         hidden: ({ user }) => {
-            if (!user) return true
-            if (user.role === 'super-admin') return false
+            // if (!user) return true
+            // if (user.role === 'super-admin') return false
             return true
         },
     },

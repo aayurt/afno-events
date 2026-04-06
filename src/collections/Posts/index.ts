@@ -49,8 +49,8 @@ export const Posts: CollectionConfig<'posts'> = {
   },
   admin: {
     hidden: ({ user }) => {
-      if (!user) return true
-      if (user.role === 'super-admin') return false
+      // if (!user) return true
+      // if (user.role === 'super-admin') return false
       return true
     },
     defaultColumns: ['title', 'slug', 'updatedAt'],

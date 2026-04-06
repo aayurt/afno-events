@@ -79,6 +79,7 @@ export const Tenants: CollectionConfig = {
       admin: {
         description: 'Used for domain-based tenant handling',
       },
+      hidden: true,
     },
     {
       name: 'slug',
