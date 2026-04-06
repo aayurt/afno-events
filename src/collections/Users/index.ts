@@ -100,6 +100,9 @@ export const Users: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, req, operation }) => {
+        if (data.email) {
+          data.email = data.email.toLowerCase()
+        }
         if (!req.user) {
           data.role = 'user'
         }
