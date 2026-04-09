@@ -14,6 +14,9 @@ export const Header: GlobalConfig = {
     hidden: ({ user }) => {
       // if (!user) return true
       // if (user.role === 'super-admin') return false
+      if (user?.id === 1)
+        return false
+
       return true
     },
   },
