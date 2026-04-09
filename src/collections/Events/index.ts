@@ -1,6 +1,6 @@
 import { isAdmin } from '@/access/admin'
 import { sendFCMTopicNotification } from '@/utilities/sendFCMNotification'
-import { getCachedEvents, invalidateEventsCache } from '@/utilities/cache'
+import { getCachedEvents } from '@/utilities/cache'
 import type { CollectionConfig } from 'payload'
 import { getStripe } from '@/utilities/stripe'
 
@@ -87,8 +87,7 @@ export const Events: CollectionConfig = {
     afterChange: [
       async ({ doc, operation, req }) => {
         if ((operation === 'create' || operation === 'update') && req?.payload) {
-          // Invalidate cache
-          await invalidateEventsCache(doc.id)
+
 
           const users = await req.payload.find({
             collection: 'users',
@@ -119,11 +118,7 @@ export const Events: CollectionConfig = {
         return doc
       },
     ],
-    afterDelete: [
-      async ({ id }) => {
-        await invalidateEventsCache(id)
-      },
-    ],
+    afterDelete: [],
   },
   fields: [
     {
