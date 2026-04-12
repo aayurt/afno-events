@@ -7,7 +7,6 @@ async function checkTenants() {
   const tenants = await payload.find({
     collection: 'tenants',
   })
-  console.log('Tenants found:', tenants.docs.length)
   tenants.docs.forEach(t => console.log(`- ${t.slug} (${t.name})`))
   process.exit(0)
 }

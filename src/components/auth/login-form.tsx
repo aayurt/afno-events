@@ -124,7 +124,6 @@ export default function LoginForm({
         setError((result as any).error?.message || 'Failed to sign in')
         return
       }
-      console.log("result", { result })
 
       // Success - redirect to admin/dashboard depending on role
       window.location.href = afterLoginPath

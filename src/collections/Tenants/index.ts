@@ -72,7 +72,12 @@ export const Tenants: CollectionConfig = {
         },
       ],
     },
-
+    {
+      name: 'companyImage',
+      type: 'upload',
+      relationTo: 'media',
+      // required: true,
+    },
     {
       name: 'domain',
       type: 'text',
@@ -101,6 +106,7 @@ export const Tenants: CollectionConfig = {
       },
       defaultValue: false,
       index: true,
+      hidden: true
     },
   ],
   // endpoints: [

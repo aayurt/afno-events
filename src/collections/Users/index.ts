@@ -17,10 +17,11 @@ const defaultTenantArrayField = tenantsArrayField({
     {
       name: 'roles',
       type: 'select',
-      defaultValue: ['tenant-viewer'],
+      defaultValue: ['tenant-viewer', 'tenant-admin'],
       hasMany: true,
       options: ['tenant-admin', 'tenant-viewer'],
       required: true,
+      hidden: true
     },
   ],
 })

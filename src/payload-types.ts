@@ -291,6 +291,7 @@ export interface Tenant {
     phone?: string | null;
     email?: string | null;
   };
+  companyImage?: (number | null) | Media;
   /**
    * Used for domain-based tenant handling
    */
@@ -818,24 +819,21 @@ export interface Event {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Event location coordinates
-   */
   location?: {
     /**
-     * Location of the event location
+     * Location of the event (Auto-set after map selection)
      */
     location?: string | null;
     /**
-     * Map address of the event location for google maps
+     * Map address for Google/Apple Maps
      */
-    'Map location'?: string | null;
+    mapLocation?: string | null;
     /**
-     * Latitude coordinate of the event location
+     * Latitude coordinate
      */
     latitude?: number | null;
     /**
-     * Longitude coordinate of the event location
+     * Longitude coordinate
      */
     longitude?: number | null;
   };
@@ -1671,7 +1669,7 @@ export interface EventsSelect<T extends boolean = true> {
     | T
     | {
         location?: T;
-        'Map location'?: T;
+        mapLocation?: T;
         latitude?: T;
         longitude?: T;
       };
@@ -1749,6 +1747,7 @@ export interface TenantsSelect<T extends boolean = true> {
         phone?: T;
         email?: T;
       };
+  companyImage?: T;
   domain?: T;
   slug?: T;
   allowPublicRead?: T;

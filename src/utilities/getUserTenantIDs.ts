@@ -17,7 +17,7 @@ export const getUserTenantIDs = (
 
   return (
     user?.tenants?.reduce<Tenant['id'][]>((acc, { roles, tenant }) => {
-      if (role && !roles.includes(role)) {
+      if (role && !roles?.includes(role)) {
         return acc
       }
 
