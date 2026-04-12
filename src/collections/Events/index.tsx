@@ -168,7 +168,7 @@ export const Events: CollectionConfig = {
             description: 'Map address for Google/Apple Maps',
             readOnly: true,
           },
-          hidden: true
+          // hidden: true
         },
         {
           name: 'latitude',
@@ -179,7 +179,7 @@ export const Events: CollectionConfig = {
             step: 0.000001,
             readOnly: true,
           },
-          hidden: true
+          // hidden: true
 
         },
         {
@@ -191,7 +191,7 @@ export const Events: CollectionConfig = {
             step: 0.000001,
             readOnly: true,
           },
-          hidden: true
+          // hidden: true
 
         },
         {

@@ -2,7 +2,7 @@
 
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
 import { useState, useEffect, useMemo, FormEvent } from 'react'
-import { useField } from '@payloadcms/ui'
+import { useField, useFormFields } from '@payloadcms/ui'
 import type { UIFieldClientProps } from 'payload'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -28,8 +28,9 @@ function LocationMarker({
   setLat: (val: number) => void
   setLng: (val: number) => void
 }) {
-  const [position, setPosition] = useState<[number, number] | null>(
-    latValue && lngValue ? [latValue, lngValue] : null,
+  const defaultPos: [number, number] = [27.7172, 85.3240] // Kathmandu
+  const [position, setPosition] = useState<[number, number]>(
+    latValue && lngValue ? [latValue, lngValue] : defaultPos,
   )
 
   useEffect(() => {
@@ -46,7 +47,7 @@ function LocationMarker({
     },
   })
 
-  return position === null ? null : <Marker position={position} />
+  return <Marker position={position} />
 }
 
 function MapUpdater({ center }: { center: [number, number] }) {
@@ -88,7 +89,7 @@ const MapPickerComponent: React.FC<MapPickerProps> = ({ latPath, lngPath, namePa
     if (latValue && lngValue) {
       return [latValue, lngValue]
     }
-    return [51.505, -0.09]
+    return [27.7172, 85.3240]
   }, [latValue, lngValue])
 
   const handleSearch = async (e: FormEvent) => {

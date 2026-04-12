@@ -73,7 +73,7 @@ export const Tenants: CollectionConfig = {
       ],
     },
     {
-      name: 'companyImage',
+      name: 'organisationImage',
       type: 'upload',
       relationTo: 'media',
       // required: true,

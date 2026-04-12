@@ -291,7 +291,7 @@ export interface Tenant {
     phone?: string | null;
     email?: string | null;
   };
-  companyImage?: (number | null) | Media;
+  organisationImage?: (number | null) | Media;
   /**
    * Used for domain-based tenant handling
    */
@@ -1747,7 +1747,7 @@ export interface TenantsSelect<T extends boolean = true> {
         phone?: T;
         email?: T;
       };
-  companyImage?: T;
+  organisationImage?: T;
   domain?: T;
   slug?: T;
   allowPublicRead?: T;
