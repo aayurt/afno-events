@@ -456,6 +456,7 @@ export interface User {
   banExpires?: string | null;
   updatedAt: string;
   createdAt: string;
+  deletedAt?: string | null;
   enableAPIKey?: boolean | null;
   apiKey?: string | null;
   apiKeyIndex?: string | null;
@@ -1646,6 +1647,7 @@ export interface UsersSelect<T extends boolean = true> {
   banExpires?: T;
   updatedAt?: T;
   createdAt?: T;
+  deletedAt?: T;
   enableAPIKey?: T;
   apiKey?: T;
   apiKeyIndex?: T;

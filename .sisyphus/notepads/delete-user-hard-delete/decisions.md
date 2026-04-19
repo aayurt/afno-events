@@ -1,0 +1,3 @@
+- Decision: Implement cascade in Users beforeChange 'delete' to detach user from posts and delete dependent records (orders, favorites) where permissions allow.
+- Decision: Do not force cascade deletions on notifications due to narrower permission scope; treat as best-effort with logging.
+- Decision: No changes to plan files (READ-ONLY); plan will be recorded in notepads for traceability.

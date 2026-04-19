@@ -32,28 +32,39 @@ export const readAccess: Access<User> = ({ req, id }) => {
     const hasTenantAccess = adminTenantAccessIDs.some((id) => id === finalSelectedTenant)
     if (superAdmin || hasTenantAccess) {
       return {
-        'tenants.tenant': {
-          equals: finalSelectedTenant,
-        },
-      }
+        and: [
+          {
+            'tenants.tenant': {
+              equals: finalSelectedTenant,
+            },
+          },
+          { deletedAt: { equals: null } }
+        ],
+      } as unknown as Where
     }
   }
   if (superAdmin) {
-    return true
+    // Admins should also only see non-deleted users
+    return { deletedAt: { equals: null } } as unknown as Where
   }
 
   return {
-    or: [
+    and: [
       {
-        id: {
-          equals: req.user.id,
-        },
+        or: [
+          {
+            id: {
+              equals: req.user.id,
+            },
+          },
+          {
+            'tenants.tenant': {
+              in: adminTenantAccessIDs,
+            },
+          },
+        ],
       },
-      {
-        'tenants.tenant': {
-          in: adminTenantAccessIDs,
-        },
-      },
+      { deletedAt: { equals: null } }
     ],
-  } as Where
+  } as unknown as Where
 }

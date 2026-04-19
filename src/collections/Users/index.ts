@@ -27,6 +27,7 @@ const defaultTenantArrayField = tenantsArrayField({
 })
 export const Users: CollectionConfig = {
   slug: 'users',
+  trash: true,
   auth: {
     disableLocalStrategy: true,
     strategies: [betterAuthStrategy()],
