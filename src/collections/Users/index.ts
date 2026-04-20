@@ -158,5 +158,32 @@ export const Users: CollectionConfig = {
         }
       },
     ],
+    beforeDelete: [
+      async ({ id, req }) => {
+        if (req.query?.force === 'true') {
+          throw new Error('Permanent delete is not allowed');
+        }
+        // delete from notifications
+        // console.log("Deleting notifications for user", id)
+        // await req.payload.delete({
+        //   collection: 'notifications',
+        //   where: {
+        //     user: {
+        //       equals: id,
+        //     },
+        //   },
+        // })
+        // console.log("Deleting account for user", id)
+
+        // await req.payload.delete({
+        //   collection: 'accounts',
+        //   where: {
+        //     userId: {
+        //       equals: id,
+        //     },
+        //   },
+        // })
+      }
+    ]
   },
 }

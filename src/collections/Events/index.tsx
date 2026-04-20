@@ -36,7 +36,7 @@ export const Events: CollectionConfig = {
     beforeChange: [
       async ({ data, operation, req }) => {
         // Sync with Stripe only if it's a paid event
-        if (data?.pricing?.type === 'paid') {
+        if ((operation === 'create' || operation === 'update') && data?.pricing?.type === 'paid') {
           try {
             const stripe = getStripe()
             // 1. Ensure Stripe Product exists for the Event
@@ -82,6 +82,8 @@ export const Events: CollectionConfig = {
             // We can decide whether to block the save or just log the error
           }
         }
+        // TODO: need to delete user fav of deleted before event delete
+
         return data
       },
     ],
@@ -117,7 +119,25 @@ export const Events: CollectionConfig = {
         return doc
       },
     ],
-    afterDelete: [],
+    beforeDelete: [
+      async ({ id, req }) => {
+        const favorites = await req.payload.find({
+          collection: 'favorites',
+          where: {
+            event: {
+              equals: id,
+            },
+          },
+          limit: 1000,
+        })
+        favorites.docs.forEach((favorite) => {
+          req.payload.delete({
+            collection: 'favorites',
+            id: favorite.id,
+          })
+        })
+      }
+    ]
   },
   fields: [
     {
