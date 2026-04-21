@@ -148,7 +148,7 @@ export const Favorites: CollectionConfig = {
             name: 'event',
             type: 'relationship',
             relationTo: 'events',
-            required: true,
+            // required: true,
             index: true,
         },
     ],

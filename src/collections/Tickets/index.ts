@@ -29,7 +29,7 @@ export const Tickets: CollectionConfig = {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
-      required: true,
+      // required: true,
     },
     {
       name: 'order',

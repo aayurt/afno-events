@@ -121,21 +121,47 @@ export const Events: CollectionConfig = {
     ],
     beforeDelete: [
       async ({ id, req }) => {
-        const favorites = await req.payload.find({
+        console.log("Deleting event collection preferences")
+        // await req.payload.create({
+        //   collection: 'payload-preferences',
+        //   data: {
+        //     key: 'collection-events-1',
+        //     value: {},
+        //     user: {
+        //       relationTo: 'users',
+        //       value: 1, // Preferences usually require a user link
+        //     },
+        //   }
+        // });
+        // await req.payload.create({
+        //   collection: 'payload-preferences', // Note the slug is usually hyphenated
+        //   // where: {
+        //   //   key: {
+        //   //     equals: 'collection-events-1',
+        //   //   },
+
+        //   // }
+        //   // data: {
+        //   //   key: 'collection-events-1',
+        //   //   value: { test: true },
+        //   //   // user: {
+        //   //   //   relationTo: 'users',
+        //   //   //   value: 'your-user-id-here', // Preferences usually require a user link
+        //   //   // },
+        //   // },
+        // });
+        console.log("Deleted event collection preferences")
+
+        // Deleting favs for the event
+        await req.payload.delete({
           collection: 'favorites',
           where: {
             event: {
               equals: id,
             },
           },
-          limit: 1000,
-        })
-        favorites.docs.forEach((favorite) => {
-          req.payload.delete({
-            collection: 'favorites',
-            id: favorite.id,
-          })
-        })
+          req
+        });
       }
     ]
   },

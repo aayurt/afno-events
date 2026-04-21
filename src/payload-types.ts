@@ -894,7 +894,7 @@ export interface Event {
 export interface Order {
   id: number;
   buyer: number | User;
-  event: number | Event;
+  event?: (number | null) | Event;
   totalAmount?: number | null;
   status?: ('pending' | 'paid' | 'cancelled' | 'refunded') | null;
   tickets?: (number | Ticket)[] | null;
@@ -914,7 +914,7 @@ export interface Order {
  */
 export interface Ticket {
   id: number;
-  event: number | Event;
+  event?: (number | null) | Event;
   order: number | Order;
   code?: string | null;
   status?: ('unused' | 'checked-in' | 'cancelled' | 'refunded' | 'transferred') | null;

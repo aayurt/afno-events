@@ -137,7 +137,7 @@ export const Orders: CollectionConfig = {
       name: 'event',
       type: 'relationship',
       relationTo: 'events',
-      required: true,
+      // required: true,
     },
 
     { name: 'totalAmount', type: 'number' },
