@@ -160,29 +160,38 @@ export const Users: CollectionConfig = {
     ],
     beforeDelete: [
       async ({ id, req }) => {
-        if (req.query?.force === 'true') {
-          throw new Error('Permanent delete is not allowed');
-        }
-        // delete from notifications
-        // console.log("Deleting notifications for user", id)
-        // await req.payload.delete({
-        //   collection: 'notifications',
-        //   where: {
-        //     user: {
-        //       equals: id,
-        //     },
-        //   },
-        // })
-        // console.log("Deleting account for user", id)
+        // 1. Delete notifications
+        await req.payload.delete({
+          collection: 'notifications',
+          where: {
+            user: { equals: id },
+          },
+          overrideAccess: true,
+        });
 
-        // await req.payload.delete({
-        //   collection: 'accounts',
-        //   where: {
-        //     userId: {
-        //       equals: id,
-        //     },
-        //   },
-        // })
+        // 2. Delete linked Better Auth accounts
+        // Note: Better Auth usually uses 'userId' as a string field 
+        // unless you mapped it as a relationship named 'user'. 
+        // Check your 'accounts' collection fields!
+        await req.payload.delete({
+          collection: 'accounts',
+          where: {
+            user: { equals: id }, // Change to userId if that's the field name
+          },
+          overrideAccess: true,
+        });
+
+        // 3. Clear this specific user's preferences only
+        // This prevents the "Failed query" crash by specifically 
+        // targeting the preference entries.
+        await req.payload.delete({
+          collection: 'payload-preferences',
+          where: {
+            'user.value': { equals: id },
+            'user.relationTo': { equals: 'users' }
+          },
+          overrideAccess: true,
+        });
       }
     ]
   },

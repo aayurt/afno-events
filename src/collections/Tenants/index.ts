@@ -38,6 +38,19 @@ export const Tenants: CollectionConfig = {
         return doc
       },
     ],
+    beforeDelete: [
+      async ({ id, req }) => {
+        // delete tenant's users
+        // await req.payload.delete({
+        //   collection: 'users_tenants',
+        //   where: {
+        //     tenant: {
+        //       equals: id,
+        //     },
+        //   },
+        // })
+      }
+    ]
   },
   fields: [
     {

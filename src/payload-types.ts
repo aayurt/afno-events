@@ -949,7 +949,7 @@ export interface Notification {
 export interface Favorite {
   id: number;
   user: number | User;
-  event: number | Event;
+  event?: (number | null) | Event;
   updatedAt: string;
   createdAt: string;
 }
