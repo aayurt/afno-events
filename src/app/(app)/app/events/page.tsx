@@ -123,8 +123,8 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event: any) => (
             <Link key={event.id} href={`/app/events/${event.slug || event.id}`}>
-              <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full">
-                <div className="aspect-[16/9] bg-muted relative overflow-hidden">
+              <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
+                <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
                   {event.coverImage ? (
                     <img
                       src={typeof event.coverImage === 'object' ? event.coverImage.url : ''}
@@ -147,7 +147,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                     </div>
                   )}
                 </div>
-                <CardHeader>
+                <CardHeader className="flex-1">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                     <Calendar size={14} />
                     {event.startDatetime
@@ -161,14 +161,14 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                   <CardTitle className="text-xl group-hover:text-primary transition-colors">
                     {event.title}
                   </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0 mt-auto space-y-2">
                   {event.location?.location && (
-                    <CardDescription className="flex items-center gap-1">
+                    <p className="text-sm text-muted-foreground flex items-center gap-1">
                       <MapPin size={14} />
                       {event.location.location}
-                    </CardDescription>
+                    </p>
                   )}
-                </CardHeader>
-                <CardContent className="pt-0">
                   {event.tags && event.tags.length > 0 && (
                     <div className="flex gap-2 flex-wrap">
                       {event.tags.slice(0, 3).map((t: string) => (
