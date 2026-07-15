@@ -17,6 +17,10 @@ export default function ProfilePage() {
   const [tab, setTab] = useState<'profile' | 'favorites' | 'orders'>('profile')
 
   useEffect(() => {
+    document.title = 'Profile | Afno Events'
+  }, [])
+
+  useEffect(() => {
     async function load() {
       const result = await authClient.getSession()
       const user = result.data?.user

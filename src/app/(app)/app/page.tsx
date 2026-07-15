@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
@@ -82,4 +83,8 @@ export default async function AppDashboardPage() {
       </section>
     </div>
   )
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: 'Dashboard | Afno Events' }
 }

@@ -19,11 +19,27 @@ export function AppNav({ children }: { children: React.ReactNode }) {
     return pathname.startsWith(href)
   }
 
+  const currentTab = tabs.find((t) => isActive(t.href))
+  const pageTitle = currentTab?.label || 'AfnoEvents'
+  const isAuthPage = pathname.startsWith('/app/auth')
+
   return (
     <div className="min-h-screen bg-background">
-      <main className="pb-20">{children}</main>
+      {!isAuthPage && (
+        <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="mx-auto max-w-6xl flex items-center justify-between h-14 px-4">
+            <Link href="/app" className="flex items-center gap-2.5 shrink-0">
+              <img src="/logo.png" alt="AfnoEvents" className="h-7 w-7" />
+            </Link>
+            <span className="font-semibold text-base absolute left-1/2 -translate-x-1/2">{pageTitle}</span>
+            <div className="w-7" />
+          </div>
+        </header>
+      )}
 
-      {!pathname.startsWith('/app/auth') && (
+      <main className={cn(isAuthPage ? '' : 'pt-14 pb-20')}>{children}</main>
+
+      {!isAuthPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="mx-auto max-w-2xl flex items-center justify-around h-16 px-4">
             {tabs.map(({ href, label, icon: Icon }) => {
