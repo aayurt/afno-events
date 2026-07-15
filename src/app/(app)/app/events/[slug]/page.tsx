@@ -1,0 +1,241 @@
+import type { Metadata } from 'next'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import { Calendar, MapPin, User } from 'lucide-react'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import { Card, CardContent } from '@/components/ui/card'
+import { TicketPurchase } from './ticket-purchase'
+
+type Args = {
+  params: Promise<{ slug: string }>
+}
+
+export default async function EventDetailPage({ params: paramsPromise }: Args) {
+  const { slug } = await paramsPromise
+  const payload = await getPayload({ config: configPromise })
+
+  const isNumeric = /^\d+$/.test(slug)
+  const where = isNumeric ? { id: { equals: parseInt(slug, 10) } } : { slug: { equals: slug } }
+
+  const result = await payload.find({
+    collection: 'events',
+    where,
+    limit: 1,
+    depth: 2,
+  })
+
+  const event = result.docs[0]
+  if (!event) notFound()
+
+  const e = event as any
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="relative h-[50vh] md:h-[60vh] bg-muted overflow-hidden">
+        {e.coverImage ? (
+          <img
+            src={typeof e.coverImage === 'object' ? e.coverImage.url : ''}
+            alt={e.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+            <Calendar size={80} className="opacity-20" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+      </div>
+
+      <div className="container -mt-32 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-10">
+            {e.tags && e.tags.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {e.tags.map((t: string) => (
+                  <Link key={t} href={`/app/events?tag=${t}`}>
+                    <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20 transition-colors cursor-pointer">
+                      {t}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{e.title}</h1>
+              {e.description && (
+                <p className="text-muted-foreground text-lg mt-6 leading-relaxed whitespace-pre-line">
+                  {e.description}
+                </p>
+              )}
+            </div>
+
+            <div className="border-t border-border pt-8">
+              <h2 className="text-xl font-semibold mb-4">Date & Time</h2>
+              {e.startDatetime ? (
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Calendar className="text-primary" size={24} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {new Date(e.startDatetime).toLocaleDateString('en-GB', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
+                    </p>
+                    <p className="text-muted-foreground">
+                      {new Date(e.startDatetime).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                      {e.endDatetime && (
+                        <> — {new Date(e.endDatetime).toLocaleTimeString('en-GB', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                        </>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-muted-foreground">To be announced</p>
+              )}
+            </div>
+
+            {e.location?.location && (
+              <div className="border-t border-border pt-8">
+                <h2 className="text-xl font-semibold mb-4">Venue</h2>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <MapPin className="text-primary" size={24} />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg">{e.location.location}</p>
+                    {e.location.mapLocation && (
+                      <p className="text-muted-foreground">{e.location.mapLocation}</p>
+                    )}
+                    {e.location.latitude != null && e.location.longitude != null && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${e.location.latitude},${e.location.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary text-sm font-medium hover:underline mt-2 inline-block"
+                      >
+                        View on Google Maps
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {e.location?.latitude != null && e.location?.longitude != null && (
+              <div className="border-t border-border pt-8">
+                <h2 className="text-xl font-semibold mb-4">Map</h2>
+                <div className="aspect-[2/1] rounded-xl overflow-hidden bg-muted relative">
+                  <iframe
+                    src={`https://maps.google.com/maps?q=${e.location.latitude},${e.location.longitude}&z=15&output=embed`}
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${e.location.latitude},${e.location.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute inset-0 z-10"
+                    aria-label="Open in Google Maps"
+                  />
+                </div>
+              </div>
+            )}
+
+            {e.tenant && (
+              <div className="border-t border-border pt-8">
+                <h2 className="text-xl font-semibold mb-4">Organiser</h2>
+                <div className="flex items-center gap-4">
+                  {e.tenant.organisationImage ? (
+                    <img
+                      src={typeof e.tenant.organisationImage === 'object' ? e.tenant.organisationImage.url : ''}
+                      alt={e.tenant.name}
+                      className="w-16 h-16 rounded-xl object-cover"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
+                      <User size={24} className="text-muted-foreground" />
+                    </div>
+                  )}
+                  <p className="font-semibold text-lg">{e.tenant.name}</p>
+                </div>
+              </div>
+            )}
+
+            {e.gallery && e.gallery.length > 0 && (
+              <div className="border-t border-border pt-8">
+                <h2 className="text-xl font-semibold mb-4">Gallery</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {e.gallery.map((item: any, i: number) => (
+                    <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
+                      {item.image && (
+                        <img
+                          src={typeof item.image === 'object' ? item.image.url : ''}
+                          alt=""
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="lg:col-span-1">
+            <div className="sticky top-24">
+              <Card className="rounded-2xl">
+                <CardContent className="p-6 space-y-6">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Price</p>
+                    <p className="text-3xl font-bold text-primary">
+                      {e.pricing?.priceRange || (e.pricing?.type === 'free' ? 'Free' : 'N/A')}
+                    </p>
+                  </div>
+
+                  <TicketPurchase event={e} />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
+  const { slug } = await paramsPromise
+  const payload = await getPayload({ config: configPromise })
+
+  const isNumeric = /^\d+$/.test(slug)
+  const where = isNumeric ? { id: { equals: parseInt(slug, 10) } } : { slug: { equals: slug } }
+
+  const result = await payload.find({
+    collection: 'events',
+    where,
+    limit: 1,
+  })
+
+  const event = result.docs[0]
+  if (!event) return { title: 'Event Not Found' }
+
+  return {
+    title: `${event.title} | Afno Events`,
+    description: event.description || '',
+  }
+}

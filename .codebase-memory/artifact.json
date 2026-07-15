@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "63e2bed6ba2040d8c34aa906216188219442deb5",
-    "indexed_at": "2026-07-10T18:38:01Z",
+    "commit": "276b751868b3772a14e146f1b7698f5d14b9486f",
+    "indexed_at": "2026-07-15T09:18:46Z",
     "project": "Users-aayurtshrestha-projects-self-AfnoEvent-server",
-    "nodes": 1111,
-    "edges": 1967,
-    "original_size": 2293760,
-    "compressed_size": 156334,
-    "compression_level": 9
+    "nodes": 2781,
+    "edges": 3798,
+    "original_size": 7340032,
+    "compressed_size": 853348,
+    "compression_level": 3
 }

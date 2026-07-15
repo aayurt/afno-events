@@ -12,7 +12,7 @@ import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 import { getServerSideURL } from '@/utilities/getURL'
-import './globals.css'
+import '../globals.css'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // const { isEnabled } = await draftMode()

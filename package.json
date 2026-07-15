@@ -7,6 +7,10 @@
   "scripts": {
     "build": "cross-env NODE_OPTIONS=--no-deprecation next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
+    "build:local": "cross-env NODE_OPTIONS=--no-deprecation next build",
+    "build:standalone": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
+    "build:deploy": "pnpm build:local && pnpm build:standalone",
+    "rebuild:native": "pnpm rebuild sharp",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",

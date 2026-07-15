@@ -52,8 +52,11 @@ const config = {
       },
       borderRadius: {
         lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        md: 'calc(var(--radius) - 4px)',
+        sm: 'calc(var(--radius) - 8px)',
+        button: '34px',
+        card: '16px',
+        input: '8px',
       },
       colors: {
         accent: {
@@ -92,6 +95,12 @@ const config = {
         success: 'hsl(var(--success))',
         error: 'hsl(var(--error))',
         warning: 'hsl(var(--warning))',
+      },
+      boxShadow: {
+        'brand-sm': '0 1px 2px rgba(0,0,0,0.05)',
+        'brand-md': '0 4px 6px rgba(0,0,0,0.07)',
+        'brand-lg': '0 10px 25px rgba(0,0,0,0.1)',
+        'brand-xl': '0 20px 50px rgba(0,0,0,0.12)',
       },
       fontFamily: {
         mono: ['var(--font-geist-mono)'],
