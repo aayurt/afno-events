@@ -37,7 +37,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
   const payload = await getPayload({ config: configPromise })
 
-  const where: Record<string, unknown> = {
+  const where: any = {
     enabled: { equals: true },
   }
 
