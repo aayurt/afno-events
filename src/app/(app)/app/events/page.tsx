@@ -161,6 +161,9 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                   <CardTitle className="text-xl group-hover:text-primary transition-colors">
                     {event.title}
                   </CardTitle>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                    {event.description || 'No description'}
+                  </p>
                 </CardHeader>
                 <CardContent className="pt-0 mt-auto space-y-2">
                   {event.location?.location && (
