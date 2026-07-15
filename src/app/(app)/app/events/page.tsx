@@ -89,7 +89,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
         <div className="flex gap-2 flex-wrap">
           {TAG_OPTIONS.map(({ label, value }) => {
             const isActive = tag === value
-            const href = isActive ? '/events' : `/events?tag=${value}${q ? `&q=${q}` : ''}`
+            const href = isActive ? '/app/events' : `/app/events?tag=${value}${q ? `&q=${q}` : ''}`
             return (
               <Link key={value} href={href}>
                 <Button
