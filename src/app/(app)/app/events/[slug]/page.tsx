@@ -16,7 +16,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const payload = await getPayload({ config: configPromise })
 
   const isNumeric = /^\d+$/.test(slug)
-  const where = isNumeric ? { id: { equals: parseInt(slug, 10) } } : { slug: { equals: slug } }
+  const where: Record<string, unknown> = isNumeric
+    ? { id: { equals: parseInt(slug, 10) } }
+    : { slug: { equals: slug } }
 
   const result = await payload.find({
     collection: 'events',
@@ -223,7 +225,9 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const payload = await getPayload({ config: configPromise })
 
   const isNumeric = /^\d+$/.test(slug)
-  const where = isNumeric ? { id: { equals: parseInt(slug, 10) } } : { slug: { equals: slug } }
+  const where: Record<string, unknown> = isNumeric
+    ? { id: { equals: parseInt(slug, 10) } }
+    : { slug: { equals: slug } }
 
   const result = await payload.find({
     collection: 'events',
