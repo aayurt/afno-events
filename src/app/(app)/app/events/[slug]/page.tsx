@@ -33,6 +33,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   const e = event as any
 
+  const now = new Date()
+  const start = e.startDatetime ? new Date(e.startDatetime) : null
+  const end = e.endDatetime ? new Date(e.endDatetime) : null
+  const eventStatus = start && start > now ? 'upcoming' : end && end < now ? 'past' : start && start <= now && (!end || end >= now) ? 'live' : null
+
   const suggestedResult = await payload.find({
     collection: 'events',
     where: {
@@ -60,9 +65,45 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        {eventStatus && (
+          <div className="absolute top-6 left-6 z-10">
+            <span className={`text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm ${
+              eventStatus === 'live'
+                ? 'bg-red-500 text-white animate-pulse'
+                : eventStatus === 'upcoming'
+                ? 'bg-blue-500/80 text-white'
+                : 'bg-muted/80 text-muted-foreground'
+            }`}>
+              {eventStatus === 'live' ? 'LIVE EVENT' : eventStatus === 'upcoming' ? 'UPCOMING' : 'PAST'}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="container -mt-32 relative z-10">
+        <div className="lg:hidden flex items-center gap-4 p-4 mb-6 bg-background/80 backdrop-blur-sm rounded-2xl border border-border sticky top-14 z-30 -mx-4">
+          <div className="flex-1 min-w-0 space-y-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar size={12} />
+              {start
+                ? new Date(start).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+                : 'TBD'}
+              {e.location?.location && (
+                <>
+                  <span>•</span>
+                  <MapPin size={12} />
+                  <span className="truncate">{e.location.location}</span>
+                </>
+              )}
+            </div>
+            <p className="font-bold text-primary">
+              {e.pricing?.priceRange || (e.pricing?.type === 'free' ? 'Free' : 'N/A')}
+            </p>
+          </div>
+          <Button size="sm" className="rounded-xl shrink-0" onClick={() => document.getElementById('ticket-card')?.scrollIntoView({ behavior: 'smooth' })}>
+            Get Tickets
+          </Button>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-10">
             {e.tags && e.tags.length > 0 && (
@@ -217,7 +258,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div className="sticky top-24" id="ticket-card">
               <Card className="rounded-2xl">
                 <CardContent className="p-6 space-y-6">
                   <div>

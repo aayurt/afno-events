@@ -91,6 +91,25 @@ export const Users: CollectionConfig = {
       hidden: true,
     },
     {
+      name: 'language',
+      type: 'select',
+      defaultValue: 'en',
+      options: [
+        { label: 'English (UK)', value: 'en' },
+        { label: 'Nepali', value: 'ne' },
+      ],
+      admin: { description: 'Interface language preference' },
+    },
+    {
+      name: 'notifications',
+      type: 'group',
+      fields: [
+        { name: 'push', type: 'checkbox', defaultValue: true, label: 'Push notifications' },
+        { name: 'email', type: 'checkbox', defaultValue: true, label: 'Email notifications' },
+      ],
+      admin: { description: 'Notification preferences' },
+    },
+    {
       ...defaultTenantArrayField,
       label: 'Tenants',
       admin: {

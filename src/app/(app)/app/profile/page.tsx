@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { authClient, signOut } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight, Languages, Bell, Shield } from 'lucide-react'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -16,6 +16,8 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<any[]>([])
   const [ordersPage, setOrdersPage] = useState(1)
   const [ordersTotalPages, setOrdersTotalPages] = useState(1)
+  const [ordersTotalDocs, setOrdersTotalDocs] = useState(0)
+  const [paidOrdersCount, setPaidOrdersCount] = useState(0)
   const [tab, setTab] = useState<'profile' | 'favorites' | 'orders'>('profile')
 
   useEffect(() => {
@@ -32,15 +34,19 @@ export default function ProfilePage() {
 
       if (user) {
         try {
-          const [favRes, ordRes] = await Promise.all([
+          const [favRes, ordRes, paidRes] = await Promise.all([
             fetch(`/api/favorites?where[user][equals]=${user.id}&depth=2&limit=50`),
             fetch(`/api/orders?where[buyer][equals]=${user.id}&depth=2&limit=${ORDERS_PER_PAGE}&page=${ordersPage}&sort=-createdAt`),
+            fetch(`/api/orders?where[buyer][equals]=${user.id}&where[status][equals]=paid&limit=1&depth=0`),
           ])
           const favData = await favRes.json()
           const ordData = await ordRes.json()
+          const paidData = await paidRes.json()
           setFavorites(favData.docs || [])
           setOrders(ordData.docs || [])
           setOrdersTotalPages(ordData.totalPages || 1)
+          setOrdersTotalDocs(ordData.totalDocs || 0)
+          setPaidOrdersCount(paidData.totalDocs || 0)
         } catch {}
       }
 
@@ -260,6 +266,54 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange }: { ord
 
       {tab === 'profile' && (
         <div className="space-y-6">
+          <Card>
+            <CardContent className="p-6 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <CheckCircle size={24} className="text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{paidOrdersCount}</p>
+                <p className="text-sm text-muted-foreground">Events Attended this year</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Preferences</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {(() => {
+                const langLabel = session.language === 'ne' ? 'Nepali' : 'English (UK)'
+                const notifValue = session.notifications?.push && session.notifications?.email
+                  ? 'Push & Email'
+                  : session.notifications?.push
+                  ? 'Push'
+                  : session.notifications?.email
+                  ? 'Email'
+                  : 'Off'
+                return [
+                  { label: 'Language', value: langLabel, icon: Languages },
+                  { label: 'Notifications', value: notifValue, icon: Bell },
+                  { label: 'Security', value: 'Manage password & 2FA', icon: Shield },
+                ]
+              })().map(({ label, value, icon: Icon }) => (
+                <div key={label} className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <Icon size={16} className="text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{label}</p>
+                      <p className="text-xs text-muted-foreground">{value}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" className="text-xs">Manage</Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle>Account Details</CardTitle>
