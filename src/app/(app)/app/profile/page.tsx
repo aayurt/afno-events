@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight, Languages, Bell, Shield } from 'lucide-react'
 import { useScopedI18n } from '@/locales/client'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export default function ProfilePage() {
   const t = useScopedI18n('profile')
@@ -21,6 +22,7 @@ export default function ProfilePage() {
   const [ordersTotalDocs, setOrdersTotalDocs] = useState(0)
   const [paidOrdersCount, setPaidOrdersCount] = useState(0)
   const [tab, setTab] = useState<'profile' | 'favorites' | 'orders'>('profile')
+  const [langOpen, setLangOpen] = useState(false)
 
   useEffect(() => {
     document.title = `${t('profileTab')} | Afno Events`
@@ -295,11 +297,11 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                   ? t('notifEmail')
                   : t('notifOff')
                 return [
-                  { label: t('language'), value: langLabel, icon: Languages },
-                  { label: t('notifications'), value: notifValue, icon: Bell },
-                  { label: t('security'), value: t('manageSecurity'), icon: Shield },
+                  { key: 'language', label: t('language'), value: langLabel, icon: Languages, onManage: () => setLangOpen(true) },
+                  { key: 'notifications', label: t('notifications'), value: notifValue, icon: Bell },
+                  { key: 'security', label: t('security'), value: t('manageSecurity'), icon: Shield },
                 ]
-              })().map(({ label, value, icon: Icon }) => (
+              })().map(({ label, value, icon: Icon, onManage }) => (
                 <div key={label} className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
@@ -310,9 +312,17 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                       <p className="text-xs text-muted-foreground">{value}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="text-xs">{t('manage')}</Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs"
+                    onClick={onManage}
+                  >
+                    {t('manage')}
+                  </Button>
                 </div>
               ))}
+              <LanguageSwitcher open={langOpen} onOpenChange={setLangOpen} />
             </CardContent>
           </Card>
 
