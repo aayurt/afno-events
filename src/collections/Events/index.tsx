@@ -91,31 +91,37 @@ export const Events: CollectionConfig = {
     afterChange: [
       async ({ doc, operation, req }) => {
         if ((operation === 'create' || operation === 'update') && req?.payload) {
-          const users = await req.payload.find({
-            collection: 'users',
-            limit: 1000,
-          })
-          users.docs.forEach((user) => {
-            req.payload.create({
-              collection: 'notifications',
-              data: {
-                user: user.id,
+          try {
+            const users = await req.payload.find({
+              collection: 'users',
+              limit: 1000,
+            })
+            users.docs.forEach((user) => {
+              req.payload.create({
+                collection: 'notifications',
+                data: {
+                  user: user.id,
+                  title: 'Check out for ' + doc.title + ' event.',
+                  message: doc.description || 'Check out the ' + doc.title + ' event.',
+                  type: 'event',
+                  link: `/events/${doc.slug}`,
+                },
+              })
+            })
+            const ci = typeof doc.coverImage === 'object' ? doc.coverImage : null
+            const imageUrl = ci?.url
+            await sendFCMTopicNotification({
+              topic: 'afno-app-event',
+              notification: {
                 title: 'Check out for ' + doc.title + ' event.',
-                message: doc.description || 'Check out the ' + doc.title + ' event.',
-                type: 'event',
-                link: `/events/${doc.slug}`,
+                body: doc.description || 'Check out the ' + doc.title + ' event.',
+                imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
+                id: doc.id,
               },
             })
-          })
-          await sendFCMTopicNotification({
-            topic: 'afno-app-event',
-            notification: {
-              title: 'Check out for ' + doc.title + ' event.',
-              body: doc.description || 'Check out the ' + doc.title + ' event.',
-              imageUrl: doc.coverImage?.url,
-              id: doc.id,
-            },
-          })
+          } catch (err) {
+            console.error('FCM notification failed (non-fatal):', err)
+          }
         }
         return doc
       },
@@ -184,8 +190,11 @@ export const Events: CollectionConfig = {
       // required: true,
     },
     {
-      name: 'gallery',
+      name: 'showcaseImages',
       type: 'array',
+      admin: {
+        description: 'Curated showcase images (visible on event detail page)',
+      },
       fields: [
         {
           name: 'image',
@@ -193,6 +202,25 @@ export const Events: CollectionConfig = {
           relationTo: 'media',
         },
       ],
+    },
+    {
+      name: 'galleryEnabled',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Enable user-submitted photo gallery for this event',
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'galleryPrice',
+      type: 'number',
+      defaultValue: 2.99,
+      admin: {
+        description: 'Price in GBP to unlock the gallery (default: £2.99)',
+        position: 'sidebar',
+        condition: (data) => data?.galleryEnabled === true,
+      },
     },
     {
       name: 'location',

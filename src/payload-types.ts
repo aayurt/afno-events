@@ -78,6 +78,8 @@ export interface Config {
     tenants: Tenant;
     notifications: Notification;
     favorites: Favorite;
+    'event-photos': EventPhoto;
+    'gallery-access': GalleryAccess;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -105,6 +107,8 @@ export interface Config {
     tenants: TenantsSelect<false> | TenantsSelect<true>;
     notifications: NotificationsSelect<false> | NotificationsSelect<true>;
     favorites: FavoritesSelect<false> | FavoritesSelect<true>;
+    'event-photos': EventPhotosSelect<false> | EventPhotosSelect<true>;
+    'gallery-access': GalleryAccessSelect<false> | GalleryAccessSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -825,12 +829,23 @@ export interface Event {
   title: string;
   description?: string | null;
   coverImage?: (number | null) | Media;
-  gallery?:
+  /**
+   * Curated showcase images (visible on event detail page)
+   */
+  showcaseImages?:
     | {
         image?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
+  /**
+   * Enable user-submitted photo gallery for this event
+   */
+  galleryEnabled?: boolean | null;
+  /**
+   * Price in GBP to unlock the gallery (default: £2.99)
+   */
+  galleryPrice?: number | null;
   location?: {
     /**
      * Location of the event (Auto-set after map selection)
@@ -944,7 +959,7 @@ export interface Notification {
   user: number | User;
   title: string;
   message: string;
-  type?: ('info' | 'event' | 'reminder' | 'system') | null;
+  type?: ('info' | 'event' | 'reminder' | 'system' | 'gallery') | null;
   read?: boolean | null;
   /**
    * Optional link to redirect the user (e.g. /events/123)
@@ -961,6 +976,38 @@ export interface Favorite {
   id: number;
   user: number | User;
   event?: (number | null) | Event;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-photos".
+ */
+export interface EventPhoto {
+  id: number;
+  tenant?: (number | null) | Tenant;
+  event: number | Event;
+  uploader: number | User;
+  image: number | Media;
+  /**
+   * Auto-generated blurred preview for locked state
+   */
+  blurredPreview?: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-access".
+ */
+export interface GalleryAccess {
+  id: number;
+  buyer: number | User;
+  event: number | Event;
+  order?: (number | null) | Order;
+  stripeSessionID?: string | null;
+  status: 'pending' | 'paid' | 'refunded';
   updatedAt: string;
   createdAt: string;
 }
@@ -1277,6 +1324,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'favorites';
         value: number | Favorite;
+      } | null)
+    | ({
+        relationTo: 'event-photos';
+        value: number | EventPhoto;
+      } | null)
+    | ({
+        relationTo: 'gallery-access';
+        value: number | GalleryAccess;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1679,12 +1734,14 @@ export interface EventsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   coverImage?: T;
-  gallery?:
+  showcaseImages?:
     | T
     | {
         image?: T;
         id?: T;
       };
+  galleryEnabled?: T;
+  galleryPrice?: T;
   location?:
     | T
     | {
@@ -1795,6 +1852,33 @@ export interface NotificationsSelect<T extends boolean = true> {
 export interface FavoritesSelect<T extends boolean = true> {
   user?: T;
   event?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-photos_select".
+ */
+export interface EventPhotosSelect<T extends boolean = true> {
+  tenant?: T;
+  event?: T;
+  uploader?: T;
+  image?: T;
+  blurredPreview?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-access_select".
+ */
+export interface GalleryAccessSelect<T extends boolean = true> {
+  buyer?: T;
+  event?: T;
+  order?: T;
+  stripeSessionID?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

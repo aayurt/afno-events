@@ -102,9 +102,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               {e.pricing?.priceRange || (e.pricing?.type === 'free' ? 'Free' : 'N/A')}
             </p>
           </div>
-          <Button size="sm" className="rounded-xl shrink-0" onClick={() => document.getElementById('ticket-card')?.scrollIntoView({ behavior: 'smooth' })}>
-            {t('getTickets')}
-          </Button>
+          <a href="#ticket-card">
+            <Button size="sm" className="rounded-xl shrink-0">
+              {t('getTickets')}
+            </Button>
+          </a>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-10">
@@ -234,11 +236,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               </div>
             )}
 
-            {e.gallery && e.gallery.length > 0 && (
+            {e.showcaseImages && e.showcaseImages.length > 0 && (
               <div className="border-t border-border pt-8">
                 <h2 className="text-xl font-semibold mb-4">{t('gallery')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {e.gallery.map((item: any, i: number) => (
+                  {e.showcaseImages.map((item: any, i: number) => (
                     <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
                       {item.image && (
                         <img
@@ -250,6 +252,15 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                     </div>
                   ))}
                 </div>
+                {e.galleryEnabled && (
+                  <div className="mt-4">
+                    <Link href={`/app/events/${e.slug || e.id}/gallery`}>
+                      <Button variant="outline" className="rounded-xl">
+                        View Event Gallery
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 

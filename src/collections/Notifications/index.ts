@@ -101,10 +101,11 @@ export const Notifications: CollectionConfig = {
             type: 'select',
             defaultValue: 'info',
             options: [
-                { label: 'Information', value: 'info' },
-                { label: 'Event Alert', value: 'event' },
-                { label: 'Reminder', value: 'reminder' },
-                { label: 'System', value: 'system' },
+        { label: 'Information', value: 'info' },
+        { label: 'Event Alert', value: 'event' },
+        { label: 'Reminder', value: 'reminder' },
+        { label: 'System', value: 'system' },
+        { label: 'Gallery', value: 'gallery' },
             ],
             admin: {
                 position: 'sidebar',

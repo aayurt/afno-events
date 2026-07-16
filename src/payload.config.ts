@@ -23,6 +23,8 @@ import { Tickets } from './collections/Tickets'
 import { Tenants } from './collections/Tenants'
 import { Notifications } from './collections/Notifications'
 import { Favorites } from './collections/Favorites'
+import { EventPhotos } from './collections/EventPhotos'
+import { GalleryAccess } from './collections/GalleryAccess'
 import { trustedOriginsValues } from './trustedOrigin'
 
 const filename = fileURLToPath(import.meta.url)
@@ -90,6 +92,8 @@ export default buildConfig({
     Tenants,
     Notifications,
     Favorites,
+    EventPhotos,
+    GalleryAccess,
   ],
   cors: [getServerSideURL(), ...trustedOriginsValues].filter(Boolean),
   globals: [Header, Footer],
@@ -103,8 +107,19 @@ export default buildConfig({
         'checkout.session.completed': async ({ event, payload, req }) => {
           const session = event.data.object as any
           const orderId = session.metadata?.orderId
+          const galleryAccessId = session.metadata?.galleryAccessId
 
-          if (orderId) {
+          if (galleryAccessId) {
+            await payload.update({
+              collection: 'gallery-access',
+              id: galleryAccessId,
+              data: {
+                status: 'paid',
+                stripeSessionID: session.id,
+              },
+              req,
+            })
+          } else if (orderId) {
             await payload.update({
               collection: 'orders',
               id: orderId,

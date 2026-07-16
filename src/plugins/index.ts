@@ -322,6 +322,7 @@ export const plugins: Plugin[] = [
       users: {},
       media: {},
       events: {},
+      'event-photos': {},
     },
     tenantField: {
       label: 'Assigned Tenant',
