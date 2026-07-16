@@ -16,16 +16,18 @@ type Args = {
 }
 
 import { TAG_OPTIONS } from '@/config/tags'
-
-const FILTER_TAGS = [
-  { label: 'All Events', value: '' },
-  ...TAG_OPTIONS,
-]
+import { getScopedI18n } from '@/locales/server'
 
 export default async function EventsPage({ searchParams: searchParamsPromise }: Args) {
+  const t = await getScopedI18n('events')
   const { q, tag, page: pageStr } = await searchParamsPromise
   const currentPage = parseInt(pageStr || '1', 10)
   const limit = 12
+
+  const FILTER_TAGS = [
+    { label: t('allEvents'), value: '' },
+    ...TAG_OPTIONS,
+  ]
 
   const payload = await getPayload({ config: configPromise })
 
@@ -58,10 +60,8 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
   return (
     <div className="container py-12 space-y-10">
       <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Discover Events</h1>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          From pulsating music festivals to immersive tech workshops, explore the most exciting happenings in your city and beyond.
-        </p>
+        <h1 className="text-4xl font-bold tracking-tight">{t('discoverEvents')}</h1>
+        <p className="text-muted-foreground text-lg max-w-2xl">{t('subtitle')}</p>
       </div>
 
       <form action="/app/events" method="GET" className="space-y-6">
@@ -70,13 +70,13 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
             <Input
               name="q"
-              placeholder="Search events..."
+              placeholder={t('search')}
               defaultValue={q || ''}
               className="pl-12 h-14 rounded-2xl"
             />
           </div>
           <Button type="submit" size="lg" className="rounded-2xl px-8">
-            Search
+            {t('searchButton')}
           </Button>
         </div>
 
@@ -101,9 +101,9 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
       {events.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-xl text-muted-foreground">No events found</p>
+          <p className="text-xl text-muted-foreground">{t('noEventsFound')}</p>
           <Link href="/app/events" className="text-primary hover:underline mt-2 block">
-            View all events
+            {t('viewAll')}
           </Link>
         </div>
       ) : (
@@ -125,13 +125,13 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                   )}
                   {event.pricing?.type === 'paid' && (
                     <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                      {event.pricing.priceRange || 'Paid'}
+                      {event.pricing.priceRange || t('paid')}
                     </div>
                   )}
                   {event.pricing?.type === 'free' && (
-                    <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      Free
-                    </div>
+                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        {t('free')}
+                      </div>
                   )}
                 </div>
                 <CardHeader className="flex-1">
@@ -143,13 +143,13 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                           month: 'short',
                           year: 'numeric',
                         })
-                      : 'TBD'}
+                      : t('tbd')}
                   </div>
                   <CardTitle className="text-xl group-hover:text-primary transition-colors">
                     {event.title}
                   </CardTitle>
                   <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                    {event.description || 'No description'}
+                    {event.description || t('noDescription')}
                   </p>
                 </CardHeader>
                 <CardContent className="pt-0 mt-auto space-y-2">
@@ -182,15 +182,15 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
         <div className="flex justify-center gap-4 pt-8">
           {page > 1 && (
             <Link href={`/app/events?page=${page - 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
-              <Button variant="outline">Previous</Button>
+              <Button variant="outline">{t('previous')}</Button>
             </Link>
           )}
           <span className="flex items-center text-muted-foreground">
-            Page {page} of {totalPages}
+            {t('pageOf', { page, totalPages })}
           </span>
           {page < totalPages && (
             <Link href={`/app/events?page=${page + 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
-              <Button variant="outline">Next</Button>
+              <Button variant="outline">{t('next')}</Button>
             </Link>
           )}
         </div>

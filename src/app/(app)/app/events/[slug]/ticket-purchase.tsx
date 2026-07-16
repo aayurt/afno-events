@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Loader2, Minus, Plus, ExternalLink } from 'lucide-react'
 import { authClient } from '@/lib/auth/client'
+import { useScopedI18n } from '@/locales/client'
 
 type TicketType = {
   name: string
@@ -15,6 +16,7 @@ type TicketType = {
 }
 
 export function TicketPurchase({ event }: { event: any }) {
+  const t = useScopedI18n('eventDetail')
   const router = useRouter()
   const [quantities, setQuantities] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(false)
@@ -118,7 +120,7 @@ export function TicketPurchase({ event }: { event: any }) {
         >
           {loading ? <Loader2 className="animate-spin" /> : (
             <>
-              Get Tickets <ExternalLink size={16} className="ml-2" />
+              {t('getTickets')} <ExternalLink size={16} className="ml-2" />
             </>
           )}
         </Button>
@@ -160,7 +162,7 @@ export function TicketPurchase({ event }: { event: any }) {
 
           {totalTickets > 0 && (
             <div className="flex justify-between items-center pt-2 border-t border-border">
-              <span className="font-semibold">Total</span>
+              <span className="font-semibold">{t('total')}</span>
               <span className="font-bold text-lg text-primary">£{total.toFixed(2)}</span>
             </div>
           )}
@@ -174,9 +176,9 @@ export function TicketPurchase({ event }: { event: any }) {
             {loading ? (
               <Loader2 className="animate-spin" />
             ) : totalTickets === 0 ? (
-              'Select Tickets'
+              t('selectTickets')
             ) : (
-              `Get Tickets${total > 0 ? ` — £${total.toFixed(2)}` : ''}`
+              `${t('getTickets')}${total > 0 ? ` — £${total.toFixed(2)}` : ''}`
             )}
           </Button>
 
@@ -191,10 +193,10 @@ export function TicketPurchase({ event }: { event: any }) {
           onClick={handlePurchase}
           disabled={loading}
         >
-          {loading ? <Loader2 className="animate-spin" /> : 'Register Free'}
+          {loading ? <Loader2 className="animate-spin" /> : t('registerFree')}
         </Button>
       ) : (
-        <p className="text-sm text-muted-foreground text-center">No tickets available</p>
+        <p className="text-sm text-muted-foreground text-center">{t('noTickets')}</p>
       )}
     </div>
   )

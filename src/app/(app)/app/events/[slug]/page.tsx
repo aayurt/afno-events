@@ -8,12 +8,14 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TicketPurchase } from './ticket-purchase'
 import { ShareButtons } from './share-buttons'
+import { getScopedI18n } from '@/locales/server'
 
 type Args = {
   params: Promise<{ slug: string }>
 }
 
 export default async function EventDetailPage({ params: paramsPromise }: Args) {
+  const t = await getScopedI18n('eventDetail')
   const { slug } = await paramsPromise
   const payload = await getPayload({ config: configPromise })
 
@@ -74,7 +76,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 ? 'bg-blue-500/80 text-white'
                 : 'bg-muted/80 text-muted-foreground'
             }`}>
-              {eventStatus === 'live' ? 'LIVE EVENT' : eventStatus === 'upcoming' ? 'UPCOMING' : 'PAST'}
+              {eventStatus === 'live' ? t('live') : eventStatus === 'upcoming' ? t('upcoming') : t('past')}
             </span>
           </div>
         )}
@@ -87,7 +89,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               <Calendar size={12} />
               {start
                 ? new Date(start).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-                : 'TBD'}
+                : t('tbd')}
               {e.location?.location && (
                 <>
                   <span>•</span>
@@ -101,7 +103,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             </p>
           </div>
           <Button size="sm" className="rounded-xl shrink-0" onClick={() => document.getElementById('ticket-card')?.scrollIntoView({ behavior: 'smooth' })}>
-            Get Tickets
+            {t('getTickets')}
           </Button>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -128,7 +130,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             </div>
 
             <div className="border-t border-border pt-8">
-              <h2 className="text-xl font-semibold mb-4">Date & Time</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('dateTime')}</h2>
               {e.startDatetime ? (
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -159,13 +161,13 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                   </div>
                 </div>
               ) : (
-                <p className="text-muted-foreground">To be announced</p>
+                <p className="text-muted-foreground">{t('tbd')}</p>
               )}
             </div>
 
             {e.location?.location && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">Venue</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('venue')}</h2>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <MapPin className="text-primary" size={24} />
@@ -182,7 +184,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                         rel="noopener noreferrer"
                         className="text-primary text-sm font-medium hover:underline mt-2 inline-block"
                       >
-                        View on Google Maps
+                        {t('viewOnGoogleMaps')}
                       </a>
                     )}
                   </div>
@@ -192,7 +194,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.location?.latitude != null && e.location?.longitude != null && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">Map</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('map')}</h2>
                 <div className="aspect-[2/1] rounded-xl overflow-hidden bg-muted relative">
                   <iframe
                     src={`https://maps.google.com/maps?q=${e.location.latitude},${e.location.longitude}&z=15&output=embed`}
@@ -214,7 +216,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.tenant && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">Organiser</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('organiser')}</h2>
                 <div className="flex items-center gap-4">
                   {e.tenant.organisationImage ? (
                     <img
@@ -234,7 +236,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.gallery && e.gallery.length > 0 && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">Gallery</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('gallery')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {e.gallery.map((item: any, i: number) => (
                     <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
@@ -252,7 +254,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             )}
 
             <div className="border-t border-border pt-8">
-              <h2 className="text-xl font-semibold mb-4">Share with friends</h2>
+              <h2 className="text-xl font-semibold mb-4">{t('shareWithFriends')}</h2>
               <ShareButtons />
             </div>
           </div>
@@ -262,9 +264,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               <Card className="rounded-2xl">
                 <CardContent className="p-6 space-y-6">
                   <div>
-                    <p className="text-sm text-muted-foreground">Price</p>
+                    <p className="text-sm text-muted-foreground">{t('price')}</p>
                     <p className="text-3xl font-bold text-primary">
-                      {e.pricing?.priceRange || (e.pricing?.type === 'free' ? 'Free' : 'N/A')}
+              {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
                     </p>
                   </div>
 
@@ -280,10 +282,10 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
         <section className="border-t border-border mt-16 pt-12">
           <div className="container">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">Suggested Events</h2>
+              <h2 className="text-2xl font-bold">{t('suggestedEvents')}</h2>
               <Link href="/app/events">
                 <Button variant="ghost" size="sm" className="gap-1 text-primary">
-                  View All <ArrowRight size={16} />
+                  {t('viewAll')} <ArrowRight size={16} />
                 </Button>
               </Link>
             </div>

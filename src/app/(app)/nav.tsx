@@ -4,21 +4,23 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Calendar, LayoutDashboard, User } from 'lucide-react'
 import { cn } from '@/utilities/ui'
+import { useScopedI18n } from '@/locales/client'
 
-const footerLinks = [
+const getFooterLinks = (t: (key: string) => string) => [
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/terms', label: 'Terms of Service' },
-  { href: '/contact', label: 'Contact Us' },
+  { href: '/contact', label: t('contact') },
 ]
 
-const tabs = [
-  { href: '/app', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/app/events', label: 'Events', icon: Calendar },
-  { href: '/app/profile', label: 'Profile', icon: User },
+const getTabs = (t: (key: string) => string) => [
+  { href: '/app', label: t('dashboard'), icon: LayoutDashboard },
+  { href: '/app/events', label: t('events'), icon: Calendar },
+  { href: '/app/profile', label: t('profile'), icon: User },
 ]
 
 export function AppNav({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+  const t = useScopedI18n('nav')
 
   const isActive = (href: string) => {
     if (href === '/app') return pathname === '/app'
@@ -26,9 +28,9 @@ export function AppNav({ children }: { children: React.ReactNode }) {
   }
 
   const pageTitleMap: Record<string, string> = {
-    '/app': 'Discover',
-    '/app/events': 'Events',
-    '/app/profile': 'Profile',
+    '/app': t('discover'),
+    '/app/events': t('events'),
+    '/app/profile': t('profile'),
   }
   const pageTitle = pageTitleMap[pathname] || 'AfnoEvents'
   const isAuthPage = pathname.startsWith('/app/auth')
@@ -58,7 +60,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
                   <span className="font-semibold text-sm">AfnoEvent</span>
                 </div>
                 <nav className="flex items-center gap-6 text-sm text-muted-foreground">
-                  {footerLinks.map(({ href, label }) => (
+                  {getFooterLinks(t).map(({ href, label }) => (
                     <Link
                       key={href}
                       href={href}
@@ -80,7 +82,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
       {!isAuthPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="mx-auto max-w-2xl flex items-center justify-around h-16 px-4">
-            {tabs.map(({ href, label, icon: Icon }) => {
+            {getTabs(t).map(({ href, label, icon: Icon }) => {
               const active = isActive(href)
               return (
                 <Link

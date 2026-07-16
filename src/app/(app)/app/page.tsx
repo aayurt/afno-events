@@ -5,8 +5,10 @@ import configPromise from '@payload-config'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getScopedI18n } from '@/locales/server'
 
 export default async function AppDashboardPage() {
+  const t = await getScopedI18n('discover')
   const payload = await getPayload({ config: configPromise })
 
   const result = await payload.find({
@@ -22,16 +24,16 @@ export default async function AppDashboardPage() {
   return (
     <div className="container py-8 space-y-8">
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Discover</h1>
-        <p className="text-muted-foreground">Events curated for you</p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('subtitle')}</p>
       </div>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Upcoming Events</h2>
+          <h2 className="text-xl font-semibold">{t('upcomingEvents')}</h2>
           <Link href="/app/events">
             <Button variant="ghost" size="sm" className="gap-1 text-primary">
-              View All <ArrowRight size={16} />
+              {t('viewAll')} <ArrowRight size={16} />
             </Button>
           </Link>
         </div>
@@ -39,7 +41,7 @@ export default async function AppDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.length === 0 ? (
             <div className="col-span-full text-center py-12 text-muted-foreground">
-              No events yet
+              {t('noEvents')}
             </div>
           ) : (
             events.map((event: any) => (
@@ -59,12 +61,12 @@ export default async function AppDashboardPage() {
                     )}
                     {event.pricing?.type === 'paid' && (
                       <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                        {event.pricing.priceRange || 'Paid'}
+                        {event.pricing.priceRange || t('paid')}
                       </div>
                     )}
                     {event.pricing?.type === 'free' && (
                       <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Free
+                        {t('free')}
                       </div>
                     )}
                   </div>
@@ -77,13 +79,13 @@ export default async function AppDashboardPage() {
                             month: 'short',
                             year: 'numeric',
                           })
-                        : 'TBD'}
+                        : t('tbd')}
                     </div>
                     <CardTitle className="text-lg group-hover:text-primary transition-colors">
                       {event.title}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                      {event.description || 'No description'}
+                      {event.description || t('noDescription')}
                     </p>
                   </CardHeader>
                   <CardContent className="pt-0 mt-auto space-y-2">

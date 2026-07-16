@@ -6,12 +6,14 @@ import Link from 'next/link'
 import { CheckCircle, Calendar, MapPin, Ticket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { getScopedI18n } from '@/locales/server'
 
 type Args = {
   params: Promise<{ id: string }>
 }
 
 export default async function OrderSuccessPage({ params: paramsPromise }: Args) {
+  const t = await getScopedI18n('orders')
   const { id } = await paramsPromise
   const payload = await getPayload({ config: configPromise })
 
@@ -43,9 +45,9 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Booking Confirmed!</h1>
+              <h1 className="text-3xl font-bold">{t('bookingConfirmed')}</h1>
               <p className="text-muted-foreground">
-                Your order has been confirmed. Order ID: #{o.id}
+                {t('orderConfirmed', { orderId: o.id })}
               </p>
             </div>
 
@@ -76,7 +78,7 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
 
             {o.items && o.items.length > 0 && (
               <div className="space-y-2">
-                <p className="font-semibold text-sm">Tickets</p>
+                <p className="font-semibold text-sm">{t('tickets')}</p>
                 {o.items.map((item: any, i: number) => (
                   <div key={i} className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -91,7 +93,7 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
                 ))}
                 {o.totalAmount != null && (
                   <div className="flex justify-between items-center pt-2 border-t border-border">
-                    <span className="font-semibold">Total</span>
+                    <span className="font-semibold">{t('total')}</span>
                     <span className="font-bold text-lg">£{o.totalAmount.toFixed(2)}</span>
                   </div>
                 )}
@@ -100,10 +102,10 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
 
             <div className="flex gap-4 justify-center pt-4">
               <Link href="/app/events">
-                <Button variant="outline">Browse More Events</Button>
+                <Button variant="outline">{t('browseMoreEvents')}</Button>
               </Link>
               <Link href="/app/profile?tab=orders">
-                <Button>View My Orders</Button>
+                <Button>{t('viewMyOrders')}</Button>
               </Link>
             </div>
           </CardContent>

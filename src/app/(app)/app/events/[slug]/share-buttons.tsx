@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Link2, Check, Share2 } from 'lucide-react'
+import { useScopedI18n } from '@/locales/client'
 
 export function ShareButtons() {
+  const t = useScopedI18n('eventDetail')
   const [copied, setCopied] = useState(false)
 
   const copyLink = async () => {
@@ -30,11 +32,11 @@ export function ShareButtons() {
     <div className="flex items-center gap-3">
       <Button variant="outline" size="sm" className="gap-2" onClick={copyLink}>
         {copied ? <Check size={14} /> : <Link2 size={14} />}
-        {copied ? 'Copied!' : 'Copy Link'}
+        {copied ? t('copied') : t('copyLink')}
       </Button>
       {canShare && (
         <Button variant="outline" size="sm" className="gap-2" onClick={share}>
-          <Share2 size={14} /> Share
+          <Share2 size={14} /> {t('share')}
         </Button>
       )}
     </div>

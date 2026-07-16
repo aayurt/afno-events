@@ -3,12 +3,14 @@ import Link from 'next/link'
 import { XCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { getScopedI18n } from '@/locales/server'
 
 type Args = {
   params: Promise<{ id: string }>
 }
 
 export default async function OrderCancelPage({ params: paramsPromise }: Args) {
+  const t = await getScopedI18n('orders')
   const { id } = await paramsPromise
 
   return (
@@ -23,18 +25,18 @@ export default async function OrderCancelPage({ params: paramsPromise }: Args) {
             </div>
 
             <div className="space-y-2">
-              <h1 className="text-3xl font-bold">Payment Cancelled</h1>
+              <h1 className="text-3xl font-bold">{t('paymentCancelled')}</h1>
               <p className="text-muted-foreground">
-                Your payment for Order #{id} was cancelled. No charges have been made.
+                {t('paymentCancelledDesc')}
               </p>
             </div>
 
             <div className="flex gap-4 justify-center pt-4">
               <Link href="/app/events">
-                <Button variant="outline">Browse Events</Button>
+                <Button variant="outline">{t('browseEvents')}</Button>
               </Link>
               <Link href="/app/profile">
-                <Button>My Profile</Button>
+                <Button>{t('myProfile')}</Button>
               </Link>
             </div>
           </CardContent>

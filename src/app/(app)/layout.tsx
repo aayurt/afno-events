@@ -11,6 +11,7 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { getServerSideURL } from '@/utilities/getURL'
 import '../globals.css'
 import { AppNav } from './nav'
+import { I18nProvider } from '@/components/I18nProvider'
 
 export default async function AppRootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,7 +22,9 @@ export default async function AppRootLayout({ children }: { children: React.Reac
       </head>
       <body>
         <Providers>
-          <AppNav>{children}</AppNav>
+          <I18nProvider>
+            <AppNav>{children}</AppNav>
+          </I18nProvider>
         </Providers>
       </body>
     </html>

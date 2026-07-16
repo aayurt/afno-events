@@ -435,6 +435,17 @@ export interface User {
   phoneNumber?: string | null;
   role?: ('user' | 'admin' | 'super-admin') | null;
   gender?: ('male' | 'female' | 'other' | 'prefer-not-to-say') | null;
+  /**
+   * Interface language preference
+   */
+  language?: ('en' | 'ne') | null;
+  /**
+   * Notification preferences
+   */
+  notifications?: {
+    push?: boolean | null;
+    email?: boolean | null;
+  };
   tenants?:
     | {
         tenant: number | Tenant;
@@ -1635,6 +1646,13 @@ export interface UsersSelect<T extends boolean = true> {
   phoneNumber?: T;
   role?: T;
   gender?: T;
+  language?: T;
+  notifications?:
+    | T
+    | {
+        push?: T;
+        email?: T;
+      };
   tenants?:
     | T
     | {
