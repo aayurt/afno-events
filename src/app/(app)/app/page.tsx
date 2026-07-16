@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import { Calendar, ArrowRight } from 'lucide-react'
+import { Calendar, ArrowRight, MapPin } from 'lucide-react'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default async function AppDashboardPage() {
   const payload = await getPayload({ config: configPromise })
@@ -44,8 +44,8 @@ export default async function AppDashboardPage() {
           ) : (
             events.map((event: any) => (
               <Link key={event.id} href={`/app/events/${event.slug || event.id}`}>
-                <Card className="group overflow-hidden hover:shadow-lg transition-all rounded-2xl h-full">
-                  <div className="aspect-[16/9] bg-muted overflow-hidden">
+                <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
+                  <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
                     {event.coverImage ? (
                       <img
                         src={typeof event.coverImage === 'object' ? event.coverImage.url : ''}
@@ -54,12 +54,23 @@ export default async function AppDashboardPage() {
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                        <Calendar size={40} className="opacity-20" />
+                        <Calendar size={48} className="opacity-20" />
+                      </div>
+                    )}
+                    {event.pricing?.type === 'paid' && (
+                      <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                        {event.pricing.priceRange || 'Paid'}
+                      </div>
+                    )}
+                    {event.pricing?.type === 'free' && (
+                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        Free
                       </div>
                     )}
                   </div>
-                  <CardHeader>
-                    <div className="text-sm text-muted-foreground mb-1">
+                  <CardHeader className="flex-1">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <Calendar size={14} />
                       {event.startDatetime
                         ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
                             day: 'numeric',
@@ -71,10 +82,30 @@ export default async function AppDashboardPage() {
                     <CardTitle className="text-lg group-hover:text-primary transition-colors">
                       {event.title}
                     </CardTitle>
-                    {event.location?.location && (
-                      <CardDescription>{event.location.location}</CardDescription>
-                    )}
+                    <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
+                      {event.description || 'No description'}
+                    </p>
                   </CardHeader>
+                  <CardContent className="pt-0 mt-auto space-y-2">
+                    {event.location?.location && (
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <MapPin size={14} />
+                        {event.location.location}
+                      </p>
+                    )}
+                    {event.tags && event.tags.length > 0 && (
+                      <div className="flex gap-2 flex-wrap">
+                        {event.tags.slice(0, 3).map((t: string) => (
+                          <span
+                            key={t}
+                            className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
                 </Card>
               </Link>
             ))

@@ -19,8 +19,12 @@ export function AppNav({ children }: { children: React.ReactNode }) {
     return pathname.startsWith(href)
   }
 
-  const currentTab = tabs.find((t) => isActive(t.href))
-  const pageTitle = currentTab?.label || 'AfnoEvents'
+  const pageTitleMap: Record<string, string> = {
+    '/app': 'Discover',
+    '/app/events': 'Events',
+    '/app/profile': 'Profile',
+  }
+  const pageTitle = pageTitleMap[pathname] || 'AfnoEvents'
   const isAuthPage = pathname.startsWith('/app/auth')
 
   return (
