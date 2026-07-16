@@ -1,6 +1,9 @@
 // src/collections/Users/index.ts (vanilla starter uses folder-based collections)
 import type { CollectionConfig } from 'payload'
 import { betterAuthStrategy } from '@delmaredigital/payload-better-auth'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields'
 import { isAdmin } from '@/access/admin'
 import { isSuperAdminAccess } from '@/access/isSuperAdmin'
@@ -115,6 +118,82 @@ export const Users: CollectionConfig = {
       admin: {
         ...(defaultTenantArrayField?.admin || {}),
         position: 'sidebar',
+      },
+    },
+  ],
+  endpoints: [
+    {
+      path: '/avatar',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        let formData: FormData
+        try {
+          formData = await req.formData()
+        } catch {
+          return Response.json({ error: 'Failed to parse form data' }, { status: 400 })
+        }
+
+        const file = formData.get('file') as File | null
+        if (!file) {
+          return Response.json({ error: 'file is required' }, { status: 400 })
+        }
+
+        try {
+          const arrayBuffer = await file.arrayBuffer()
+          const buffer = Buffer.from(arrayBuffer)
+
+          const tmpDir = os.tmpdir()
+          const tmpPath = path.join(tmpDir, `avatar-${Date.now()}-${file.name}`)
+          fs.writeFileSync(tmpPath, buffer)
+
+          const resolveTenant = (val: any): string | number | null => {
+            if (!val) return null
+            return typeof val === 'object' ? val.id : val
+          }
+
+          let tenantId = resolveTenant((req.user as any).tenant)
+
+          if (!tenantId) {
+            const userDoc = await req.payload.findByID({
+              collection: 'users',
+              id: req.user.id,
+              depth: 1,
+            })
+            const userTenant = Array.isArray(userDoc.tenants) && userDoc.tenants.length > 0
+              ? userDoc.tenants[0].tenant
+              : null
+            tenantId = resolveTenant(userTenant)
+          }
+
+          const mediaData: any = { alt: `${req.user.name || 'User'}'s avatar` }
+          if (tenantId) mediaData.tenant = tenantId
+
+          const mediaDoc = await req.payload.create({
+            collection: 'media',
+            data: mediaData,
+            filePath: tmpPath,
+          })
+
+          try { fs.unlinkSync(tmpPath) } catch {}
+
+          await req.payload.update({
+            collection: 'users',
+            id: req.user.id,
+            data: { image: mediaDoc.id, ...(tenantId ? { tenant: tenantId } : {}) },
+          })
+
+          return Response.json({
+            url: mediaDoc.url,
+            id: mediaDoc.id,
+          })
+        } catch (error: any) {
+          req.payload.logger.error(`Avatar upload error: ${error.message}`)
+          return Response.json({ error: error.message }, { status: 500 })
+        }
       },
     },
   ],

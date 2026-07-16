@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useScopedI18n } from '@/locales/client'
 import { authClient } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Loader2, Lock, Camera, Upload, X, ImageIcon, Clock } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
@@ -126,8 +127,22 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-32">
-        <Loader2 className="animate-spin text-muted-foreground" size={32} />
+      <div className="space-y-6 py-12">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <Skeleton className="h-10 w-36 rounded-xl" />
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="aspect-square w-full rounded-xl" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+          ))}
+        </div>
       </div>
     )
   }

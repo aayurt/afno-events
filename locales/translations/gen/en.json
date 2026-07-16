@@ -110,7 +110,14 @@
     "notifPush": "Push",
     "notifEmail": "Email",
     "notifOff": "Off",
-    "exploreEvents": "Explore Events"
+    "exploreEvents": "Explore Events",
+    "myPhotos": "My Photos",
+    "noPhotos": "No photos uploaded yet",
+    "photosDescription": "Photos you've uploaded to event galleries",
+    "theme": "Theme",
+    "themeSystem": "System",
+    "themeLight": "Light",
+    "themeDark": "Dark"
   },
   "auth": {
     "welcomeBack": "Welcome back",

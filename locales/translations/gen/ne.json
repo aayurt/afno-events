@@ -110,7 +110,14 @@
     "notifPush": "पुस",
     "notifEmail": "इमेल",
     "notifOff": "बन्द",
-    "exploreEvents": "कार्यक्रमहरू हेर्नुहोस्"
+    "exploreEvents": "कार्यक्रमहरू हेर्नुहोस्",
+    "myPhotos": "मेरा तस्बिरहरू",
+    "noPhotos": "अहिलेसम्म कुनै तस्बिर अपलोड गरिएको छैन",
+    "photosDescription": "तपाईंले कार्यक्रम ग्यालरीहरूमा अपलोड गरेका तस्बिरहरू",
+    "theme": "थिम",
+    "themeSystem": "प्रणाली",
+    "themeLight": "उज्यालो",
+    "themeDark": "गाढा"
   },
   "auth": {
     "welcomeBack": "पुन: स्वागत छ",

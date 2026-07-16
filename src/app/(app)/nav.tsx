@@ -39,24 +39,24 @@ export function AppNav({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background">
       {!isAuthPage && (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="mx-auto max-w-6xl flex items-center justify-between h-14 px-4">
-            <Link href="/app" className="flex items-center gap-2.5 shrink-0">
-              <img src="/logo.png" alt="AfnoEvents" className="h-7 w-7" />
+          <div className="mx-auto max-w-6xl flex items-center justify-between h-22 px-4">
+            <Link href="/app" className="flex items-center shrink-0">
+              <img src="/logo.png" alt="AfnoEvents" className="h-20 w-20" />
             </Link>
             <span className="font-semibold text-base absolute left-1/2 -translate-x-1/2">{pageTitle}</span>
-            <div className="w-7" />
+            <div className="w-20" />
           </div>
         </header>
       )}
 
-      <main className={cn(isAuthPage ? '' : 'pt-14 pb-24')}>
+      <main className={cn(isAuthPage ? '' : 'pt-16 pb-24')}>
         {children}
         {!isAuthPage && (
           <footer className="border-t border-border bg-background mt-16">
             <div className="mx-auto max-w-6xl px-4 py-10">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-2.5">
-                  <img src="/logo.png" alt="AfnoEvents" className="h-7 w-7" />
+                  <img src="/logo.png" alt="AfnoEvents" className="h-20 w-20" />
                   <span className="font-semibold text-sm">AfnoEvent</span>
                 </div>
                 <nav className="flex items-center gap-6 text-sm text-muted-foreground">

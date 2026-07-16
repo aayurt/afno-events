@@ -6,12 +6,16 @@ import Link from 'next/link'
 import { authClient, signOut } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight, Languages, Bell, Shield } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight, Languages, Bell, Shield, Monitor, ImageIcon, Camera } from 'lucide-react'
 import { useScopedI18n } from '@/locales/client'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+import { useTheme } from '@/providers/Theme'
 
 export default function ProfilePage() {
   const t = useScopedI18n('profile')
+  const gt = useScopedI18n('gallery')
   const router = useRouter()
   const [session, setSession] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -21,8 +25,15 @@ export default function ProfilePage() {
   const [ordersTotalPages, setOrdersTotalPages] = useState(1)
   const [ordersTotalDocs, setOrdersTotalDocs] = useState(0)
   const [paidOrdersCount, setPaidOrdersCount] = useState(0)
-  const [tab, setTab] = useState<'profile' | 'favorites' | 'orders'>('profile')
+  const [tab, setTab] = useState<'profile' | 'favorites' | 'orders' | 'images'>('profile')
+  const [photos, setPhotos] = useState<any[]>([])
+  const [previewPhoto, setPreviewPhoto] = useState<any>(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [langOpen, setLangOpen] = useState(false)
+  const [themeOpen, setThemeOpen] = useState(false)
+  const { theme } = useTheme()
+  const themeLabel = theme === null ? t('themeSystem') : theme === 'light' ? t('themeLight') : t('themeDark')
 
   useEffect(() => {
     document.title = `${t('profileTab')} | Afno Events`
@@ -38,19 +49,32 @@ export default function ProfilePage() {
 
       if (user) {
         try {
-          const [favRes, ordRes, paidRes] = await Promise.all([
+          const [favRes, ordRes, paidRes, photoRes] = await Promise.all([
             fetch(`/api/favorites?where[user][equals]=${user.id}&depth=2&limit=50`),
             fetch(`/api/orders?where[buyer][equals]=${user.id}&depth=2&limit=${ORDERS_PER_PAGE}&page=${ordersPage}&sort=-createdAt`),
             fetch(`/api/orders?where[buyer][equals]=${user.id}&where[status][equals]=paid&limit=1&depth=0`),
+            fetch(`/api/event-photos?where[uploader][equals]=${user.id}&depth=2&limit=50&sort=-createdAt`),
           ])
           const favData = await favRes.json()
           const ordData = await ordRes.json()
           const paidData = await paidRes.json()
+          const photoData = await photoRes.json()
           setFavorites(favData.docs || [])
           setOrders(ordData.docs || [])
           setOrdersTotalPages(ordData.totalPages || 1)
           setOrdersTotalDocs(ordData.totalDocs || 0)
           setPaidOrdersCount(paidData.totalDocs || 0)
+          setPhotos(photoData.docs || [])
+
+          if (user.image && typeof user.image === 'string' && user.image.startsWith('http')) {
+            setAvatarUrl(user.image)
+          } else {
+            const userRes = await fetch(`/api/users/${user.id}?depth=1`)
+            const userData = await userRes.json()
+            if (userData.image && typeof userData.image === 'object' && userData.image.url) {
+              setAvatarUrl(userData.image.url)
+            }
+          }
         } catch {}
       }
 
@@ -195,6 +219,26 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
   )
 }
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarUploading(true)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/users/avatar', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setAvatarUrl(data.url)
+      }
+    } catch {}
+    setAvatarUploading(false)
+  }
+
   const handleLogout = async () => {
     await signOut()
     router.push('/')
@@ -203,8 +247,28 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
 
   if (loading) {
     return (
-      <div className="container py-20 flex justify-center">
-        <Loader2 className="animate-spin h-8 w-8 text-muted-foreground" />
+      <div className="container py-12 space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Skeleton className="w-20 h-20 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-56" />
+            </div>
+          </div>
+          <Skeleton className="h-9 w-28 rounded-md" />
+        </div>
+        <div className="flex gap-4 border-b border-border pb-3">
+          <Skeleton className="h-8 w-20 rounded-md" />
+          <Skeleton className="h-8 w-28 rounded-md" />
+          <Skeleton className="h-8 w-24 rounded-md" />
+          <Skeleton className="h-8 w-28 rounded-md" />
+        </div>
+        <div className="space-y-6">
+          <Skeleton className="h-24 w-full rounded-xl" />
+          <Skeleton className="h-56 w-full rounded-xl" />
+          <Skeleton className="h-48 w-full rounded-xl" />
+        </div>
       </div>
     )
   }
@@ -234,8 +298,28 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
     <div className="container py-12 space-y-8">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <User size={32} className="text-primary" />
+          <div className="relative shrink-0">
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <User size={36} className="text-primary" />
+              )}
+            </div>
+            <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors shadow-md">
+              {avatarUploading ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Camera size={14} />
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+                disabled={avatarUploading}
+              />
+            </label>
           </div>
           <div>
             <h1 className="text-2xl font-bold">{session.name || 'User'}</h1>
@@ -247,11 +331,12 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
         </Button>
       </div>
 
-      <div className="flex gap-4 border-b border-border">
+      <div className="flex gap-4 border-b border-border overflow-x-auto">
         {[
           { key: 'profile', label: t('profileTab'), icon: User },
           { key: 'favorites', label: `${t('favorites')} (${favorites.length})`, icon: Heart },
           { key: 'orders', label: `${t('orders')} (${orders.length})`, icon: Ticket },
+          { key: 'images', label: `${t('myPhotos')} (${photos.length})`, icon: ImageIcon },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
@@ -298,6 +383,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                   : t('notifOff')
                 return [
                   { key: 'language', label: t('language'), value: langLabel, icon: Languages, onManage: () => setLangOpen(true) },
+                  { key: 'theme', label: t('theme'), value: themeLabel, icon: Monitor, onManage: () => setThemeOpen(true) },
                   { key: 'notifications', label: t('notifications'), value: notifValue, icon: Bell },
                   { key: 'security', label: t('security'), value: t('manageSecurity'), icon: Shield },
                 ]
@@ -323,6 +409,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                 </div>
               ))}
               <LanguageSwitcher open={langOpen} onOpenChange={setLangOpen} />
+              <ThemeSwitcher open={themeOpen} onOpenChange={setThemeOpen} t={t} />
             </CardContent>
           </Card>
 
@@ -473,6 +560,114 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
       )}
 
       {tab === 'orders' && <OrdersTab orders={orders} ordersPage={ordersPage} ordersTotalPages={ordersTotalPages} onPageChange={setOrdersPage} t={t} />}
+
+      {previewPhoto && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={() => setPreviewPhoto(null)}
+        >
+          <button
+            onClick={() => setPreviewPhoto(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors z-10"
+          >
+            <XCircle size={24} />
+          </button>
+          <div
+            className="relative max-w-4xl w-full max-h-[90vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {previewPhoto.image?.url ? (
+              <img
+                src={previewPhoto.image.url}
+                alt=""
+                className="max-w-full max-h-[90vh] object-contain rounded-xl"
+              />
+            ) : (
+              <div className="bg-muted rounded-xl p-20 text-muted-foreground">
+                <ImageIcon size={64} className="mx-auto" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'images' && (
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-xl font-semibold">{t('myPhotos')}</h2>
+            <p className="text-sm text-muted-foreground">{t('photosDescription')}</p>
+          </div>
+
+          {photos.length === 0 ? (
+            <Card>
+              <CardContent className="text-center py-12 text-muted-foreground">
+                <ImageIcon size={32} className="mx-auto mb-4 opacity-30" />
+                <p>{t('noPhotos')}</p>
+                <Link href="/app/events">
+                  <Button variant="outline" size="sm" className="mt-4">
+                    {t('browseEvents')}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {photos.map((photo: any) => {
+                const event = photo.event
+                const image = photo.image
+                const statusStyles: Record<string, string> = {
+                  pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+                  approved: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                  rejected: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                }
+                const statusLabels: Record<string, string> = {
+                  pending: gt('pendingApproval'),
+                  approved: gt('approved'),
+                  rejected: gt('rejected'),
+                }
+                return (
+                  <Card key={photo.id} className="overflow-hidden hover:shadow-md transition-shadow h-full">
+                    <button
+                      onClick={() => setPreviewPhoto(photo)}
+                      className="w-full text-left group"
+                    >
+                      <div className="relative aspect-square bg-muted">
+                        {image?.url ? (
+                          <img
+                            src={image.url}
+                            alt=""
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                            <ImageIcon size={32} />
+                          </div>
+                        )}
+                        <div className="absolute top-2 right-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full capitalize font-medium ${statusStyles[photo.status] || ''}`}>
+                            {statusLabels[photo.status] || photo.status}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                    <CardContent className="p-3">
+                      <Link
+                        href={`/app/events/${event?.id || ''}/gallery`}
+                        className="text-sm font-medium truncate block hover:text-primary transition-colors"
+                      >
+                        {event?.title || `Event #${typeof event === 'number' ? event : ''}`}
+                      </Link>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {photo.createdAt ? new Date(photo.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
