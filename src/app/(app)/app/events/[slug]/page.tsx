@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { Calendar, MapPin, User } from 'lucide-react'
+import { Calendar, MapPin, User, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { TicketPurchase } from './ticket-purchase'
+import { ShareButtons } from './share-buttons'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -30,6 +32,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   if (!event) notFound()
 
   const e = event as any
+
+  const suggestedResult = await payload.find({
+    collection: 'events',
+    where: {
+      enabled: { equals: true },
+      id: { not_equals: e.id },
+    } as any,
+    limit: 3,
+    depth: 1,
+    sort: '-startDatetime',
+  })
+  const suggestedEvents = suggestedResult.docs as any[]
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,6 +209,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 </div>
               </div>
             )}
+
+            <div className="border-t border-border pt-8">
+              <h2 className="text-xl font-semibold mb-4">Share with friends</h2>
+              <ShareButtons />
+            </div>
           </div>
 
           <div className="lg:col-span-1">
@@ -215,6 +234,57 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
           </div>
         </div>
       </div>
+
+      {suggestedEvents.length > 0 && (
+        <section className="border-t border-border mt-16 pt-12">
+          <div className="container">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold">Suggested Events</h2>
+              <Link href="/app/events">
+                <Button variant="ghost" size="sm" className="gap-1 text-primary">
+                  View All <ArrowRight size={16} />
+                </Button>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {suggestedEvents.map((ev: any) => (
+                <Link key={ev.id} href={`/app/events/${ev.slug || ev.id}`}>
+                  <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
+                    <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
+                      {ev.coverImage ? (
+                        <img
+                          src={typeof ev.coverImage === 'object' ? ev.coverImage.url : ''}
+                          alt={ev.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                          <Calendar size={40} className="opacity-20" />
+                        </div>
+                      )}
+                    </div>
+                    <CardContent className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground mb-1">
+                          {ev.startDatetime
+                            ? new Date(ev.startDatetime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : 'TBD'}
+                        </p>
+                        <h3 className="font-semibold group-hover:text-primary transition-colors">{ev.title}</h3>
+                      </div>
+                      {ev.location?.location && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
+                          <MapPin size={12} /> {ev.location.location}
+                        </p>
+                      )}
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }
