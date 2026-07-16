@@ -5,6 +5,12 @@ import { usePathname } from 'next/navigation'
 import { Calendar, LayoutDashboard, User } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 
+const footerLinks = [
+  { href: '/privacy', label: 'Privacy Policy' },
+  { href: '/terms', label: 'Terms of Service' },
+  { href: '/contact', label: 'Contact Us' },
+]
+
 const tabs = [
   { href: '/app', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/app/events', label: 'Events', icon: Calendar },
@@ -41,7 +47,35 @@ export function AppNav({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <main className={cn(isAuthPage ? '' : 'pt-14 pb-20')}>{children}</main>
+      <main className={cn(isAuthPage ? '' : 'pt-14 pb-24')}>
+        {children}
+        {!isAuthPage && (
+          <footer className="border-t border-border bg-background mt-16">
+            <div className="mx-auto max-w-6xl px-4 py-10">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-2.5">
+                  <img src="/logo.png" alt="AfnoEvents" className="h-7 w-7" />
+                  <span className="font-semibold text-sm">AfnoEvent</span>
+                </div>
+                <nav className="flex items-center gap-6 text-sm text-muted-foreground">
+                  {footerLinks.map(({ href, label }) => (
+                    <Link
+                      key={href}
+                      href={href}
+                      className="hover:text-foreground transition-colors"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+              <div className="mt-6 text-center text-xs text-muted-foreground/60">
+                &copy; {new Date().getFullYear()} AfnoEvent. All rights reserved.
+              </div>
+            </div>
+          </footer>
+        )}
+      </main>
 
       {!isAuthPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

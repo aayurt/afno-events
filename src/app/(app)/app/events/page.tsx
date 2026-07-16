@@ -15,19 +15,11 @@ type Args = {
   }>
 }
 
-const TAG_OPTIONS = [
-  { label: 'Music', value: 'music' },
-  { label: 'Gaming', value: 'gaming' },
-  { label: 'Theatre', value: 'theatre' },
-  { label: 'Arts', value: 'arts' },
-  { label: 'Business', value: 'business' },
-  { label: 'Technology', value: 'technology' },
-  { label: 'Sports', value: 'sports' },
-  { label: 'Food & Drink', value: 'food-drink' },
-  { label: 'Exhibition', value: 'exhibition' },
-  { label: 'Comedy', value: 'comedy' },
-  { label: 'Workshop', value: 'workshop' },
-  { label: 'Fitness', value: 'fitness' },
+import { TAG_OPTIONS } from '@/config/tags'
+
+const FILTER_TAGS = [
+  { label: 'All Events', value: '' },
+  ...TAG_OPTIONS,
 ]
 
 export default async function EventsPage({ searchParams: searchParamsPromise }: Args) {
@@ -66,8 +58,10 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
   return (
     <div className="container py-12 space-y-10">
       <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Events</h1>
-        <p className="text-muted-foreground text-lg">Discover events happening near you</p>
+        <h1 className="text-4xl font-bold tracking-tight">Discover Events</h1>
+        <p className="text-muted-foreground text-lg max-w-2xl">
+          From pulsating music festivals to immersive tech workshops, explore the most exciting happenings in your city and beyond.
+        </p>
       </div>
 
       <form action="/app/events" method="GET" className="space-y-6">
@@ -87,11 +81,11 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
         </div>
 
         <div className="flex gap-2 flex-wrap">
-          {TAG_OPTIONS.map(({ label, value }) => {
-            const isActive = tag === value
-            const href = isActive ? '/app/events' : `/app/events?tag=${value}${q ? `&q=${q}` : ''}`
+          {FILTER_TAGS.map(({ label, value }) => {
+            const isActive = value === '' ? !tag : tag === value
+            const href = value === '' ? '/app/events' : `/app/events?tag=${value}${q ? `&q=${q}` : ''}`
             return (
-              <Link key={value} href={href}>
+              <Link key={value || '__all'} href={href}>
                 <Button
                   type="button"
                   variant={isActive ? 'default' : 'outline'}
@@ -102,13 +96,6 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
               </Link>
             )
           })}
-          {tag && (
-            <Link href="/app/events">
-              <Button type="button" variant="ghost" className="rounded-full text-muted-foreground">
-                Clear
-              </Button>
-            </Link>
-          )}
         </div>
       </form>
 

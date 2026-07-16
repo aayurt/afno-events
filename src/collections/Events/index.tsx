@@ -3,6 +3,7 @@ import { sendFCMTopicNotification } from '@/utilities/sendFCMNotification'
 import { getCachedEvents } from '@/utilities/cache'
 import type { CollectionConfig } from 'payload'
 import { getStripe } from '@/utilities/stripe'
+import { TAG_OPTIONS } from '@/config/tags'
 
 
 export const Events: CollectionConfig = {
@@ -286,20 +287,7 @@ export const Events: CollectionConfig = {
       name: 'tags',
       type: 'select',
       hasMany: true,
-      options: [
-        { label: 'Music', value: 'music' },
-        { label: 'Gaming', value: 'gaming' },
-        { label: 'Theatre', value: 'theatre' },
-        { label: 'Arts', value: 'arts' },
-        { label: 'Business', value: 'business' },
-        { label: 'Technology', value: 'technology' },
-        { label: 'Sports', value: 'sports' },
-        { label: 'Food & Drink', value: 'food-drink' },
-        { label: 'Exhibition', value: 'exhibition' },
-        { label: 'Comedy', value: 'comedy' },
-        { label: 'Workshop', value: 'workshop' },
-        { label: 'Fitness', value: 'fitness' },
-      ],
+      options: TAG_OPTIONS as any,
       admin: {
         description: 'Select one or more tags for this event',
         position: 'sidebar',
