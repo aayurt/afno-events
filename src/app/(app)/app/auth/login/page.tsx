@@ -16,9 +16,13 @@ export default async function LoginPage({ searchParams }: Props) {
           <p className="text-muted-foreground">Sign in to your account</p>
         </div>
         <LoginForm
+          title="Sign in to AfnoEvent"
           afterLoginPath={redirect || '/app'}
+          requiredRole={null}
           enableSignUp
+          signUpUrl="/app/auth/register"
           enableForgotPassword
+          resetPasswordUrl="/app/auth/forgot-password"
         />
       </div>
     </div>

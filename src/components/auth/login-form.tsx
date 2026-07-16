@@ -21,6 +21,8 @@ export type LoginViewProps = {
   logo?: React.ReactNode
   /** Login page title. Default: 'Login' */
   title?: string
+  /** Login form card title. Default: 'Sign in to Payload' */
+  title?: string
   /** Path to redirect after successful login. Default: '/admin' */
   afterLoginPath?: string
   /**
@@ -43,6 +45,8 @@ export type LoginViewProps = {
    * - 'auto' (default): Auto-detect if passkey plugin is available
    */
   enablePasskey?: boolean | 'auto'
+  /** Custom sign-up URL. Default: '/admin/signup' */
+  signUpUrl?: string
   /**
    * Enable user registration (sign up) option.
    * - true: Always show "Create account" link
@@ -72,11 +76,13 @@ export type LoginViewProps = {
 
 export default function LoginForm({
   authClient: providedClient,
+  title = 'Sign in to Payload',
   afterLoginPath = '/admin',
   requiredRole = 'admin',
   requireAllRoles = false,
   enableForgotPassword = 'auto',
   resetPasswordUrl,
+  signUpUrl = '/admin/signup',
   enableSignUp = 'auto',
 }: LoginViewProps) {
   const router = useRouter()
@@ -145,10 +151,8 @@ export default function LoginForm({
     setError(null)
     setLoading(true)
     try {
-      const currentURL = typeof window !== 'undefined' ? window.location.href : ''
-      await signIn.social({ provider, callbackURL: currentURL })
-      // social sign-in typically redirects; if it returns, refresh
-      router.refresh()
+      const base = typeof window !== 'undefined' ? window.location.origin : ''
+      await signIn.social({ provider, callbackURL: `${base}${afterLoginPath}` })
     } catch (err: any) {
       setError(err?.message || `Failed to sign in with ${provider}`)
     } finally {
@@ -192,7 +196,7 @@ export default function LoginForm({
     <div className="login-container">
       <Card className="login-card">
         <CardHeader className="login-header">
-          <CardTitle className="login-title">Sign in to Payload</CardTitle>
+          <CardTitle className="login-title">{title}</CardTitle>
           <CardDescription className="login-description">
             Enter your credentials or continue with a social provider
           </CardDescription>
@@ -283,7 +287,7 @@ export default function LoginForm({
           {(enableSignUp === true || enableSignUp === 'auto') && (
             <div className="signup-container">
               Don&apos;t have an account?{' '}
-              <Link href="/admin/signup" className="signup-link">
+              <Link href={signUpUrl} className="signup-link">
                 Sign up
               </Link>
             </div>

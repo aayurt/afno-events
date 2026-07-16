@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import './index.scss'
 
-export default function SignUpForm() {
+export default function SignUpForm({ redirectPath = '/app' }: { redirectPath?: string }) {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -29,7 +29,7 @@ export default function SignUpForm() {
         email,
         password,
         name,
-        callbackURL: '/admin',
+        callbackURL: redirectPath,
       })
 
       if ((result as any)?.error) {
@@ -37,9 +37,7 @@ export default function SignUpForm() {
         return
       }
 
-      // Success - redirect to admin
-      router.push('/admin')
-      router.refresh()
+      window.location.href = redirectPath
     } catch (err: any) {
       setError(err?.message || 'An unexpected error occurred')
     } finally {
@@ -118,7 +116,7 @@ export default function SignUpForm() {
 
           <div className="signup-container">
             Already have an account?{' '}
-            <Link href="/admin/login" className="signup-link">
+            <Link href={`/app/auth/login${redirectPath !== '/app' ? `?redirect=${encodeURIComponent(redirectPath)}` : ''}`} className="signup-link">
               Sign in
             </Link>
           </div>
