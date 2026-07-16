@@ -164,11 +164,17 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
             return (
               <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-muted relative group">
                 {isUnlocked || isPending ? (
-                  <img
-                    src={typeof photo.image === 'object' ? photo.image.url : ''}
-                    alt=""
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  typeof photo.image === 'object' && photo.image.url ? (
+                    <img
+                      src={photo.image.url}
+                      alt=""
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <ImageIcon className="text-muted-foreground/40" size={48} />
+                    </div>
+                  )
                 ) : photo.blurredPreview ? (
                   <img
                     src={photo.blurredPreview}

@@ -48,9 +48,9 @@ export default async function AppDashboardPage() {
               <Link key={event.id} href={`/app/events/${event.slug || event.id}`}>
                 <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
                   <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
-                    {event.coverImage ? (
+                    {typeof event.coverImage === 'object' && event.coverImage.url ? (
                       <img
-                        src={typeof event.coverImage === 'object' ? event.coverImage.url : ''}
+                        src={event.coverImage.url}
                         alt={event.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />

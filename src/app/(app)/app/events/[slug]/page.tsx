@@ -55,9 +55,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   return (
     <div className="min-h-screen bg-background">
       <div className="relative h-[50vh] md:h-[60vh] bg-muted overflow-hidden">
-        {e.coverImage ? (
+        {typeof e.coverImage === 'object' && e.coverImage.url ? (
           <img
-            src={typeof e.coverImage === 'object' ? e.coverImage.url : ''}
+            src={e.coverImage.url}
             alt={e.title}
             className="w-full h-full object-cover"
           />
@@ -242,13 +242,13 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {e.showcaseImages.map((item: any, i: number) => (
                     <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
-                      {item.image && (
+                      {typeof item.image === 'object' && item.image.url ? (
                         <img
-                          src={typeof item.image === 'object' ? item.image.url : ''}
+                          src={item.image.url}
                           alt=""
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                         />
-                      )}
+                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -305,9 +305,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 <Link key={ev.id} href={`/app/events/${ev.slug || ev.id}`}>
                   <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
                     <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
-                      {ev.coverImage ? (
+                      {typeof ev.coverImage === 'object' && ev.coverImage.url ? (
                         <img
-                          src={typeof ev.coverImage === 'object' ? ev.coverImage.url : ''}
+                          src={ev.coverImage.url}
                           alt={ev.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />

@@ -516,9 +516,9 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                     <Link key={fav.id} href={`/app/events/${ev.slug || ev.id}`}>
                       <Card className="hover:shadow-md transition-shadow">
                         <CardContent className="p-4 flex gap-4">
-                          {ev.coverImage ? (
+                          {typeof ev.coverImage === 'object' && ev.coverImage.url ? (
                             <img
-                              src={typeof ev.coverImage === 'object' ? ev.coverImage.url : ''}
+                              src={ev.coverImage.url}
                               alt=""
                               className="w-20 h-20 rounded-lg object-cover shrink-0"
                             />
