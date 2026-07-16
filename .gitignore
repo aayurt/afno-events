@@ -14,3 +14,4 @@ public/robots.txt
 public/sitemap*.xml
 serviceAccountKey.json
 direct-deploy.sh
+opencode.json
