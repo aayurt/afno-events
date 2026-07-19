@@ -12,6 +12,7 @@ public/media/
 
 public/robots.txt
 public/sitemap*.xml
+*.p8
 serviceAccountKey.json
 direct-deploy.sh
 opencode.json

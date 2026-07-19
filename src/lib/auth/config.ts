@@ -1,10 +1,48 @@
 import { apiKeyWithDefaults } from '@delmaredigital/payload-better-auth'
 import { admin, bearer } from 'better-auth/plugins'
 import type { BetterAuthOptions } from 'better-auth'
+import fs from 'fs'
+import path from 'path'
+import crypto from 'crypto'
+
+function generateAppleClientSecret(): string {
+  const clientId = process.env.APPLE_CLIENT_ID
+  const teamId = process.env.APPLE_TEAM_ID
+  const keyId = process.env.APPLE_KEY_ID
+  const p8Path = process.env.APPLE_P8_PATH || path.resolve(process.cwd(), 'AuthKey.p8')
+
+  if (!clientId || !teamId || !keyId || !fs.existsSync(p8Path)) {
+    console.warn(
+      'Apple Sign In: missing APPLE_CLIENT_ID, APPLE_TEAM_ID, APPLE_KEY_ID, or AuthKey.p8 — falling back to APPLE_CLIENT_SECRET env var',
+    )
+    return process.env.APPLE_CLIENT_SECRET || ''
+  }
+
+  const privateKey = fs.readFileSync(p8Path, 'utf8')
+
+  const header = Buffer.from(
+    JSON.stringify({ alg: 'ES256', kid: keyId }),
+  ).toString('base64url')
+
+  const now = Math.floor(Date.now() / 1000)
+  const payload = Buffer.from(
+    JSON.stringify({
+      iss: teamId,
+      iat: now,
+      exp: now + 86400 * 150,
+      aud: 'https://appleid.apple.com',
+      sub: clientId,
+    }),
+  ).toString('base64url')
+
+  const signature = crypto
+    .sign('sha256', Buffer.from(`${header}.${payload}`), privateKey)
+    .toString('base64url')
+
+  return `${header}.${payload}.${signature}`
+}
 
 export const betterAuthOptions: Partial<BetterAuthOptions> = {
-  // Model names are SINGULAR - they get pluralized automatically
-  // 'user' becomes 'users', 'session' becomes 'sessions', etc.
   appName: 'Afno Payload',
   user: {
     additionalFields: {
@@ -14,29 +52,6 @@ export const betterAuthOptions: Partial<BetterAuthOptions> = {
   session: {
     expiresIn: 60 * 60 * 24 * 30, // 30 days
   },
-  // emailAndPassword: {
-  //   enabled: true,
-  //   resetPasswordTokenExpiresIn: 3600, // 1 hour
-  //   sendResetPassword: async ({ user, url }) => {
-  //     await resend.emails.send({
-  //       to: user.email,
-  //       subject: 'Reset your password',
-  //       html: `
-  //         <p>Hello ${user.name},</p>
-  //         <p>Click the link below to reset your password:</p>
-  //         <a href="${url}">${url}</a>
-  //         <p>If you did not request a password reset, please ignore this email.</p>
-  //       `,
-  //     })
-  //   },
-  // },
-  // emailVerification: {
-  //   sendOnSignUp: true,
-
-  //   //  afterEmailVerification: async (user) => {
-  //   //    await onUserEmailVerified(user);
-  //   //  },
-  // },
   socialProviders: {
     google: {
       enabled: true,
@@ -46,7 +61,7 @@ export const betterAuthOptions: Partial<BetterAuthOptions> = {
     apple: {
       enabled: true,
       clientId: process.env.APPLE_CLIENT_ID || '',
-      clientSecret: process.env.APPLE_CLIENT_SECRET || '',
+      clientSecret: generateAppleClientSecret(),
     },
   },
   plugins: [
