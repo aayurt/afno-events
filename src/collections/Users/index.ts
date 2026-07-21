@@ -91,7 +91,6 @@ export const Users: CollectionConfig = {
         { label: 'Prefer Not to Say', value: 'prefer-not-to-say' },
       ],
       defaultValue: 'prefer-not-to-say',
-      hidden: true,
     },
     {
       name: 'language',
@@ -111,6 +110,14 @@ export const Users: CollectionConfig = {
         { name: 'email', type: 'checkbox', defaultValue: true, label: 'Email notifications' },
       ],
       admin: { description: 'Notification preferences' },
+    },
+    {
+      name: 'fcmTokens',
+      type: 'json',
+      defaultValue: [],
+      admin: {
+        description: 'FCM device tokens for push notifications',
+      },
     },
     {
       ...defaultTenantArrayField,
@@ -193,6 +200,94 @@ export const Users: CollectionConfig = {
         } catch (error: any) {
           req.payload.logger.error(`Avatar upload error: ${error.message}`)
           return Response.json({ error: error.message }, { status: 500 })
+        }
+      },
+    },
+    {
+      path: '/register-fcm-token',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        let body: { token?: string }
+        try {
+          body = await req.json()
+        } catch {
+          return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
+        }
+
+        if (!body.token || typeof body.token !== 'string') {
+          return Response.json({ error: 'token is required' }, { status: 400 })
+        }
+
+        try {
+          const user = await req.payload.findByID({
+            collection: 'users',
+            id: req.user.id,
+          })
+
+          const tokens: string[] = Array.isArray((user as any).fcmTokens)
+            ? (user as any).fcmTokens
+            : []
+
+          if (!tokens.includes(body.token)) {
+            tokens.push(body.token)
+            await req.payload.update({
+              collection: 'users',
+              id: req.user.id,
+              data: { fcmTokens: tokens },
+            })
+          }
+
+          return Response.json({ success: true })
+        } catch (error) {
+          req.payload.logger.error(`Error registering FCM token: ${error}`)
+          return Response.json({ error: 'Internal Server Error' }, { status: 500 })
+        }
+      },
+    },
+    {
+      path: '/unregister-fcm-token',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        let body: { token?: string }
+        try {
+          body = await req.json()
+        } catch {
+          return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
+        }
+
+        if (!body.token || typeof body.token !== 'string') {
+          return Response.json({ error: 'token is required' }, { status: 400 })
+        }
+
+        try {
+          const user = await req.payload.findByID({
+            collection: 'users',
+            id: req.user.id,
+          })
+
+          const tokens: string[] = Array.isArray((user as any).fcmTokens)
+            ? (user as any).fcmTokens
+            : []
+
+          const filtered = tokens.filter((t) => t !== body.token)
+          await req.payload.update({
+            collection: 'users',
+            id: req.user.id,
+            data: { fcmTokens: filtered },
+          })
+
+          return Response.json({ success: true })
+        } catch (error) {
+          req.payload.logger.error(`Error unregistering FCM token: ${error}`)
+          return Response.json({ error: 'Internal Server Error' }, { status: 500 })
         }
       },
     },

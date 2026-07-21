@@ -8,6 +8,8 @@ type NotificationData = {
   body: string
   imageUrl?: string
   link?: string
+  type?: string
+  eventId?: string
 }
 
 type SendFCMNotificationParams = {
@@ -41,6 +43,8 @@ export const sendFCMNotification = async ({
       },
       data: {
         link: notification.link || '',
+        type: notification.type || 'info',
+        eventId: notification.eventId || '',
       },
       tokens,
     }
