@@ -37,7 +37,7 @@ export const Tickets: CollectionConfig = {
 
         const orders = await payload.find({
           collection: 'orders',
-          depth: 1,
+          depth: 0,
           where: {
             buyer: { equals: user.id },
             status: { equals: 'paid' },
@@ -45,7 +45,10 @@ export const Tickets: CollectionConfig = {
           pagination: false,
         })
 
-        const ticketIds = orders.docs.flatMap((o: any) => o.tickets || [])
+        const ticketIds = orders.docs.flatMap((o: any) => {
+          const tickets = o.tickets || []
+          return tickets.map((t: any) => (typeof t === 'object' ? t.id : t))
+        })
 
         if (ticketIds.length === 0) {
           return Response.json({ docs: [] })
