@@ -450,6 +450,18 @@ export interface User {
     push?: boolean | null;
     email?: boolean | null;
   };
+  /**
+   * FCM device tokens for push notifications
+   */
+  fcmTokens?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   tenants?:
     | {
         tenant: number | Tenant;
@@ -1708,6 +1720,7 @@ export interface UsersSelect<T extends boolean = true> {
         push?: T;
         email?: T;
       };
+  fcmTokens?: T;
   tenants?:
     | T
     | {

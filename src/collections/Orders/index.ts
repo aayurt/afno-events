@@ -79,7 +79,7 @@ export const Orders: CollectionConfig = {
           const order = await payload.findByID({
             collection: 'orders',
             id,
-            depth: 2, // Get event and ticket types
+            depth: 2,
           })
 
           if (!order) {
@@ -87,8 +87,19 @@ export const Orders: CollectionConfig = {
           }
 
           const event = order.event as any
+
+          // Free order — mark as paid immediately, no Stripe needed
+          if (!order.totalAmount || order.totalAmount === 0) {
+            await payload.update({
+              collection: 'orders',
+              id: order.id,
+              data: { status: 'paid' },
+              req,
+            })
+            return Response.json({ url: null })
+          }
+
           const line_items = order.items.map((item: any) => {
-            // Find the matching ticket type in the event to get its stripePriceID
             const ticketType = event.pricing?.ticketTypes?.find(
               (tt: any) => tt.name === item.ticketType,
             )

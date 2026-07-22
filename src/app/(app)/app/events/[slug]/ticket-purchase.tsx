@@ -53,16 +53,6 @@ export function TicketPurchase({ event }: { event: any }) {
         return
       }
 
-      if (hasExternalLink) {
-        window.open(event.pricing.paymentExternalLink, '_blank')
-        return
-      }
-
-      if (isFree || totalTickets === 0) {
-        router.push(`/app/orders/new?eventId=${event.id}`)
-        return
-      }
-
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
