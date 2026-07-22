@@ -27,7 +27,7 @@ export const Tickets: CollectionConfig = {
 
   endpoints: [
     {
-      path: '/my',
+      path: '/user-tickets',
       method: 'get',
       handler: async (req) => {
         const { payload, user } = req
@@ -35,35 +35,42 @@ export const Tickets: CollectionConfig = {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const orders = await payload.find({
-          collection: 'orders',
-          depth: 0,
-          where: {
-            buyer: { equals: user.id },
-            status: { equals: 'paid' },
-          },
-          pagination: false,
-        })
+        try {
+          const buyerId = typeof user.id === 'number' ? user.id : parseInt(user.id as string, 10)
 
-        const ticketIds = orders.docs.flatMap((o: any) => {
-          const tickets = o.tickets || []
-          return tickets.map((t: any) => (typeof t === 'object' ? t.id : t))
-        })
+          const orders = await payload.find({
+            collection: 'orders',
+            depth: 0,
+            where: {
+              buyer: { equals: buyerId },
+              status: { equals: 'paid' },
+            },
+            limit: 100,
+          })
 
-        if (ticketIds.length === 0) {
-          return Response.json({ docs: [] })
+          const ticketIds = (orders.docs || []).flatMap((o: any) => {
+            const tickets = o.tickets || []
+            return tickets.map((t: any) => (typeof t === 'object' ? t.id : t))
+          })
+
+          if (ticketIds.length === 0) {
+            return Response.json({ docs: [] })
+          }
+
+          const tickets = await payload.find({
+            collection: 'tickets',
+            depth: 2,
+            where: {
+              id: { in: ticketIds },
+            },
+            limit: 100,
+          })
+
+          return Response.json(tickets)
+        } catch (error: any) {
+          req.payload.logger.error(`Error in /api/tickets/user-tickets: ${error.message}`)
+          return Response.json({ error: error.message }, { status: 500 })
         }
-
-        const tickets = await payload.find({
-          collection: 'tickets',
-          depth: 2,
-          where: {
-            id: { in: ticketIds },
-          },
-          pagination: false,
-        })
-
-        return Response.json(tickets)
       },
     },
     {
