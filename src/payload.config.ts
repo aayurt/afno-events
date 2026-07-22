@@ -95,6 +95,55 @@ export default buildConfig({
     EventPhotos,
     GalleryAccess,
   ],
+  endpoints: [
+    {
+      path: '/my-tickets',
+      method: 'get',
+      handler: async (req) => {
+        const { payload, user } = req
+        if (!user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        try {
+          const buyerId = typeof user.id === 'number' ? user.id : parseInt(user.id as string, 10)
+
+          const orders = await payload.find({
+            collection: 'orders',
+            depth: 0,
+            where: {
+              buyer: { equals: buyerId },
+              status: { equals: 'paid' },
+            },
+            limit: 100,
+          })
+
+          const ticketIds = (orders.docs || []).flatMap((o: any) => {
+            const tickets = o.tickets || []
+            return tickets.map((t: any) => (typeof t === 'object' ? t.id : t))
+          })
+
+          if (ticketIds.length === 0) {
+            return Response.json({ docs: [] })
+          }
+
+          const tickets = await payload.find({
+            collection: 'tickets',
+            depth: 2,
+            where: {
+              id: { in: ticketIds },
+            },
+            limit: 100,
+          })
+
+          return Response.json(tickets)
+        } catch (error: any) {
+          req.payload.logger.error(`Error in /api/my-tickets: ${error.message}`)
+          return Response.json({ error: error.message }, { status: 500 })
+        }
+      },
+    },
+  ],
   cors: [getServerSideURL(), ...trustedOriginsValues].filter(Boolean),
   globals: [Header, Footer],
   plugins: [
