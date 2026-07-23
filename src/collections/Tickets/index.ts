@@ -90,7 +90,7 @@ export const Tickets: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
-      options: ['unused', 'checked-in', 'cancelled', 'refunded', 'transferred'],
+      options: ['unused', 'checked-in', 'cancelled', 'refunded', 'transferred', 'expired'],
       defaultValue: 'unused',
     },
     {

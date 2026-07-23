@@ -136,6 +136,23 @@ export default buildConfig({
             limit: 100,
           })
 
+          const now = new Date()
+          for (const ticket of tickets.docs || []) {
+            if (ticket.status === 'unused' && ticket.event) {
+              const event = ticket.event as any
+              const eventEnd = event.endDatetime || event.startDatetime
+              if (eventEnd && new Date(eventEnd) < now) {
+                await payload.update({
+                  collection: 'tickets',
+                  id: ticket.id,
+                  data: { status: 'expired' },
+                  req,
+                })
+                ticket.status = 'expired'
+              }
+            }
+          }
+
           return Response.json(tickets)
         } catch (error: any) {
           req.payload.logger.error(`Error in /api/my-tickets: ${error.message}`)
