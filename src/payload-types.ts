@@ -937,6 +937,7 @@ export interface Order {
   status?: ('pending' | 'paid' | 'cancelled' | 'refunded') | null;
   tickets?: (number | Ticket)[] | null;
   stripeCheckoutSessionID?: string | null;
+  stripePaymentIntentID?: string | null;
   items: {
     ticketType: string;
     quantity: number;
@@ -1798,6 +1799,7 @@ export interface OrdersSelect<T extends boolean = true> {
   status?: T;
   tickets?: T;
   stripeCheckoutSessionID?: T;
+  stripePaymentIntentID?: T;
   items?:
     | T
     | {

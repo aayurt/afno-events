@@ -153,6 +153,22 @@ export default buildConfig({
       isTestKey: true, // Set to false in production
       stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOK_SECRET,
       webhooks: {
+        'payment_intent.succeeded': async ({ event, payload, req }) => {
+          const paymentIntent = event.data.object as any
+          const orderId = paymentIntent.metadata?.orderId
+
+          if (orderId) {
+            await payload.update({
+              collection: 'orders',
+              id: orderId,
+              data: {
+                status: 'paid',
+                stripePaymentIntentID: paymentIntent.id,
+              },
+              req,
+            })
+          }
+        },
         'checkout.session.completed': async ({ event, payload, req }) => {
           const session = event.data.object as any
           const orderId = session.metadata?.orderId

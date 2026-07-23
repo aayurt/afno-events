@@ -86,8 +86,6 @@ export const Orders: CollectionConfig = {
             return Response.json({ error: 'Order not found' }, { status: 404 })
           }
 
-          const event = order.event as any
-
           // Free order — mark as paid immediately, no Stripe needed
           if (!order.totalAmount || order.totalAmount === 0) {
             await payload.update({
@@ -96,42 +94,23 @@ export const Orders: CollectionConfig = {
               data: { status: 'paid' },
               req,
             })
-            return Response.json({ url: null })
+            return Response.json({ clientSecret: null })
           }
 
-          const line_items = order.items.map((item: any) => {
-            const ticketType = event.pricing?.ticketTypes?.find(
-              (tt: any) => tt.name === item.ticketType,
-            )
-
-            if (!ticketType?.stripePriceID) {
-              throw new Error(`Ticket type ${item.ticketType} does not have a Stripe Price ID`)
-            }
-
-            return {
-              price: ticketType.stripePriceID,
-              quantity: item.quantity,
-            }
-          })
-
           const stripe = getStripe()
-          const frontendUrl = process.env.NEXT_PUBLIC_CLIENT_URL || process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:8100'
 
-          const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items,
-            mode: 'payment',
-            success_url: `${frontendUrl}/orders/${order.id}/success`,
-            cancel_url: `${frontendUrl}/orders/${order.id}/cancel`,
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: Math.round(order.totalAmount * 100),
+            currency: 'gbp',
             metadata: {
               orderId: order.id.toString(),
             },
             customer_email: user.email,
           })
 
-          return Response.json({ url: session.url })
+          return Response.json({ clientSecret: paymentIntent.client_secret })
         } catch (error: any) {
-          req.payload.logger.error(`Error creating checkout session: ${error.message}`)
+          req.payload.logger.error(`Error initiating payment: ${error.message}`)
           return Response.json({ error: error.message }, { status: 500 })
         }
       },
@@ -171,6 +150,14 @@ export const Orders: CollectionConfig = {
     },
     {
       name: 'stripeCheckoutSessionID',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
+    {
+      name: 'stripePaymentIntentID',
       type: 'text',
       admin: {
         position: 'sidebar',
