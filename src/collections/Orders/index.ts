@@ -79,11 +79,15 @@ export const Orders: CollectionConfig = {
           const order = await payload.findByID({
             collection: 'orders',
             id,
-            depth: 2,
+            depth: 0,
           })
 
           if (!order) {
             return Response.json({ error: 'Order not found' }, { status: 404 })
+          }
+
+          if (order.buyer !== user.id) {
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
           }
 
           // Free order — mark as paid immediately, no Stripe needed
@@ -111,6 +115,50 @@ export const Orders: CollectionConfig = {
           return Response.json({ clientSecret: paymentIntent.client_secret })
         } catch (error: any) {
           req.payload.logger.error(`Error initiating payment: ${error.message}`)
+          return Response.json({ error: error.message }, { status: 500 })
+        }
+      },
+    },
+    {
+      path: '/:id/confirm-payment',
+      method: 'post',
+      handler: async (req) => {
+        const { payload, user } = req
+        const id = (req.routeParams as any)?.id
+
+        if (!user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        try {
+          const order = await payload.findByID({
+            collection: 'orders',
+            id,
+            depth: 0,
+          })
+
+          if (!order) {
+            return Response.json({ error: 'Order not found' }, { status: 404 })
+          }
+
+          if (order.buyer !== user.id) {
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
+          }
+
+          if (order.status === 'paid') {
+            return Response.json({ success: true })
+          }
+
+          await payload.update({
+            collection: 'orders',
+            id: order.id,
+            data: { status: 'paid' },
+            req,
+          })
+
+          return Response.json({ success: true })
+        } catch (error: any) {
+          req.payload.logger.error(`Error confirming payment: ${error.message}`)
           return Response.json({ error: error.message }, { status: 500 })
         }
       },
