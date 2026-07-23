@@ -6,7 +6,6 @@ export const Tickets: CollectionConfig = {
   admin: {
     useAsTitle: 'code',
     group: 'Events',
-    hidden: true,
   },
 
   access: {

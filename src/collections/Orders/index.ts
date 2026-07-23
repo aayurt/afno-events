@@ -59,7 +59,6 @@ export const Orders: CollectionConfig = {
     ],
   },
   admin: {
-    hidden: true,
     useAsTitle: 'id',
     group: 'Events',
   },
