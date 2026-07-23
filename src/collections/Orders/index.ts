@@ -105,7 +105,7 @@ export const Orders: CollectionConfig = {
             metadata: {
               orderId: order.id.toString(),
             },
-            customer_email: user.email,
+            receipt_email: user.email,
           })
 
           return Response.json({ clientSecret: paymentIntent.client_secret })
