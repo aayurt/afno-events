@@ -6,6 +6,7 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { checkRateLimit, rateLimitedResponse } from './utilities/rateLimit'
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
@@ -31,6 +32,10 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+
+  graphQL: {
+    disable: true,
+  },
 
   admin: {
     // components: {
@@ -105,6 +110,10 @@ export default buildConfig({
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const ip = req.headers.get('x-forwarded-for') ?? 'my-tickets'
+        const rl = checkRateLimit(`my-tickets:${ip}`, 30)
+        if (!rl.allowed) return rateLimitedResponse()
+
         try {
           const buyerId = typeof user.id === 'number' ? user.id : parseInt(user.id as string, 10)
 
@@ -156,7 +165,7 @@ export default buildConfig({
           return Response.json(tickets)
         } catch (error: any) {
           req.payload.logger.error(`Error in /api/my-tickets: ${error.message}`)
-          return Response.json({ error: error.message }, { status: 500 })
+          return Response.json({ error: 'Something went wrong' }, { status: 500 })
         }
       },
     },

@@ -1,4 +1,5 @@
 import { isAdmin } from '@/access/admin'
+import { checkRateLimit, rateLimitedResponse } from '@/utilities/rateLimit'
 import type { CollectionConfig } from 'payload'
 import crypto from 'crypto'
 import { getStripe } from '@/utilities/stripe'
@@ -8,8 +9,12 @@ export const Orders: CollectionConfig = {
   access: {
     create: () => true,
     delete: isAdmin,
-    read: () => true,
-    update: () => true, // Allow users to update status for now (simulation)
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'admin' || user.role === 'super-admin') return true
+      return { buyer: { equals: user.id } }
+    },
+    update: isAdmin,
   },
   hooks: {
     afterChange: [
@@ -74,6 +79,10 @@ export const Orders: CollectionConfig = {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
+        const ip = req.headers.get('x-forwarded-for') ?? `checkout:${id}`
+        const rl = checkRateLimit(`initiate-checkout:${ip}`, 10)
+        if (!rl.allowed) return rateLimitedResponse()
+
         try {
           const order = await payload.findByID({
             collection: 'orders',
@@ -114,7 +123,7 @@ export const Orders: CollectionConfig = {
           return Response.json({ clientSecret: paymentIntent.client_secret })
         } catch (error: any) {
           req.payload.logger.error(`Error initiating payment: ${error.message}`)
-          return Response.json({ error: error.message }, { status: 500 })
+          return Response.json({ error: 'Payment processing failed' }, { status: 500 })
         }
       },
     },
@@ -128,6 +137,10 @@ export const Orders: CollectionConfig = {
         if (!user) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
+
+        const ip = req.headers.get('x-forwarded-for') ?? `confirm:${id}`
+        const rl = checkRateLimit(`confirm-payment:${ip}`, 10)
+        if (!rl.allowed) return rateLimitedResponse()
 
         try {
           const order = await payload.findByID({
@@ -158,7 +171,7 @@ export const Orders: CollectionConfig = {
           return Response.json({ success: true })
         } catch (error: any) {
           req.payload.logger.error(`Error confirming payment: ${error.message}`)
-          return Response.json({ error: error.message }, { status: 500 })
+          return Response.json({ error: 'Payment confirmation failed' }, { status: 500 })
         }
       },
     },
