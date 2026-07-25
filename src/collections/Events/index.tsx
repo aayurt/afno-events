@@ -292,6 +292,7 @@ export const Events: CollectionConfig = {
       type: 'date',
       required: false,
       defaultValue: new Date().toISOString(),
+      timezone: true,
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',
@@ -304,12 +305,36 @@ export const Events: CollectionConfig = {
       type: 'date',
       required: false,
       defaultValue: new Date().toISOString(),
+      timezone: true,
       admin: {
         date: {
           pickerAppearance: 'dayAndTime',
           displayFormat: 'MMM d, yyyy h:mm a',
         },
       },
+    },
+    {
+      name: 'timezone',
+      type: 'select',
+      defaultValue: 'Europe/London',
+      admin: {
+        position: 'sidebar',
+        description: 'Timezone for event date and time',
+      },
+      options: [
+        { label: 'UK (GMT/BST)', value: 'Europe/London' },
+        { label: 'Central Europe', value: 'Europe/Berlin' },
+        { label: 'US Eastern', value: 'America/New_York' },
+        { label: 'US Central', value: 'America/Chicago' },
+        { label: 'US Mountain', value: 'America/Denver' },
+        { label: 'US Pacific', value: 'America/Los_Angeles' },
+        { label: 'India (UTC+5:30)', value: 'Asia/Kolkata' },
+        { label: 'Nepal (UTC+5:45)', value: 'Asia/Kathmandu' },
+        { label: 'Bangladesh (UTC+6)', value: 'Asia/Dhaka' },
+        { label: 'Australia Eastern', value: 'Australia/Sydney' },
+        { label: 'Japan (UTC+9)', value: 'Asia/Tokyo' },
+        { label: 'Dubai (UTC+4)', value: 'Asia/Dubai' },
+      ],
     },
     {
       name: 'tags',
