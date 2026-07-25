@@ -877,7 +877,28 @@ export interface Event {
     longitude?: number | null;
   };
   startDatetime?: string | null;
+  startDatetime_tz?: SupportedTimezones;
   endDatetime?: string | null;
+  endDatetime_tz?: SupportedTimezones;
+  /**
+   * Timezone for event date and time
+   */
+  timezone?:
+    | (
+        | 'Europe/London'
+        | 'Europe/Berlin'
+        | 'America/New_York'
+        | 'America/Chicago'
+        | 'America/Denver'
+        | 'America/Los_Angeles'
+        | 'Asia/Kolkata'
+        | 'Asia/Kathmandu'
+        | 'Asia/Dhaka'
+        | 'Australia/Sydney'
+        | 'Asia/Tokyo'
+        | 'Asia/Dubai'
+      )
+    | null;
   /**
    * Select one or more tags for this event
    */
@@ -956,7 +977,7 @@ export interface Ticket {
   event?: (number | null) | Event;
   order: number | Order;
   code?: string | null;
-  status?: ('unused' | 'checked-in' | 'cancelled' | 'refunded' | 'transferred') | null;
+  status?: ('unused' | 'checked-in' | 'cancelled' | 'refunded' | 'transferred' | 'expired') | null;
   checkedInAt?: string | null;
   attendeeName?: string | null;
   attendeeEmail?: string | null;
@@ -1765,7 +1786,10 @@ export interface EventsSelect<T extends boolean = true> {
         longitude?: T;
       };
   startDatetime?: T;
+  startDatetime_tz?: T;
   endDatetime?: T;
+  endDatetime_tz?: T;
+  timezone?: T;
   tags?: T;
   pricing?:
     | T
