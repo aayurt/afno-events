@@ -36,7 +36,7 @@
     "@payloadcms/plugin-redirects": "3.75.0",
     "@payloadcms/plugin-search": "3.75.0",
     "@payloadcms/plugin-seo": "3.75.0",
-    "@payloadcms/plugin-stripe": "^3.80.0",
+    "@payloadcms/plugin-stripe": "3.75.0",
     "@payloadcms/richtext-lexical": "3.75.0",
     "@payloadcms/ui": "3.75.0",
     "@radix-ui/react-checkbox": "^1.0.4",
