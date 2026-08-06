@@ -157,6 +157,70 @@ export const Circles: CollectionConfig = {
       },
     },
     {
+      path: '/join-by-code',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        let body: { code?: string }
+        try {
+          body = (await req.json!()) as { code?: string }
+        } catch {
+          return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
+        }
+        const code = (body?.code || '').trim().toLowerCase()
+        if (!code) {
+          return Response.json({ error: 'Invite code is required' }, { status: 400 })
+        }
+        try {
+          const found = await req.payload.find({
+            collection: 'circles' as any,
+            where: { inviteCode: { equals: code } },
+            depth: 1,
+            limit: 1,
+            overrideAccess: true,
+          })
+          const circle = found.docs?.[0]
+          if (!circle) {
+            return Response.json({ error: 'Invalid invite code' }, { status: 404 })
+          }
+          const alreadyMember = (circle.members || []).some((m: any) => {
+            const uid = typeof m.user === 'object' ? m.user.id : m.user
+            return String(uid) === String(req.user!.id)
+          })
+          if (alreadyMember) {
+            return Response.json({ error: 'Already a member' }, { status: 409 })
+          }
+          const updated = await req.payload.update({
+            collection: 'circles' as any,
+            id: circle.id,
+            data: {
+              members: [
+                ...(circle.members || []),
+                { user: req.user.id, role: 'member' },
+              ],
+            },
+            overrideAccess: true,
+          })
+          const name = circle.name || 'Circle'
+          try {
+            await sendFCMTopicNotification({
+              topic: `circle-${circle.id}`,
+              notification: {
+                title: 'New member',
+                body: `${req.user.name || 'Someone'} joined "${name}"`,
+              },
+            })
+          } catch (_) {}
+          return Response.json(updated)
+        } catch (error: any) {
+          req.payload.logger.error(`Error joining circle by code: ${error.message}`)
+          return Response.json({ error: 'Internal Server Error' }, { status: 500 })
+        }
+      },
+    },
+    {
       path: '/:id/join',
       method: 'post',
       handler: async (req) => {
@@ -172,6 +236,7 @@ export const Circles: CollectionConfig = {
             collection: 'circles' as any,
             id,
             depth: 1,
+            overrideAccess: true,
           }) as any
           if (!circle) {
             return Response.json({ error: 'Circle not found' }, { status: 404 })
@@ -192,6 +257,7 @@ export const Circles: CollectionConfig = {
                 { user: req.user.id, role: 'member' },
               ],
             },
+            overrideAccess: true,
           })
           const name = circle.name || 'Circle'
           try {
@@ -226,6 +292,7 @@ export const Circles: CollectionConfig = {
             collection: 'circles' as any,
             id,
             depth: 1,
+            overrideAccess: true,
           }) as any
           if (!circle) {
             return Response.json({ error: 'Circle not found' }, { status: 404 })
@@ -238,6 +305,7 @@ export const Circles: CollectionConfig = {
             collection: 'circles' as any,
             id,
             data: { members: filtered },
+            overrideAccess: true,
           })
           return Response.json(updated)
         } catch (error: any) {
