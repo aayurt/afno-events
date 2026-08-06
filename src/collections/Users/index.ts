@@ -343,6 +343,12 @@ export const Users: CollectionConfig = {
   hooks: {
     beforeChange: [
       async ({ data, req, operation }) => {
+        if (typeof data.image === 'string' && !/^\d+$/.test(data.image)) {
+          // Social providers (Google/Apple) supply an avatar URL string, but the
+          // users.image field is an upload (media) relationship. A URL string
+          // fails Payload validation, so drop it and keep the user avatarless.
+          delete data.image
+        }
         if (data.email) {
           data.email = data.email.toLowerCase()
         }
