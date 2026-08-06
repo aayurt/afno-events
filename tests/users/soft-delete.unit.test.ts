@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 
 // Import the Users collection to access the soft-delete hook
-import { Users } from '../../src/collections/Users/index.ts'
+import { Users } from '../../src/collections/Users/index'
 
 describe('Users soft-delete (beforeChange hook)', () => {
   it('should soft-delete a user by setting deletedAt and cancel the actual delete', async () => {

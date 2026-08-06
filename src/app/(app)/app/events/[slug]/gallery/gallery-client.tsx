@@ -9,7 +9,7 @@ import { Loader2, Lock, Camera, Upload, X, ImageIcon, Clock } from 'lucide-react
 import { useSearchParams, useRouter } from 'next/navigation'
 
 function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: any[] }) {
-  const t = useScopedI18n('gallery')
+  const t = useScopedI18n('gallery') as (key: string, params?: Record<string, string | number>) => string
   const searchParams = useSearchParams()
   const router = useRouter()
 

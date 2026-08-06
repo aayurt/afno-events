@@ -36,7 +36,7 @@ export const EventPhotos: CollectionConfig = {
 
         let body: { ids: string[]; status: string }
         try {
-          body = await req.json()
+          body = (await req.json!())!
         } catch {
           return Response.json({ error: 'Invalid JSON' }, { status: 400 })
         }
@@ -52,7 +52,7 @@ export const EventPhotos: CollectionConfig = {
             await payload.update({
               collection: 'event-photos',
               id,
-              data: { status },
+              data: { status: status as any },
               req,
             })
             results.push({ id, status: 'updated' })
@@ -86,7 +86,7 @@ export const EventPhotos: CollectionConfig = {
 
         let formData: FormData
         try {
-          formData = await req.formData()
+          formData = (await req.formData!())!
         } catch {
           return Response.json({ error: 'Failed to parse form data' }, { status: 400 })
         }
@@ -141,7 +141,7 @@ export const EventPhotos: CollectionConfig = {
               depth: 1,
             })
             const userTenant = Array.isArray(userDoc.tenants) && userDoc.tenants.length > 0
-              ? userDoc.tenants[0].tenant
+              ? userDoc.tenants[0]?.tenant
               : null
             tenantId = resolveTenant(userTenant)
           }
@@ -153,7 +153,7 @@ export const EventPhotos: CollectionConfig = {
               depth: 0,
             })
             if (tenantsResult.docs.length > 0) {
-              tenantId = resolveTenant(tenantsResult.docs[0].id)
+              tenantId = resolveTenant(tenantsResult.docs[0]?.id)
             }
           }
 
@@ -175,7 +175,7 @@ export const EventPhotos: CollectionConfig = {
               uploader: req.user.id,
               image: mediaDoc.id,
               status: 'pending',
-              tenant: tenantId || undefined,
+              tenant: (tenantId || undefined) as any,
             },
           })
 
@@ -232,7 +232,7 @@ export const EventPhotos: CollectionConfig = {
                   title: 'Your photo was approved!',
                   message: `Your photo at ${event?.title || 'the event'} has been approved and is now visible in the gallery.`,
                   type: 'gallery',
-                  link: `/events/${event?.slug || ''}/gallery`,
+                  link: `/events/${(event as any)?.slug || ''}/gallery`,
                 },
               })
             } catch (error) {

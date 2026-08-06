@@ -56,6 +56,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
   })
 
   const { docs: events, totalPages, page } = result
+  const current = page ?? 1
 
   return (
     <div className="container py-12 space-y-10">
@@ -180,16 +181,16 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
       {totalPages > 1 && (
         <div className="flex justify-center gap-4 pt-8">
-          {page > 1 && (
-            <Link href={`/app/events?page=${page - 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
+          {current > 1 && (
+            <Link href={`/app/events?page=${current - 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
               <Button variant="outline">{t('previous')}</Button>
             </Link>
           )}
           <span className="flex items-center text-muted-foreground">
-            {t('pageOf', { page, totalPages })}
+            {t('pageOf', { page: current, totalPages })}
           </span>
-          {page < totalPages && (
-            <Link href={`/app/events?page=${page + 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
+          {current < totalPages && (
+            <Link href={`/app/events?page=${current + 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
               <Button variant="outline">{t('next')}</Button>
             </Link>
           )}

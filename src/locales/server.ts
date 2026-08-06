@@ -25,7 +25,7 @@ export async function getScopedI18n(scope: string): Promise<ScopedT> {
     if (value === undefined || value === null) return key
     value = String(value)
     if (params) {
-      value = value.replace(/\{(\w+)\}/g, (_, k: string) => String(params[k] ?? `{${k}}`))
+      value = value.replace(/\{(\w+)\}/g, (_: string, k: string) => String(params[k] ?? `{${k}}`))
     }
     return value
   }
@@ -47,7 +47,7 @@ export async function getI18n(): Promise<I18n> {
     if (value === undefined || value === null) return key
     value = String(value)
     if (params) {
-      value = value.replace(/\{(\w+)\}/g, (_, k: string) => String(params[k] ?? `{${k}}`))
+      value = value.replace(/\{(\w+)\}/g, (_: string, k: string) => String(params[k] ?? `{${k}}`))
     }
     return value
   }

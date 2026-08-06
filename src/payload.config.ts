@@ -26,6 +26,7 @@ import { Notifications } from './collections/Notifications'
 import { Favorites } from './collections/Favorites'
 import { EventPhotos } from './collections/EventPhotos'
 import { GalleryAccess } from './collections/GalleryAccess'
+import { Circles } from './collections/Circles'
 import { trustedOriginsValues } from './trustedOrigin'
 
 const filename = fileURLToPath(import.meta.url)
@@ -99,6 +100,7 @@ export default buildConfig({
     Favorites,
     EventPhotos,
     GalleryAccess,
+    Circles,
   ],
   endpoints: [
     {

@@ -110,15 +110,38 @@ export const Events: CollectionConfig = {
             })
             const ci = typeof doc.coverImage === 'object' ? doc.coverImage : null
             const imageUrl = ci?.url
-            await sendFCMTopicNotification({
-              topic: 'afno-app-event',
-              notification: {
-                title: 'Check out for ' + doc.title + ' event.',
-                body: doc.description || 'Check out the ' + doc.title + ' event.',
-                imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
-                id: doc.id,
-              },
-            })
+            const eventTags: string[] = Array.isArray(doc.tags) ? doc.tags : []
+            if (eventTags.length > 0) {
+              for (const tag of eventTags) {
+                try {
+                  await sendFCMTopicNotification({
+                    topic: `category-${tag}`,
+                    notification: {
+                      title: 'New ' + tag + ' event: ' + doc.title,
+                      body: doc.description || 'Check out the ' + doc.title + ' event.',
+                      imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
+                      id: doc.id,
+                    },
+                  })
+                } catch (topicErr) {
+                  console.error(`FCM topic notification failed for category-${tag}:`, topicErr)
+                }
+              }
+            } else {
+              try {
+                await sendFCMTopicNotification({
+                  topic: 'afno-app-event',
+                  notification: {
+                    title: 'Check out for ' + doc.title + ' event.',
+                    body: doc.description || 'Check out the ' + doc.title + ' event.',
+                    imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
+                    id: doc.id,
+                  },
+                })
+              } catch (topicErr) {
+                console.error('FCM topic notification failed:', topicErr)
+              }
+            }
           } catch (err) {
             console.error('FCM notification failed (non-fatal):', err)
           }

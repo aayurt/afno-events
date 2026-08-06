@@ -9,6 +9,7 @@ import { isAdmin } from '@/access/admin'
 import { isSuperAdminAccess } from '@/access/isSuperAdmin'
 import { updateAndDeleteAccess } from './access/updateAndDelete'
 import { readAccess } from './access/read'
+import { TAG_OPTIONS } from '@/config/tags'
 
 const defaultTenantArrayField = tenantsArrayField({
   tenantsArrayFieldName: 'tenants',
@@ -112,6 +113,14 @@ export const Users: CollectionConfig = {
       admin: { description: 'Notification preferences' },
     },
     {
+      name: 'subscribedCategories',
+      type: 'select',
+      hasMany: true,
+      options: TAG_OPTIONS as any,
+      defaultValue: [],
+      admin: { description: 'Categories the user wants push notifications for' },
+    },
+    {
       name: 'fcmTokens',
       type: 'json',
       defaultValue: [],
@@ -139,7 +148,7 @@ export const Users: CollectionConfig = {
 
         let formData: FormData
         try {
-          formData = await req.formData()
+          formData = (await req.formData!())!
         } catch {
           return Response.json({ error: 'Failed to parse form data' }, { status: 400 })
         }
@@ -171,7 +180,7 @@ export const Users: CollectionConfig = {
               depth: 1,
             })
             const userTenant = Array.isArray(userDoc.tenants) && userDoc.tenants.length > 0
-              ? userDoc.tenants[0].tenant
+              ? userDoc.tenants[0]?.tenant
               : null
             tenantId = resolveTenant(userTenant)
           }
@@ -190,7 +199,7 @@ export const Users: CollectionConfig = {
           await req.payload.update({
             collection: 'users',
             id: req.user.id,
-            data: { image: mediaDoc.id, ...(tenantId ? { tenant: tenantId } : {}) },
+            data: { image: mediaDoc.id, ...(tenantId ? { tenant: tenantId as any } : {}) },
           })
 
           return Response.json({
@@ -213,7 +222,7 @@ export const Users: CollectionConfig = {
 
         let body: { token?: string }
         try {
-          body = await req.json()
+          body = (await req.json!())!
         } catch {
           return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
         }
@@ -258,7 +267,7 @@ export const Users: CollectionConfig = {
 
         let body: { token?: string }
         try {
-          body = await req.json()
+          body = (await req.json!())!
         } catch {
           return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
         }
@@ -287,6 +296,45 @@ export const Users: CollectionConfig = {
           return Response.json({ success: true })
         } catch (error) {
           req.payload.logger.error(`Error unregistering FCM token: ${error}`)
+          return Response.json({ error: 'Internal Server Error' }, { status: 500 })
+        }
+      },
+    },
+    {
+      path: '/subscribed-categories',
+      method: 'post',
+      handler: async (req) => {
+        if (!req.user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        let body: { categories?: string[] }
+        try {
+          body = (await req.json!())!
+        } catch {
+          return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
+        }
+
+        const categories = body.categories
+        if (!Array.isArray(categories)) {
+          return Response.json({ error: 'categories array is required' }, { status: 400 })
+        }
+
+        const validValues = TAG_OPTIONS.map((t) => t.value)
+        const invalid = categories.filter((c) => !validValues.includes(c as any))
+        if (invalid.length > 0) {
+          return Response.json({ error: `Invalid categories: ${invalid.join(', ')}` }, { status: 400 })
+        }
+
+        try {
+          await req.payload.update({
+            collection: 'users',
+            id: req.user.id,
+            data: { subscribedCategories: categories } as any,
+          })
+          return Response.json({ success: true, categories })
+        } catch (error) {
+          req.payload.logger.error(`Error updating subscribed categories: ${error}`)
           return Response.json({ error: 'Internal Server Error' }, { status: 500 })
         }
       },

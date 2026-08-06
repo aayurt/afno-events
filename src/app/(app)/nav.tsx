@@ -6,13 +6,13 @@ import { Calendar, LayoutDashboard, User } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { useScopedI18n } from '@/locales/client'
 
-const getFooterLinks = (t: (key: string) => string) => [
+const getFooterLinks = (t: (key: any, params?: any) => any) => [
   { href: '/privacy', label: 'Privacy Policy' },
   { href: '/terms', label: 'Terms of Service' },
   { href: '/contact', label: t('contact') },
 ]
 
-const getTabs = (t: (key: string) => string) => [
+const getTabs = (t: (key: any, params?: any) => any) => [
   { href: '/app', label: t('dashboard'), icon: LayoutDashboard },
   { href: '/app/events', label: t('events'), icon: Calendar },
   { href: '/app/profile', label: t('profile'), icon: User },

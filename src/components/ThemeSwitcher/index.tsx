@@ -20,7 +20,7 @@ export function ThemeSwitcher({
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  t: (key: string) => string
+  t: (key: any, params?: any) => any
 }) {
   const { setTheme } = useTheme()
   const [current, setCurrent] = useState('auto')

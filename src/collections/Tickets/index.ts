@@ -2,6 +2,7 @@ import crypto from 'crypto'
 import type { CollectionConfig } from 'payload'
 import type { User } from '../../payload-types.js'
 import { checkRateLimit, rateLimitedResponse } from '@/utilities/rateLimit'
+import { generatePassEndpoint } from './endpoints/pass'
 
 export const Tickets: CollectionConfig = {
   slug: 'tickets',
@@ -31,6 +32,7 @@ export const Tickets: CollectionConfig = {
   },
 
   endpoints: [
+    generatePassEndpoint,
     {
       path: '/lookup/:code',
       method: 'get',

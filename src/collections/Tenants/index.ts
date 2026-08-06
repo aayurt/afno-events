@@ -92,6 +92,13 @@ export const Tenants: CollectionConfig = {
       // required: true,
     },
     {
+      name: 'description',
+      type: 'textarea',
+      admin: {
+        description: 'Short description/about text for the organiser page',
+      },
+    },
+    {
       name: 'domain',
       type: 'text',
       admin: {

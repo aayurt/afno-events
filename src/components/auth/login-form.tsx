@@ -21,8 +21,6 @@ export type LoginViewProps = {
   logo?: React.ReactNode
   /** Login page title. Default: 'Login' */
   title?: string
-  /** Login form card title. Default: 'Sign in to Payload' */
-  title?: string
   /** Path to redirect after successful login. Default: '/admin' */
   afterLoginPath?: string
   /**

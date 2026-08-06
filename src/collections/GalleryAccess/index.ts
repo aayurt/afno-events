@@ -39,7 +39,7 @@ export const GalleryAccess: CollectionConfig = {
 
         let body: { eventId?: string }
         try {
-          body = await req.json()
+          body = (await req.json!())!
         } catch {
           return Response.json({ error: 'Invalid JSON body' }, { status: 400 })
         }
@@ -78,7 +78,7 @@ export const GalleryAccess: CollectionConfig = {
             collection: 'gallery-access',
             data: {
               buyer: user.id,
-              event: eventId,
+              event: eventId as any,
               status: 'pending',
             },
             req,
@@ -103,8 +103,8 @@ export const GalleryAccess: CollectionConfig = {
               },
             ],
             mode: 'payment',
-            success_url: `${frontendUrl}/events/${event.slug || eventId}/gallery?unlock=success`,
-            cancel_url: `${frontendUrl}/events/${event.slug || eventId}/gallery?unlock=cancelled`,
+            success_url: `${frontendUrl}/events/${(event as any).slug || eventId}/gallery?unlock=success`,
+            cancel_url: `${frontendUrl}/events/${(event as any).slug || eventId}/gallery?unlock=cancelled`,
             metadata: {
               galleryAccessId: galleryAccess.id.toString(),
               eventId: eventId,

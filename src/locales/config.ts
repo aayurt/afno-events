@@ -11,7 +11,7 @@ export const localesPathMap = {
     try {
       custom = await import('../../locales/translations/custom/en.json')
     } catch {}
-    return { default: { ...gen.default, ...custom.default } }
+    return { default: { ...gen.default, ...(custom.default ?? {}) } as typeof gen.default }
   },
   ne: async () => {
     const gen = await import('../../locales/translations/gen/ne.json')
@@ -19,6 +19,6 @@ export const localesPathMap = {
     try {
       custom = await import('../../locales/translations/custom/ne.json')
     } catch {}
-    return { default: { ...gen.default, ...custom.default } }
+    return { default: { ...gen.default, ...(custom.default ?? {}) } as typeof gen.default }
   },
 } as const

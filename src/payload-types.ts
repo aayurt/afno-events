@@ -80,6 +80,7 @@ export interface Config {
     favorites: Favorite;
     'event-photos': EventPhoto;
     'gallery-access': GalleryAccess;
+    circles: Circle;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -109,6 +110,7 @@ export interface Config {
     favorites: FavoritesSelect<false> | FavoritesSelect<true>;
     'event-photos': EventPhotosSelect<false> | EventPhotosSelect<true>;
     'gallery-access': GalleryAccessSelect<false> | GalleryAccessSelect<true>;
+    circles: CirclesSelect<false> | CirclesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -297,6 +299,10 @@ export interface Tenant {
   };
   organisationImage?: (number | null) | Media;
   /**
+   * Short description/about text for the organiser page
+   */
+  description?: string | null;
+  /**
    * Used for domain-based tenant handling
    */
   domain?: string | null;
@@ -450,6 +456,25 @@ export interface User {
     push?: boolean | null;
     email?: boolean | null;
   };
+  /**
+   * Categories the user wants push notifications for
+   */
+  subscribedCategories?:
+    | (
+        | 'music'
+        | 'gaming'
+        | 'theatre'
+        | 'arts'
+        | 'business'
+        | 'technology'
+        | 'sports'
+        | 'food-drink'
+        | 'exhibition'
+        | 'comedy'
+        | 'workshop'
+        | 'fitness'
+      )[]
+    | null;
   /**
    * FCM device tokens for push notifications
    */
@@ -1047,6 +1072,28 @@ export interface GalleryAccess {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circles".
+ */
+export interface Circle {
+  id: number;
+  name: string;
+  description?: string | null;
+  coverImage?: (number | null) | Media;
+  creator: number | User;
+  members?:
+    | {
+        user: number | User;
+        role?: ('admin' | 'member') | null;
+        id?: string | null;
+      }[]
+    | null;
+  events?: (number | Event)[] | null;
+  inviteCode?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1366,6 +1413,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'gallery-access';
         value: number | GalleryAccess;
+      } | null)
+    | ({
+        relationTo: 'circles';
+        value: number | Circle;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1742,6 +1793,7 @@ export interface UsersSelect<T extends boolean = true> {
         push?: T;
         email?: T;
       };
+  subscribedCategories?: T;
   fcmTokens?: T;
   tenants?:
     | T
@@ -1864,6 +1916,7 @@ export interface TenantsSelect<T extends boolean = true> {
         email?: T;
       };
   organisationImage?: T;
+  description?: T;
   domain?: T;
   slug?: T;
   allowPublicRead?: T;
@@ -1918,6 +1971,27 @@ export interface GalleryAccessSelect<T extends boolean = true> {
   order?: T;
   stripeSessionID?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circles_select".
+ */
+export interface CirclesSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  coverImage?: T;
+  creator?: T;
+  members?:
+    | T
+    | {
+        user?: T;
+        role?: T;
+        id?: T;
+      };
+  events?: T;
+  inviteCode?: T;
   updatedAt?: T;
   createdAt?: T;
 }
