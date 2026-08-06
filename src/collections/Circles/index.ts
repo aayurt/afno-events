@@ -14,9 +14,7 @@ export const Circles: CollectionConfig = {
       if (!req.user) return false
       if (req.user.role === 'super-admin') return true
       return {
-        members: {
-          contains: req.user.id,
-        },
+        'members.user': { equals: req.user.id },
       }
     },
     update: ({ req }) => {
