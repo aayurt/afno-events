@@ -81,6 +81,10 @@ export interface Config {
     'event-photos': EventPhoto;
     'gallery-access': GalleryAccess;
     circles: Circle;
+    'circle-messages': CircleMessage;
+    'circle-locations': CircleLocation;
+    'circle-alerts': CircleAlert;
+    'alert-cooldowns': AlertCooldown;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -111,6 +115,10 @@ export interface Config {
     'event-photos': EventPhotosSelect<false> | EventPhotosSelect<true>;
     'gallery-access': GalleryAccessSelect<false> | GalleryAccessSelect<true>;
     circles: CirclesSelect<false> | CirclesSelect<true>;
+    'circle-messages': CircleMessagesSelect<false> | CircleMessagesSelect<true>;
+    'circle-locations': CircleLocationsSelect<false> | CircleLocationsSelect<true>;
+    'circle-alerts': CircleAlertsSelect<false> | CircleAlertsSelect<true>;
+    'alert-cooldowns': AlertCooldownsSelect<false> | AlertCooldownsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1094,6 +1102,93 @@ export interface Circle {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circle-messages".
+ */
+export interface CircleMessage {
+  id: number;
+  circle: number | Circle;
+  sender: number | User;
+  message: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circle-locations".
+ */
+export interface CircleLocation {
+  id: number;
+  circle: number | Circle;
+  user: number | User;
+  /**
+   * Latitude of the member
+   */
+  lat: number;
+  /**
+   * Longitude of the member
+   */
+  lng: number;
+  /**
+   * Position accuracy in meters
+   */
+  accuracy?: number | null;
+  /**
+   * Compass heading in degrees (optional)
+   */
+  heading?: number | null;
+  /**
+   * Who can see this location: ['all'] or an array of user ids
+   */
+  visibleTo?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * When sharing auto-stops (time-limited sharing). Empty = until stopped.
+   */
+  expiresAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circle-alerts".
+ */
+export interface CircleAlert {
+  id: number;
+  circle: number | Circle;
+  user: number | User;
+  type: 'live_sharing' | 'nearby' | 'geofence';
+  title: string;
+  body?: string | null;
+  read?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "alert-cooldowns".
+ */
+export interface AlertCooldown {
+  id: number;
+  /**
+   * Unique cooldown key, e.g. nearby:12:34:56
+   */
+  key: string;
+  /**
+   * When the alert last fired; used to enforce the cooldown window
+   */
+  firedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1417,6 +1512,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'circles';
         value: number | Circle;
+      } | null)
+    | ({
+        relationTo: 'circle-messages';
+        value: number | CircleMessage;
+      } | null)
+    | ({
+        relationTo: 'circle-locations';
+        value: number | CircleLocation;
+      } | null)
+    | ({
+        relationTo: 'circle-alerts';
+        value: number | CircleAlert;
+      } | null)
+    | ({
+        relationTo: 'alert-cooldowns';
+        value: number | AlertCooldown;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1992,6 +2103,57 @@ export interface CirclesSelect<T extends boolean = true> {
       };
   events?: T;
   inviteCode?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circle-messages_select".
+ */
+export interface CircleMessagesSelect<T extends boolean = true> {
+  circle?: T;
+  sender?: T;
+  message?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circle-locations_select".
+ */
+export interface CircleLocationsSelect<T extends boolean = true> {
+  circle?: T;
+  user?: T;
+  lat?: T;
+  lng?: T;
+  accuracy?: T;
+  heading?: T;
+  visibleTo?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "circle-alerts_select".
+ */
+export interface CircleAlertsSelect<T extends boolean = true> {
+  circle?: T;
+  user?: T;
+  type?: T;
+  title?: T;
+  body?: T;
+  read?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "alert-cooldowns_select".
+ */
+export interface AlertCooldownsSelect<T extends boolean = true> {
+  key?: T;
+  firedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

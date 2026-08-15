@@ -27,6 +27,11 @@ import { Favorites } from './collections/Favorites'
 import { EventPhotos } from './collections/EventPhotos'
 import { GalleryAccess } from './collections/GalleryAccess'
 import { Circles } from './collections/Circles'
+import { CircleLocations } from './collections/CircleLocations'
+import { CircleMessages } from './collections/CircleMessages'
+import { CircleAlerts } from './collections/CircleAlerts'
+import { AlertCooldowns } from './collections/AlertCooldowns'
+import { startCleanupScheduler } from './utilities/cleanup'
 import { trustedOriginsValues } from './trustedOrigin'
 
 const filename = fileURLToPath(import.meta.url)
@@ -101,6 +106,10 @@ export default buildConfig({
     EventPhotos,
     GalleryAccess,
     Circles,
+    CircleMessages,
+    CircleLocations,
+    CircleAlerts,
+    AlertCooldowns,
   ],
   endpoints: [
     {
@@ -247,5 +256,9 @@ export default buildConfig({
       },
     },
     tasks: [],
+  },
+  onInit: async (payload) => {
+    // Nightly purge of stale alert cooldowns and expired location rows.
+    startCleanupScheduler(payload)
   },
 })
