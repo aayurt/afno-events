@@ -37,7 +37,7 @@ type CircleDoc = {
 
 function MemberAvatar({ user, size = 'md' }: { user: any; size?: 'sm' | 'md' }) {
   const cls = size === 'sm' ? 'w-7 h-7 text-xs' : 'w-9 h-9 text-sm'
-  const img = user && typeof user.image === 'object' && user.image.url ? user.image.url : null
+  const img = user && user.image && typeof user.image === 'object' && user.image.url ? user.image.url : null
   if (img) {
     return (
       <img

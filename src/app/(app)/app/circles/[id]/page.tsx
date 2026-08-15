@@ -77,7 +77,7 @@ const remainingShareLabel = (expiresAt?: string): string | null => {
 function Avatar({ user, size = 'md' }: { user: any; size?: 'sm' | 'md' | 'lg' }) {
   const cls =
     size === 'sm' ? 'w-7 h-7 text-xs' : size === 'lg' ? 'w-12 h-12 text-base' : 'w-9 h-9 text-sm'
-  const img = user && typeof user.image === 'object' && user.image.url ? user.image.url : null
+  const img = user && user.image && typeof user.image === 'object' && user.image.url ? user.image.url : null
   if (img) {
     return <img src={img} alt="" className={`${cls} rounded-full object-cover ring-2 ring-background shrink-0`} />
   }
