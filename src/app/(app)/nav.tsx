@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, LayoutDashboard, User } from 'lucide-react'
+import { Calendar, LayoutDashboard, User, Users } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { useScopedI18n } from '@/locales/client'
 
@@ -15,6 +15,7 @@ const getFooterLinks = (t: (key: any, params?: any) => any) => [
 const getTabs = (t: (key: any, params?: any) => any) => [
   { href: '/app', label: t('dashboard'), icon: LayoutDashboard },
   { href: '/app/events', label: t('events'), icon: Calendar },
+  { href: '/app/circles', label: t('circles'), icon: Users },
   { href: '/app/profile', label: t('profile'), icon: User },
 ]
 
@@ -30,6 +31,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
   const pageTitleMap: Record<string, string> = {
     '/app': t('discover'),
     '/app/events': t('events'),
+    '/app/circles': t('circles'),
     '/app/profile': t('profile'),
   }
   const pageTitle = pageTitleMap[pathname] || 'AfnoEvents'
