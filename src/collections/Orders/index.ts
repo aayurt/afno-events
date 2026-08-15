@@ -3,6 +3,7 @@ import { checkRateLimit, rateLimitedResponse } from '@/utilities/rateLimit'
 import type { CollectionConfig } from 'payload'
 import crypto from 'crypto'
 import { getStripe } from '@/utilities/stripe'
+import { getServerSideURL } from '@/utilities/getURL'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -120,9 +121,94 @@ export const Orders: CollectionConfig = {
             receipt_email: user.email,
           })
 
+          // Remember the PaymentIntent so confirm-payment can verify it server-side.
+          await payload.update({
+            collection: 'orders',
+            id: order.id,
+            data: { stripePaymentIntentID: paymentIntent.id },
+            req,
+          })
+
           return Response.json({ clientSecret: paymentIntent.client_secret })
         } catch (error: any) {
           req.payload.logger.error(`Error initiating payment: ${error.message}`)
+          return Response.json({ error: 'Payment processing failed' }, { status: 500 })
+        }
+      },
+    },
+    {
+      path: '/:id/checkout-session',
+      method: 'post',
+      handler: async (req) => {
+        const { payload, user } = req
+        const id = (req.routeParams as any)?.id
+
+        if (!user) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+
+        const ip = req.headers.get('x-forwarded-for') ?? `checkout-session:${id}`
+        const rl = checkRateLimit(`checkout-session:${ip}`, 10)
+        if (!rl.allowed) return rateLimitedResponse()
+
+        try {
+          const order = await payload.findByID({
+            collection: 'orders',
+            id,
+            depth: 0,
+          })
+
+          if (!order) {
+            return Response.json({ error: 'Order not found' }, { status: 404 })
+          }
+
+          if (order.buyer !== user.id) {
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
+          }
+
+          // Free order — mark as paid immediately, no Stripe needed.
+          if (!order.totalAmount || order.totalAmount === 0) {
+            await payload.update({
+              collection: 'orders',
+              id: order.id,
+              data: { status: 'paid' },
+              req,
+            })
+            return Response.json({ url: null })
+          }
+
+          const stripe = getStripe()
+
+          const session = await stripe.checkout.sessions.create({
+            mode: 'payment',
+            line_items: (order.items || []).map((item: any) => ({
+              quantity: item.quantity,
+              price_data: {
+                currency: 'gbp',
+                unit_amount: Math.round(item.price * 100),
+                product_data: {
+                  name: item.ticketType,
+                },
+              },
+            })),
+            metadata: {
+              orderId: order.id.toString(),
+            },
+            customer_email: user.email,
+            success_url: `${getServerSideURL()}/app/orders/${order.id}/success`,
+            cancel_url: `${getServerSideURL()}/app/orders/${order.id}/cancel`,
+          })
+
+          await payload.update({
+            collection: 'orders',
+            id: order.id,
+            data: { stripeCheckoutSessionID: session.id },
+            req,
+          })
+
+          return Response.json({ url: session.url })
+        } catch (error: any) {
+          req.payload.logger.error(`Error creating checkout session: ${error.message}`)
           return Response.json({ error: 'Payment processing failed' }, { status: 500 })
         }
       },
@@ -159,6 +245,27 @@ export const Orders: CollectionConfig = {
 
           if (order.status === 'paid') {
             return Response.json({ success: true })
+          }
+
+          // Never trust the client: verify the PaymentIntent actually succeeded
+          // with Stripe before marking the order as paid.
+          if (!order.stripePaymentIntentID) {
+            return Response.json(
+              { error: 'No payment found for this order' },
+              { status: 400 },
+            )
+          }
+
+          const stripe = getStripe()
+          const paymentIntent = await stripe.paymentIntents.retrieve(
+            order.stripePaymentIntentID,
+          )
+
+          if (paymentIntent.status !== 'succeeded') {
+            return Response.json(
+              { error: 'Payment not completed' },
+              { status: 400 },
+            )
           }
 
           await payload.update({

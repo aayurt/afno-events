@@ -45,6 +45,13 @@ export function TicketPurchase({ event }: { event: any }) {
     setError(null)
 
     try {
+      // External-link events sell tickets elsewhere (Eventbrite, Ticketmaster,
+      // etc.) — send the user straight to that link instead of a Stripe order.
+      if (hasExternalLink) {
+        window.location.href = event.pricing?.paymentExternalLink
+        return
+      }
+
       const session = await authClient.getSession()
       const user = session.data?.user
 
@@ -78,12 +85,13 @@ export function TicketPurchase({ event }: { event: any }) {
 
       const order = await res.json()
 
-      const checkoutRes = await fetch(`/api/orders/${order.doc.id}/initiate-checkout`, {
+      const checkoutRes = await fetch(`/api/orders/${order.doc.id}/checkout-session`, {
         method: 'POST',
       })
 
       if (!checkoutRes.ok) {
-        throw new Error('Failed to initiate checkout')
+        const err = await checkoutRes.json().catch(() => null)
+        throw new Error(err?.error || 'Failed to initiate checkout')
       }
 
       const { url } = await checkoutRes.json()
