@@ -4,6 +4,7 @@ import type { CollectionConfig } from 'payload'
 import crypto from 'crypto'
 import { getStripe } from '@/utilities/stripe'
 import { getServerSideURL } from '@/utilities/getURL'
+import { markOrderRefunded } from '@/utilities/stripeWebhooks'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -210,6 +211,60 @@ export const Orders: CollectionConfig = {
         } catch (error: any) {
           req.payload.logger.error(`Error creating checkout session: ${error.message}`)
           return Response.json({ error: 'Payment processing failed' }, { status: 500 })
+        }
+      },
+    },
+    {
+      path: '/:id/refund',
+      method: 'post',
+      handler: async (req) => {
+        const { payload, user } = req
+        const id = (req.routeParams as any)?.id
+
+        if (!user || (user.role !== 'admin' && user.role !== 'super-admin')) {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
+        const ip = req.headers.get('x-forwarded-for') ?? `refund:${id}`
+        const rl = checkRateLimit(`refund:${ip}`, 20)
+        if (!rl.allowed) return rateLimitedResponse()
+
+        try {
+          const order = await payload.findByID({
+            collection: 'orders',
+            id,
+            depth: 0,
+          })
+
+          if (!order) {
+            return Response.json({ error: 'Order not found' }, { status: 404 })
+          }
+
+          if (order.status !== 'paid') {
+            return Response.json(
+              { error: 'Only paid orders can be refunded' },
+              { status: 400 },
+            )
+          }
+
+          if (!order.stripePaymentIntentID) {
+            return Response.json(
+              { error: 'No Stripe payment found for this order' },
+              { status: 400 },
+            )
+          }
+
+          const stripe = getStripe()
+          await stripe.refunds.create({
+            payment_intent: order.stripePaymentIntentID,
+          })
+
+          await markOrderRefunded(payload, order.id, req)
+
+          return Response.json({ success: true })
+        } catch (error: any) {
+          req.payload.logger.error(`Error refunding order: ${error.message}`)
+          return Response.json({ error: 'Refund failed' }, { status: 500 })
         }
       },
     },

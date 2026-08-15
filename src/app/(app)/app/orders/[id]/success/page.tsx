@@ -3,10 +3,11 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle, Calendar, MapPin, Ticket } from 'lucide-react'
+import { CheckCircle, Loader2, Calendar, MapPin, Ticket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { getScopedI18n } from '@/locales/server'
+import { OrderStatusPoller } from './order-status-poller'
 
 type Args = {
   params: Promise<{ id: string }>
@@ -32,24 +33,46 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
 
   const o = order as any
   const event = typeof o.event === 'object' ? o.event : null
+  const isPaid = o.status === 'paid'
 
   return (
     <div className="container py-20 flex justify-center">
       <div className="w-full max-w-lg">
         <Card className="rounded-2xl">
           <CardContent className="p-8 text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle size={40} className="text-green-600" />
-              </div>
-            </div>
+            {isPaid ? (
+              <>
+                <div className="flex justify-center">
+                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
+                    <CheckCircle size={40} className="text-green-600" />
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold">{t('bookingConfirmed')}</h1>
-              <p className="text-muted-foreground">
-                {t('orderConfirmed', { orderId: o.id })}
-              </p>
-            </div>
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">{t('bookingConfirmed')}</h1>
+                  <p className="text-muted-foreground">
+                    {t('orderConfirmed', { orderId: o.id })}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-center">
+                  <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center">
+                    <Loader2 size={40} className="text-blue-600 animate-spin" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <h1 className="text-3xl font-bold">Confirming your payment…</h1>
+                  <p className="text-muted-foreground">
+                    {t('orderConfirmed', { orderId: o.id })} — this page will update
+                    automatically when the payment is confirmed.
+                  </p>
+                </div>
+                <OrderStatusPoller orderId={o.id} initialStatus={o.status} />
+              </>
+            )}
 
             {event && (
               <div className="bg-muted/50 rounded-xl p-4 space-y-3 text-left">

@@ -33,6 +33,11 @@ import { CircleAlerts } from './collections/CircleAlerts'
 import { AlertCooldowns } from './collections/AlertCooldowns'
 import { startCleanupScheduler } from './utilities/cleanup'
 import { trustedOriginsValues } from './trustedOrigin'
+import {
+  chargeRefunded,
+  checkoutSessionCompleted,
+  paymentIntentSucceeded,
+} from './utilities/stripeWebhooks'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -190,49 +195,9 @@ export default buildConfig({
       isTestKey: true, // Set to false in production
       stripeWebhooksEndpointSecret: process.env.STRIPE_WEBHOOK_SECRET,
       webhooks: {
-        'payment_intent.succeeded': async ({ event, payload, req }) => {
-          const paymentIntent = event.data.object as any
-          const orderId = paymentIntent.metadata?.orderId
-
-          if (orderId) {
-            await payload.update({
-              collection: 'orders',
-              id: orderId,
-              data: {
-                status: 'paid',
-                stripePaymentIntentID: paymentIntent.id,
-              },
-              req,
-            })
-          }
-        },
-        'checkout.session.completed': async ({ event, payload, req }) => {
-          const session = event.data.object as any
-          const orderId = session.metadata?.orderId
-          const galleryAccessId = session.metadata?.galleryAccessId
-
-          if (galleryAccessId) {
-            await payload.update({
-              collection: 'gallery-access',
-              id: galleryAccessId,
-              data: {
-                status: 'paid',
-                stripeSessionID: session.id,
-              },
-              req,
-            })
-          } else if (orderId) {
-            await payload.update({
-              collection: 'orders',
-              id: orderId,
-              data: {
-                status: 'paid',
-                stripeCheckoutSessionID: session.id,
-              },
-              req,
-            })
-          }
-        },
+        'payment_intent.succeeded': paymentIntentSucceeded,
+        'checkout.session.completed': checkoutSessionCompleted,
+        'charge.refunded': chargeRefunded,
       },
     }),
     // storage-adapter-placeholder
