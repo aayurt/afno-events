@@ -13,7 +13,7 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-semibold">1. Information we collect</h2>
         <p className="text-muted-foreground">
           When you create an account we collect your name and email address. When you purchase tickets we
-          collect your order details and payment confirmation. When you use Circles live location sharing, we
+          collect your order details and payment confirmation. When you use Squads live location sharing, we
           collect and store your location only while you choose to share it, and only with the members of
           your circle.
         </p>
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-semibold">2. How we use your information</h2>
         <p className="text-muted-foreground">
           We use your information to provide and improve our services: to process ticket orders, send booking
-          confirmations and event updates you opt into, notify you about your circles, and keep the platform
+          confirmations and event updates you opt into, notify you about your squads, and keep the platform
           secure. We never sell your personal data.
         </p>
       </section>
@@ -33,7 +33,7 @@ export default function PrivacyPage() {
         <p className="text-muted-foreground">
           Live location sharing is opt-in and privacy-first. You control exactly when you share and who can
           see you (including per-member visibility). Sharing stops automatically when you stop sharing, leave
-          a circle, or when a time limit you set expires. Location data is only visible to members you
+          a squad, or when a time limit you set expires. Location data is only visible to members you
           explicitly allow.
         </p>
       </section>

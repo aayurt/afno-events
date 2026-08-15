@@ -137,7 +137,7 @@ export default function CircleDetailPage() {
     try {
       const res = await fetch(`/api/circles/${circleId}`, { credentials: 'include' })
       if (!res.ok) {
-        setError(`Circle not found (${res.status})`)
+        setError(`Squad not found (${res.status})`)
         return
       }
       const data = await res.json()
@@ -354,7 +354,7 @@ export default function CircleDetailPage() {
           <Users size={48} className="mx-auto text-muted-foreground" />
           <p className="font-semibold">{error}</p>
           <p className="text-sm text-muted-foreground">
-            You may not be a member of this circle, or it no longer exists.
+            You may not be a member of this squad, or it no longer exists.
           </p>
           <Link href="/app/circles">
             <Button variant="outline">Back to circles</Button>
@@ -397,7 +397,7 @@ export default function CircleDetailPage() {
             </div>
             <Button variant="outline" className="gap-2 text-red-600 hover:text-red-700" onClick={handleLeave} disabled={leaving}>
               {leaving ? <Loader2 size={16} className="animate-spin" /> : <LogOut size={16} />}
-              Leave circle
+              Leave squad
             </Button>
           </div>
 
@@ -542,7 +542,7 @@ export default function CircleDetailPage() {
 
       {/* Chat */}
       <div className="space-y-3">
-        <h2 className="text-xl font-semibold">Circle chat</h2>
+        <h2 className="text-xl font-semibold">Squad chat</h2>
         <Card className="rounded-2xl">
           <div className="h-80 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 ? (
@@ -586,7 +586,7 @@ export default function CircleDetailPage() {
             <Input
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
-              placeholder="Message the circle…"
+              placeholder="Message the squad…"
               className="flex-1"
             />
             <Button type="submit" size="icon" disabled={sending || !draft.trim()}>

@@ -80,14 +80,14 @@ export default function CirclesPage() {
     try {
       const res = await fetch('/api/circles/my', { credentials: 'include' })
       if (!res.ok) {
-        setError(`Failed to load circles (${res.status})`)
+        setError(`Failed to load squads (${res.status})`)
         return
       }
       const data = await res.json()
       setCircles(data.docs || [])
       setError(null)
     } catch {
-      setError('Could not load your circles. Please try again.')
+      setError('Could not load your squads. Please try again.')
     }
   }, [])
 
@@ -115,7 +115,7 @@ export default function CirclesPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setCreateError(data.errors?.[0]?.message || `Failed to create circle (${res.status})`)
+        setCreateError(data.errors?.[0]?.message || `Failed to create squad (${res.status})`)
         return
       }
       setCreateOpen(false)
@@ -124,7 +124,7 @@ export default function CirclesPage() {
       await load()
       router.push(`/app/circles/${data.doc?.id ?? data.id}`)
     } catch {
-      setCreateError('Network error while creating circle.')
+      setCreateError('Network error while creating squad.')
     } finally {
       setCreating(false)
     }
@@ -152,7 +152,7 @@ export default function CirclesPage() {
       await load()
       router.push(`/app/circles/${data.id}`)
     } catch {
-      setJoinError('Network error while joining circle.')
+      setJoinError('Network error while joining squad.')
     } finally {
       setJoining(false)
     }
@@ -183,8 +183,8 @@ export default function CirclesPage() {
         <Card className="w-full max-w-md text-center p-8 space-y-6">
           <Users size={48} className="mx-auto text-muted-foreground" />
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold">Your Circles</h1>
-            <p className="text-muted-foreground">Sign in to create and join circles with your friends.</p>
+            <h1 className="text-2xl font-bold">Your Squads</h1>
+            <p className="text-muted-foreground">Sign in to create and join squads with your friends.</p>
           </div>
           <Link href="/app/auth/login?redirect=/app/circles">
             <Button size="lg" className="w-full">Sign In</Button>
@@ -198,9 +198,9 @@ export default function CirclesPage() {
     <div className="container py-12 space-y-8">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Circles</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Squads</h1>
           <p className="text-muted-foreground">
-            Share your live location, see who&apos;s nearby, and chat with your circle.
+            Share your live location, see who&apos;s nearby, and chat with your squad.
           </p>
         </div>
         <div className="flex gap-3">
@@ -208,7 +208,7 @@ export default function CirclesPage() {
             <LogIn size={16} /> Join
           </Button>
           <Button className="gap-2" onClick={() => setCreateOpen(true)}>
-            <Plus size={16} /> New Circle
+            <Plus size={16} /> New Squad
           </Button>
         </div>
       </div>
@@ -226,9 +226,9 @@ export default function CirclesPage() {
               <Users size={28} className="text-primary" />
             </div>
             <div className="space-y-1">
-              <p className="text-lg font-semibold">No circles yet</p>
+              <p className="text-lg font-semibold">No squads yet</p>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Create a circle for your friends or family, then share the invite code so they can
+                Create a squad for your friends or family, then share the invite code so they can
                 join and share live locations.
               </p>
             </div>
@@ -237,7 +237,7 @@ export default function CirclesPage() {
                 <LogIn size={16} /> Join with code
               </Button>
               <Button className="gap-2" onClick={() => setCreateOpen(true)}>
-                <Plus size={16} /> Create circle
+                <Plus size={16} /> Create squad
               </Button>
             </div>
           </CardContent>
@@ -326,11 +326,11 @@ export default function CirclesPage() {
 
       {/* Create circle dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogHeader onClose={() => setCreateOpen(false)}>Create a new circle</DialogHeader>
+        <DialogHeader onClose={() => setCreateOpen(false)}>Create a new squad</DialogHeader>
         <DialogContent>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Circle name</label>
+              <label className="text-sm font-medium">Squad name</label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -343,7 +343,7 @@ export default function CirclesPage() {
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="What is this circle about?"
+                placeholder="What is this squad about?"
                 rows={3}
               />
             </div>
@@ -365,7 +365,7 @@ export default function CirclesPage() {
 
       {/* Join dialog */}
       <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
-        <DialogHeader onClose={() => setJoinOpen(false)}>Join a circle</DialogHeader>
+        <DialogHeader onClose={() => setJoinOpen(false)}>Join a squad</DialogHeader>
         <DialogContent>
           <form onSubmit={handleJoin} className="space-y-4">
             <div className="space-y-2">
@@ -378,7 +378,7 @@ export default function CirclesPage() {
                 className="font-mono uppercase tracking-widest"
               />
               <p className="text-xs text-muted-foreground">
-                Ask a circle member for their invite code.
+                Ask a squad member for their invite code.
               </p>
             </div>
             {joinError && (
