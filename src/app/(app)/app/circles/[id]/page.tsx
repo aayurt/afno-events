@@ -23,8 +23,18 @@ import {
   Timer,
   Radio,
 } from 'lucide-react'
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet'
-import 'leaflet/dist/leaflet.css'
+import dynamic from 'next/dynamic'
+
+// react-leaflet touches `window` at module init, so it must only load in the
+// browser — Next.js server-renders 'use client' pages for the initial HTML.
+const CircleLiveMap = dynamic(() => import('./circle-map').then((m) => m.CircleLiveMap), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full w-full flex items-center justify-center bg-muted/40 text-sm text-muted-foreground">
+      Loading map…
+    </div>
+  ),
+})
 
 type Member = {
   user: any
@@ -159,22 +169,34 @@ export default function CircleDetailPage() {
   }, [circleId])
 
   useEffect(() => {
+    let cancelled = false
+    let locTimer: ReturnType<typeof setInterval> | null = null
+    let msgTimer: ReturnType<typeof setInterval> | null = null
     async function init() {
       const result = await authClient.getSession()
       const user = result.data?.user ?? null
+      if (cancelled) return
       setSession(user)
       if (user) {
         await Promise.all([loadCircle(), loadLocations(), loadMessages()])
-        const locTimer = setInterval(loadLocations, 10_000)
-        const msgTimer = setInterval(loadMessages, 15_000)
-        return () => {
-          clearInterval(locTimer)
-          clearInterval(msgTimer)
-        }
+        if (cancelled) return
+        setLoading(false)
+        locTimer = setInterval(loadLocations, 10_000)
+        msgTimer = setInterval(loadMessages, 15_000)
+      } else {
+        setLoading(false)
       }
-      setLoading(false)
     }
     init()
+    return () => {
+      cancelled = true
+      if (locTimer) clearInterval(locTimer)
+      if (msgTimer) clearInterval(msgTimer)
+      if (watchIdRef.current != null) {
+        navigator.geolocation.clearWatch(watchIdRef.current)
+        watchIdRef.current = null
+      }
+    }
   }, [loadCircle, loadLocations, loadMessages])
 
   useEffect(() => {
@@ -296,8 +318,7 @@ export default function CircleDetailPage() {
   const liveRows = locations.filter(isLive)
   const mapCenter: [number, number] =
     liveRows.length > 0 ? [liveRows[0]!.lat, liveRows[0]!.lng] : [20, 10]
-  const markerColor = (row: LocationRow) =>
-    String(row.user?.id ?? row.user) === String(session?.id) ? '#3b82f6' : '#22c55e'
+  const mapZoom = liveRows.length > 1 ? 14 : 15
 
   if (loading) {
     return (
@@ -450,38 +471,7 @@ export default function CircleDetailPage() {
         ) : (
           <Card className="overflow-hidden rounded-2xl">
             <div className="h-[420px] w-full relative z-0">
-              <MapContainer
-                center={mapCenter}
-                zoom={liveRows.length > 1 ? 14 : 15}
-                scrollWheelZoom
-                className="h-full w-full"
-                key={`${circleId}-${liveRows.length}`}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                {liveRows.map((row) => (
-                  <CircleMarker
-                    key={row.id}
-                    center={[row.lat, row.lng]}
-                    radius={String(row.user?.id ?? row.user) === String(session?.id) ? 9 : 7}
-                    pathOptions={{
-                      color: markerColor(row),
-                      fillColor: markerColor(row),
-                      fillOpacity: 0.35,
-                      weight: 2,
-                    }}
-                  >
-                    <Tooltip direction="top" offset={[0, -8]}>
-                      <div className="text-xs font-medium">
-                        {memberName(row.user)}
-                        {String(row.user?.id ?? row.user) === String(session?.id) && ' (you)'}
-                      </div>
-                    </Tooltip>
-                  </CircleMarker>
-                ))}
-              </MapContainer>
+              <CircleLiveMap rows={liveRows} myUserId={String(session?.id)} center={mapCenter} zoom={mapZoom} />
             </div>
             <CardContent className="p-3 border-t border-border">
               <div className="flex items-center gap-4 flex-wrap text-xs text-muted-foreground">

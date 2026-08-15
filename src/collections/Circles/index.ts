@@ -467,10 +467,12 @@ export const Circles: CollectionConfig = {
             return Response.json({ error: 'Not a member of this circle' }, { status: 403 })
           }
 
+          // routeParams ids arrive as strings; the relationship field needs the numeric serial id.
+          const circleId = Number(id)
           const existing = await req.payload.find({
             collection: 'circle-locations' as any,
             where: {
-              circle: { equals: id },
+              circle: { equals: circleId },
               user: { equals: req.user.id },
             },
             limit: 1,
@@ -478,7 +480,7 @@ export const Circles: CollectionConfig = {
           })
 
           const data: any = {
-            circle: id,
+            circle: circleId,
             user: req.user.id,
             lat,
             lng,
@@ -813,7 +815,7 @@ export const Circles: CollectionConfig = {
           const doc = await req.payload.create({
             collection: 'circle-messages' as any,
             data: {
-              circle: id,
+              circle: Number(id),
               sender: req.user.id,
               message,
             },
