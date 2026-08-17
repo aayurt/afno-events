@@ -98,6 +98,15 @@ export const EventPhotos: CollectionConfig = {
           return Response.json({ error: 'file is required' }, { status: 400 })
         }
 
+        // Explicit generous limit (Payload 3.x has no collection-level maxFileSize).
+        const MAX_IMAGE_SIZE = 25 * 1024 * 1024 // 25MB
+        if (file.size > MAX_IMAGE_SIZE) {
+          return Response.json(
+            { error: 'Image is too large. Maximum size is 25MB.' },
+            { status: 413 },
+          )
+        }
+
         let eventId: string | null = null
         if (dataStr) {
           try {

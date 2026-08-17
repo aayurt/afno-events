@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { TicketPurchase } from './ticket-purchase'
 import { ShareButtons } from './share-buttons'
 import { getScopedI18n } from '@/locales/server'
+import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -55,9 +56,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   return (
     <div className="min-h-screen bg-background">
       <div className="relative h-[50vh] md:h-[60vh] bg-muted overflow-hidden">
-        {typeof e.coverImage === 'object' && e.coverImage.url ? (
+        {getCardImageUrl(e.coverImage) ? (
           <img
-            src={e.coverImage.url}
+            src={getCardImageUrl(e.coverImage)!}
             alt={e.title}
             className="w-full h-full object-cover"
           />
@@ -305,9 +306,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 <Link key={ev.id} href={`/app/events/${ev.slug || ev.id}`}>
                   <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
                     <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
-                      {typeof ev.coverImage === 'object' && ev.coverImage.url ? (
+                      {getCardImageUrl(ev.coverImage) ? (
                         <img
-                          src={ev.coverImage.url}
+                          src={getCardImageUrl(ev.coverImage)!}
                           alt={ev.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />

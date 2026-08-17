@@ -12,6 +12,7 @@ import { useScopedI18n } from '@/locales/client'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { useTheme } from '@/providers/Theme'
+import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
 export default function ProfilePage() {
   const t = useScopedI18n('profile')
@@ -516,9 +517,9 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                     <Link key={fav.id} href={`/app/events/${ev.slug || ev.id}`}>
                       <Card className="hover:shadow-md transition-shadow">
                         <CardContent className="p-4 flex gap-4">
-                          {typeof ev.coverImage === 'object' && ev.coverImage.url ? (
+                          {getCardImageUrl(ev.coverImage) ? (
                             <img
-                              src={ev.coverImage.url}
+                              src={getCardImageUrl(ev.coverImage)!}
                               alt=""
                               className="w-20 h-20 rounded-lg object-cover shrink-0"
                             />

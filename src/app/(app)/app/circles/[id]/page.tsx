@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
+import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import {
   Users,
   User,
@@ -379,8 +380,8 @@ export default function CircleDetailPage() {
       {/* Header */}
       <Card className="overflow-hidden rounded-2xl">
         <div className="relative h-40 bg-gradient-to-br from-primary/20 to-primary/5">
-          {typeof circle.coverImage === 'object' && circle.coverImage?.url ? (
-            <img src={circle.coverImage.url} alt={circle.name} className="w-full h-full object-cover" />
+          {getCardImageUrl(circle.coverImage) ? (
+            <img src={getCardImageUrl(circle.coverImage)!} alt={circle.name} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Users size={56} className="text-primary/40" />

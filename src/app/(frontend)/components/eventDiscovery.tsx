@@ -5,6 +5,7 @@ import { Calendar, MapPin, Search } from 'lucide-react'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import Link from 'next/link'
+import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
 export default async function EventDiscovery() {
   const payload = await getPayload({ config: configPromise })
@@ -60,9 +61,7 @@ export default async function EventDiscovery() {
             </div>
           ) : (
             events.map((event: any) => {
-              const coverUrl = typeof event.coverImage === 'object' && event.coverImage?.url
-                ? event.coverImage.url
-                : null
+              const coverUrl = getCardImageUrl(event.coverImage)
 
               return (
                 <Link key={event.id} href={`/app/events/${event.slug || event.id}`}>

@@ -17,6 +17,7 @@ type Args = {
 
 import { TAG_OPTIONS } from '@/config/tags'
 import { getScopedI18n } from '@/locales/server'
+import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
 export default async function EventsPage({ searchParams: searchParamsPromise }: Args) {
   const t = await getScopedI18n('events')
@@ -113,9 +114,9 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
             <Link key={event.id} href={`/app/events/${event.slug || event.id}`}>
               <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
                 <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
-                  {typeof event.coverImage === 'object' && event.coverImage.url ? (
+                  {getCardImageUrl(event.coverImage) ? (
                     <img
-                      src={event.coverImage.url}
+                      src={getCardImageUrl(event.coverImage)!}
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

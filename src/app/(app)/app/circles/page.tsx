@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
+import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import {
   Users,
   Plus,
@@ -251,9 +252,9 @@ export default function CirclesPage() {
               <Link key={circle.id} href={`/app/circles/${circle.id}`}>
                 <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full">
                   <div className="relative h-32 bg-gradient-to-br from-primary/15 to-primary/5">
-                    {typeof circle.coverImage === 'object' && circle.coverImage?.url ? (
+                    {getCardImageUrl(circle.coverImage) ? (
                       <img
-                        src={circle.coverImage.url}
+                        src={getCardImageUrl(circle.coverImage)!}
                         alt={circle.name}
                         className="w-full h-full object-cover"
                       />
