@@ -123,12 +123,17 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
               </div>
             )}
 
-            <div className="flex gap-4 justify-center pt-4">
-              <Link href="/app/events">
-                <Button variant="outline">{t('browseMoreEvents')}</Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <Link href="/app/tickets">
+                <Button className="gap-2">
+                  <Ticket size={16} /> {t('viewMyTickets')}
+                </Button>
               </Link>
               <Link href="/app/profile?tab=orders">
-                <Button>{t('viewMyOrders')}</Button>
+                <Button variant="outline">{t('viewMyOrders')}</Button>
+              </Link>
+              <Link href="/app/events">
+                <Button variant="ghost">{t('browseMoreEvents')}</Button>
               </Link>
             </div>
           </CardContent>

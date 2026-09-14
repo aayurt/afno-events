@@ -10,13 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
+import { useScopedI18n } from '@/locales/client'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import {
   Users,
   Plus,
   LogIn,
   User,
-  MapPin,
   Loader2,
   ArrowRight,
   Copy,
@@ -56,6 +56,10 @@ function MemberAvatar({ user, size = 'md' }: { user: any; size?: 'sm' | 'md' }) 
 }
 
 export default function CirclesPage() {
+  const t = useScopedI18n('circles') as (
+    key: string,
+    params?: Record<string, string | number>,
+  ) => string
   const router = useRouter()
   const [session, setSession] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -81,16 +85,16 @@ export default function CirclesPage() {
     try {
       const res = await fetch('/api/circles/my', { credentials: 'include' })
       if (!res.ok) {
-        setError(`Failed to load squads (${res.status})`)
+        setError(t('loadFailed', { status: res.status }))
         return
       }
       const data = await res.json()
       setCircles(data.docs || [])
       setError(null)
     } catch {
-      setError('Could not load your squads. Please try again.')
+      setError(t('loadFailedGeneric'))
     }
-  }, [])
+  }, [t])
 
   useEffect(() => {
     async function init() {
@@ -116,7 +120,7 @@ export default function CirclesPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setCreateError(data.errors?.[0]?.message || `Failed to create squad (${res.status})`)
+        setCreateError(data.errors?.[0]?.message || t('createFailed', { status: res.status }))
         return
       }
       setCreateOpen(false)
@@ -125,7 +129,7 @@ export default function CirclesPage() {
       await load()
       router.push(`/app/circles/${data.doc?.id ?? data.id}`)
     } catch {
-      setCreateError('Network error while creating squad.')
+      setCreateError(t('createNetworkError'))
     } finally {
       setCreating(false)
     }
@@ -145,7 +149,7 @@ export default function CirclesPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setJoinError(data.error || `Failed to join (${res.status})`)
+        setJoinError(data.error || t('joinFailed', { status: res.status }))
         return
       }
       setJoinOpen(false)
@@ -153,7 +157,7 @@ export default function CirclesPage() {
       await load()
       router.push(`/app/circles/${data.id}`)
     } catch {
-      setJoinError('Network error while joining squad.')
+      setJoinError(t('joinNetworkError'))
     } finally {
       setJoining(false)
     }
@@ -184,11 +188,11 @@ export default function CirclesPage() {
         <Card className="w-full max-w-md text-center p-8 space-y-6">
           <Users size={48} className="mx-auto text-muted-foreground" />
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold">Your Squads</h1>
-            <p className="text-muted-foreground">Sign in to create and join squads with your friends.</p>
+            <h1 className="text-2xl font-bold">{t('signInTitle')}</h1>
+            <p className="text-muted-foreground">{t('signInDesc')}</p>
           </div>
           <Link href="/app/auth/login?redirect=/app/circles">
-            <Button size="lg" className="w-full">Sign In</Button>
+            <Button size="lg" className="w-full">{t('signIn')}</Button>
           </Link>
         </Card>
       </div>
@@ -199,17 +203,15 @@ export default function CirclesPage() {
     <div className="container py-12 space-y-8">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Squads</h1>
-          <p className="text-muted-foreground">
-            Share your live location, see who&apos;s nearby, and chat with your squad.
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" className="gap-2" onClick={() => setJoinOpen(true)}>
-            <LogIn size={16} /> Join
+            <LogIn size={16} /> {t('join')}
           </Button>
           <Button className="gap-2" onClick={() => setCreateOpen(true)}>
-            <Plus size={16} /> New Squad
+            <Plus size={16} /> {t('newSquad')}
           </Button>
         </div>
       </div>
@@ -227,18 +229,15 @@ export default function CirclesPage() {
               <Users size={28} className="text-primary" />
             </div>
             <div className="space-y-1">
-              <p className="text-lg font-semibold">No squads yet</p>
-              <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                Create a squad for your friends or family, then share the invite code so they can
-                join and share live locations.
-              </p>
+              <p className="text-lg font-semibold">{t('emptyTitle')}</p>
+              <p className="text-sm text-muted-foreground max-w-sm mx-auto">{t('emptyDesc')}</p>
             </div>
             <div className="flex gap-3 justify-center pt-2">
               <Button variant="outline" className="gap-2" onClick={() => setJoinOpen(true)}>
-                <LogIn size={16} /> Join with code
+                <LogIn size={16} /> {t('joinWithCode')}
               </Button>
               <Button className="gap-2" onClick={() => setCreateOpen(true)}>
-                <Plus size={16} /> Create squad
+                <Plus size={16} /> {t('createSquad')}
               </Button>
             </div>
           </CardContent>
@@ -265,7 +264,7 @@ export default function CirclesPage() {
                     )}
                     <div className="absolute top-3 right-3">
                       <span className="bg-black/50 text-white text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur">
-                        {members.length} {members.length === 1 ? 'member' : 'members'}
+                        {members.length} {members.length === 1 ? t('memberOne') : t('memberMany')}
                       </span>
                     </div>
                   </div>
@@ -298,7 +297,7 @@ export default function CirclesPage() {
                               e.preventDefault()
                               copyCode(circle.id, circle.inviteCode!)
                             }}
-                            title="Copy invite code"
+                            title={t('copyInvite')}
                             className="text-muted-foreground hover:text-foreground transition-colors"
                           >
                             {copiedCode === circle.id ? (
@@ -327,24 +326,24 @@ export default function CirclesPage() {
 
       {/* Create circle dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogHeader onClose={() => setCreateOpen(false)}>Create a new squad</DialogHeader>
+        <DialogHeader onClose={() => setCreateOpen(false)}>{t('createTitle')}</DialogHeader>
         <DialogContent>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Squad name</label>
+              <label className="text-sm font-medium">{t('squadName')}</label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Weekend Crew"
+                placeholder={t('squadNamePlaceholder')}
                 autoFocus
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Description (optional)</label>
+              <label className="text-sm font-medium">{t('descriptionOptional')}</label>
               <Textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="What is this squad about?"
+                placeholder={t('descriptionPlaceholder')}
                 rows={3}
               />
             </div>
@@ -353,11 +352,11 @@ export default function CirclesPage() {
             )}
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="outline" className="flex-1" onClick={() => setCreateOpen(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button type="submit" className="flex-1" disabled={creating || !name.trim()}>
                 {creating ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                {creating ? 'Creating…' : 'Create'}
+                {creating ? t('creating') : t('create')}
               </Button>
             </div>
           </form>
@@ -366,32 +365,30 @@ export default function CirclesPage() {
 
       {/* Join dialog */}
       <Dialog open={joinOpen} onOpenChange={setJoinOpen}>
-        <DialogHeader onClose={() => setJoinOpen(false)}>Join a squad</DialogHeader>
+        <DialogHeader onClose={() => setJoinOpen(false)}>{t('joinTitle')}</DialogHeader>
         <DialogContent>
           <form onSubmit={handleJoin} className="space-y-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Invite code</label>
+              <label className="text-sm font-medium">{t('inviteCode')}</label>
               <Input
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                placeholder="e.g. a1b2c3d4"
+                placeholder={t('inviteCodePlaceholder')}
                 autoFocus
                 className="font-mono uppercase tracking-widest"
               />
-              <p className="text-xs text-muted-foreground">
-                Ask a squad member for their invite code.
-              </p>
+              <p className="text-xs text-muted-foreground">{t('joinHint')}</p>
             </div>
             {joinError && (
               <p className="text-sm text-red-600 dark:text-red-400">{joinError}</p>
             )}
             <div className="flex gap-3 pt-2">
               <Button type="button" variant="outline" className="flex-1" onClick={() => setJoinOpen(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button type="submit" className="flex-1" disabled={joining || !code.trim()}>
                 {joining ? <Loader2 size={16} className="animate-spin" /> : <LogIn size={16} />}
-                {joining ? 'Joining…' : 'Join'}
+                {joining ? t('joining') : t('join')}
               </Button>
             </div>
           </form>

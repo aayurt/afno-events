@@ -7,7 +7,9 @@ import { authClient, signOut } from '@/lib/auth/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight, Languages, Bell, Shield, Monitor, ImageIcon, Camera } from 'lucide-react'
+import { Calendar, Heart, LogOut, MapPin, Ticket, User, Loader2, CreditCard, CheckCircle, Clock, XCircle, ChevronLeft, ChevronRight, Languages, Bell, BellRing, Shield, Monitor, ImageIcon, Camera, UserCog, KeyRound, Trash2, ScanLine } from 'lucide-react'
+import { ChangePasswordDialog, DeleteAccountDialog } from './account-dialogs'
+import { CategoryNotificationsDialog } from './category-dialog'
 import { useScopedI18n } from '@/locales/client'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
@@ -15,7 +17,10 @@ import { useTheme } from '@/providers/Theme'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
 export default function ProfilePage() {
-  const t = useScopedI18n('profile')
+  const t = useScopedI18n('profile') as (
+    key: string,
+    params?: Record<string, string | number>,
+  ) => string
   const gt = useScopedI18n('gallery')
   const router = useRouter()
   const [session, setSession] = useState<any>(null)
@@ -33,6 +38,10 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [langOpen, setLangOpen] = useState(false)
   const [themeOpen, setThemeOpen] = useState(false)
+  const [pwOpen, setPwOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [catOpen, setCatOpen] = useState(false)
+  const [userDoc, setUserDoc] = useState<any>(null)
   const { theme } = useTheme()
   const themeLabel = theme === null ? t('themeSystem') : theme === 'light' ? t('themeLight') : t('themeDark')
 
@@ -50,16 +59,19 @@ export default function ProfilePage() {
 
       if (user) {
         try {
-          const [favRes, ordRes, paidRes, photoRes] = await Promise.all([
+          const [favRes, ordRes, paidRes, photoRes, userRes] = await Promise.all([
             fetch(`/api/favorites?where[user][equals]=${user.id}&depth=2&limit=50`),
             fetch(`/api/orders?where[buyer][equals]=${user.id}&depth=2&limit=${ORDERS_PER_PAGE}&page=${ordersPage}&sort=-createdAt`),
             fetch(`/api/orders?where[buyer][equals]=${user.id}&where[status][equals]=paid&limit=1&depth=0`),
             fetch(`/api/event-photos?where[uploader][equals]=${user.id}&depth=2&limit=50&sort=-createdAt`),
+            fetch(`/api/users/${user.id}?depth=1`),
           ])
           const favData = await favRes.json()
           const ordData = await ordRes.json()
           const paidData = await paidRes.json()
           const photoData = await photoRes.json()
+          const userData = await userRes.json()
+          setUserDoc(userData)
           setFavorites(favData.docs || [])
           setOrders(ordData.docs || [])
           setOrdersTotalPages(ordData.totalPages || 1)
@@ -69,12 +81,8 @@ export default function ProfilePage() {
 
           if (user.image && typeof user.image === 'string' && user.image.startsWith('http')) {
             setAvatarUrl(user.image)
-          } else {
-            const userRes = await fetch(`/api/users/${user.id}?depth=1`)
-            const userData = await userRes.json()
-            if (userData.image && typeof userData.image === 'object' && userData.image.url) {
-              setAvatarUrl(userData.image.url)
-            }
+          } else if (userData.image && typeof userData.image === 'object' && userData.image.url) {
+            setAvatarUrl(userData.image.url)
           }
         } catch {}
       }
@@ -368,6 +376,31 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
             </CardContent>
           </Card>
 
+          {(userDoc?.role === 'admin' || userDoc?.role === 'super-admin') && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('adminTools')}</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="divide-y divide-border">
+                  <Link
+                    href="/app/admin/check-in"
+                    className="flex items-center gap-3 px-6 py-4 hover:bg-muted/40 transition-colors"
+                  >
+                    <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <ScanLine size={16} className="text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">{t('ticketCheckIn')}</p>
+                      <p className="text-xs text-muted-foreground">{t('ticketCheckInDesc')}</p>
+                    </div>
+                    <ChevronRight size={16} className="text-muted-foreground/50 shrink-0" />
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>{t('preferences')}</CardTitle>
@@ -382,10 +415,15 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                   : session.notifications?.email
                   ? t('notifEmail')
                   : t('notifOff')
+                const savedCats = Array.isArray(userDoc?.subscribedCategories) ? userDoc.subscribedCategories : []
+                const catValue = savedCats.length === 0
+                  ? t('categoryAll')
+                  : t('categoriesSelected', { count: savedCats.length })
                 return [
                   { key: 'language', label: t('language'), value: langLabel, icon: Languages, onManage: () => setLangOpen(true) },
                   { key: 'theme', label: t('theme'), value: themeLabel, icon: Monitor, onManage: () => setThemeOpen(true) },
                   { key: 'notifications', label: t('notifications'), value: notifValue, icon: Bell },
+                  { key: 'categories', label: t('categoryNotifications'), value: catValue, icon: BellRing, onManage: () => setCatOpen(true) },
                   { key: 'security', label: t('security'), value: t('manageSecurity'), icon: Shield },
                 ]
               })().map(({ label, value, icon: Icon, onManage }) => (
@@ -481,6 +519,57 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
               </CardContent>
             </Card>
           )}
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('accountSecurity')}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="divide-y divide-border">
+                <Link
+                  href="/app/profile/edit"
+                  className="flex items-center gap-3 px-6 py-4 hover:bg-muted/40 transition-colors"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <UserCog size={16} className="text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{t('editProfile')}</p>
+                    <p className="text-xs text-muted-foreground">{t('editProfileInfo')}</p>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground/50 shrink-0" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setPwOpen(true)}
+                  className="w-full flex items-center gap-3 px-6 py-4 hover:bg-muted/40 transition-colors text-left"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <KeyRound size={16} className="text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{t('changePassword')}</p>
+                    <p className="text-xs text-muted-foreground">{t('changePasswordInfo')}</p>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground/50 shrink-0" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteOpen(true)}
+                  className="w-full flex items-center gap-3 px-6 py-4 hover:bg-muted/40 transition-colors text-left"
+                >
+                  <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
+                    <Trash2 size={16} className="text-red-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-red-600">{t('deleteAccount')}</p>
+                    <p className="text-xs text-muted-foreground">{t('deleteAccountDesc')}</p>
+                  </div>
+                  <ChevronRight size={16} className="text-muted-foreground/50 shrink-0" />
+                </button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -669,6 +758,18 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
           )}
         </div>
       )}
+
+      <ChangePasswordDialog open={pwOpen} onClose={() => setPwOpen(false)} />
+      <DeleteAccountDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        userId={Number(session?.id)}
+      />
+      <CategoryNotificationsDialog
+        open={catOpen}
+        onClose={() => setCatOpen(false)}
+        userId={Number(session?.id)}
+      />
     </div>
   )
 }
