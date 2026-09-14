@@ -162,7 +162,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
                     <div className="absolute top-2 left-2">
                       <span
-                        className="bg-foreground/85 text-white text-xs font-semibold rounded-full px-2 py-0.5"
+                        className="bg-background/85 text-foreground border border-border text-xs font-semibold rounded-full px-2.5 py-1 backdrop-blur-sm"
                       >
                         {event.tags?.[0] || t('allEvents')}
                       </span>
@@ -194,7 +194,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                       </CardTitle>
                     </CardHeader>
 
-                    <CardContent className="p-4 flex flex-col flex-1 gap-2">
+                    <CardContent className="px-4 pt-3 pb-4 flex flex-col flex-1 min-h-[7.5rem] gap-2">
                       {event.location?.location && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <MapPin size={12} />
@@ -202,7 +202,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                         </p>
                       )}
 
-                      <div className="mt-auto pt-3 flex items-baseline justify-between">
+                      <div className="mt-auto pt-2.5 flex items-baseline justify-between">
                         <span className={stockClass}>
                           {priceText}
                         </span>
