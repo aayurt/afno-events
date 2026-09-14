@@ -67,6 +67,12 @@ ssh "$SERVER" bash -s <<'EOF'
   [ -f AuthKey.p8 ] && cp AuthKey.p8 .next/standalone/AuthKey.p8
   [ -f serviceAccountKey.json ] && cp serviceAccountKey.json .next/standalone/serviceAccountKey.json
 
+  echo "🖼️  Ensuring media directories..."
+  mkdir -p public/media
+  ln -sfn /var/www/vhosts/afnoevents.co.uk/public/media .next/standalone/public/media
+  mkdir -p /Users/aayurtshrestha/projects/self/AfnoEvent/server/public
+  ln -sfn /var/www/vhosts/afnoevents.co.uk/public/media /Users/aayurtshrestha/projects/self/AfnoEvent/server/public/media
+
   echo "📦 Ensuring VPS Linux sharp in standalone..."
   mkdir -p .next/standalone/node_modules
   rm -rf .next/standalone/node_modules/sharp .next/standalone/node_modules/@img
