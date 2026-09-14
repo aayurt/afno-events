@@ -23,19 +23,19 @@
     flex-direction: column;
     gap: 0.375rem;
     padding: 1.5rem;
-    border-bottom: 1px solid var(--theme-border, #e5e7eb);
+    border-bottom: 1px solid hsl(var(--border));
 
     .login-title {
       font-size: 1.25rem;
       font-weight: 600;
       line-height: 1.5rem;
-      color: var(--theme-text, #1f2937);
+      color: hsl(var(--foreground));
       margin: 0;
     }
 
     .login-description {
       font-size: 0.875rem;
-      color: var(--theme-text-secondary, #6b7280);
+      color: hsl(var(--muted-foreground));
       margin: 0;
     }
   }
@@ -61,8 +61,8 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.75rem;
-    border: 1px solid var(--theme-border, #e5e7eb);
-    background-color: var(--theme-bg, #ffffff);
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--background));
     border-radius: 0.375rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
@@ -70,7 +70,7 @@
     font-weight: 500;
 
     &:hover:not(:disabled) {
-      background-color: var(--theme-elevation-50, #f9fafb);
+      background-color: hsl(var(--muted));
     }
 
     &:disabled {
@@ -100,7 +100,7 @@
     top: 0;
     left: 0;
     right: 0;
-    border-top: 1px solid var(--theme-border, #e5e7eb);
+    border-top: 1px solid hsl(var(--border));
   }
 
   .divider-text {
@@ -112,8 +112,8 @@
 
     span {
       padding: 0 0.5rem;
-      background-color: var(--theme-bg, #ffffff);
-      color: var(--theme-text-secondary, #6b7280);
+      background-color: hsl(var(--background));
+      color: hsl(var(--muted-foreground));
     }
   }
 }
@@ -133,26 +133,26 @@
   label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--theme-text, #1f2937);
+    color: hsl(var(--foreground));
   }
 
   input {
     width: 100%;
     height: 2.5rem;
     padding: 0.75rem;
-    border: 1px solid var(--theme-border, #e5e7eb);
+    border: 1px solid hsl(var(--border));
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    background-color: var(--theme-bg, #ffffff);
-    color: var(--theme-text, #1f2937);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     transition:
       border-color 0.2s ease,
       box-shadow 0.2s ease;
 
     &:focus {
       outline: none;
-      border-color: var(--theme-primary, #4f46e5);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      border-color: hsl(var(--ring));
+      box-shadow: 0 0 0 3px hsl(var(--ring)/0.15);
     }
 
     &:disabled {
@@ -161,7 +161,7 @@
     }
 
     &::placeholder {
-      color: var(--theme-text-tertiary, #9ca3af);
+      color: hsl(var(--muted-foreground));
     }
   }
 }
@@ -169,10 +169,10 @@
 // Error Message
 .error-message {
   border-radius: 0.375rem;
-  background-color: rgba(220, 38, 38, 0.1);
+  background-color: hsl(var(--destructive)/0.1);
   padding: 0.75rem;
   font-size: 0.875rem;
-  color: var(--theme-error, #dc2626);
+  color: hsl(var(--destructive));
 }
 
 // Submit Button
@@ -183,7 +183,7 @@
   gap: 0.5rem;
   width: 100%;
   padding: 0.75rem;
-  background-color: var(--theme-primary, #4f46e5);
+  background-color: hsl(var(--primary));
   color: white;
   border: none;
   border-radius: 0.375rem;
@@ -193,7 +193,7 @@
   transition: background-color 0.2s ease;
 
   &:hover:not(:disabled) {
-    background-color: var(--theme-primary-dark, #4338ca);
+    background-color: hsl(var(--primary)/0.9);
   }
 
   &:disabled {
@@ -223,31 +223,31 @@
   }
 
   .text {
-    color: var(--theme-text-secondary, #6b7280);
+    color: hsl(var(--muted-foreground));
   }
 }
 
 // Access Denied
 .access-denied-card {
-  border: 1px solid rgba(220, 38, 38, 0.5);
+  border: 1px solid hsl(var(--destructive)/0.5);
 
   .access-denied-header {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     padding: 1.5rem;
-    border-bottom: 1px solid var(--theme-border, #e5e7eb);
+    border-bottom: 1px solid hsl(var(--border));
 
     .access-denied-title {
       font-size: 1.25rem;
       font-weight: 600;
-      color: var(--theme-error, #dc2626);
+      color: hsl(var(--destructive));
       margin: 0;
     }
 
     .access-denied-description {
       font-size: 0.875rem;
-      color: var(--theme-text-secondary, #6b7280);
+      color: hsl(var(--muted-foreground));
       margin: 0;
     }
   }
@@ -260,23 +260,23 @@
 
     p {
       font-size: 0.875rem;
-      color: var(--theme-text-secondary, #6b7280);
+      color: hsl(var(--muted-foreground));
       margin: 0;
     }
 
     button {
       padding: 0.75rem 1rem;
-      background-color: var(--theme-elevation-100, #f3f4f6);
-      border: 1px solid var(--theme-border, #e5e7eb);
+      background-color: hsl(var(--muted));
+      border: 1px solid hsl(var(--border));
       border-radius: 0.375rem;
-      color: var(--theme-text, #1f2937);
+      color: hsl(var(--foreground));
       font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: var(--theme-elevation-150, #e5e7eb);
+        background-color: hsl(var(--muted));
       }
 
       &:disabled {
@@ -322,7 +322,7 @@
 // Links
 .forgot-password-link {
   font-size: 0.875rem;
-  color: var(--theme-text-secondary, #6b7280);
+  color: hsl(var(--muted-foreground));
   text-decoration: none;
 
   &:hover {
@@ -334,15 +334,15 @@
   margin-top: 1rem;
   text-align: center;
   font-size: 0.875rem;
-  color: var(--theme-text-secondary, #6b7280);
+  color: hsl(var(--muted-foreground));
 }
 
 .signup-link {
   text-decoration: underline;
-  color: var(--theme-text, #1f2937);
+  color: hsl(var(--foreground));
 
   &:hover {
-    color: var(--theme-primary, #4f46e5);
+    color: hsl(var(--primary));
   }
 }
 
