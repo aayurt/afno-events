@@ -195,7 +195,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <main className={cn('flex-1', isAuthPage ? '' : 'pt-16 pb-6')}>
+      <main className={cn('flex flex-col flex-1 min-h-[calc(100vh-5.5rem)]', isAuthPage ? '' : 'pt-16 pb-6')}>
         {children}
         {!isAuthPage && (
           <footer className="border-t border-border bg-background mt-12">
