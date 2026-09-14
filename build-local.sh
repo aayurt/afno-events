@@ -18,44 +18,91 @@ if [ ! -f .env ]; then
 fi
 
 echo "🏗️  Building Next.js locally..."
-# build:deploy = next build (uses .env) + assemble standalone dir.
-# The staging Mac .env points at the same Neon DB prod uses, so prerendering works
-# and matches prod content. Build failure aborts BEFORE anything touches the server.
+# Clean previous build artifacts
+rm -rf .next/standalone
+
 pnpm build:deploy
 
 echo ""
-echo "📂 Assembling standalone output..."
+echo "📂 Verifying and assembling standalone output..."
 pnpm build:standalone
 
-echo ""
-echo "📡 Syncing build to server..."
-rsync -az --delete .next/standalone/ "$SERVER:$REMOTE_PATH/.next/standalone/"
-rsync -az .next/static/ "$SERVER:$REMOTE_PATH/.next/standalone/.next/static/"
-rsync -az --delete public/ "$SERVER:$REMOTE_PATH/.next/standalone/public/"
+# Handle case where outputFileTracing creates nested server.js
+if [ ! -f .next/standalone/server.js ]; then
+  NESTED_SERVER=$(find .next/standalone -name "server.js" | head -n 1)
+  if [ -n "$NESTED_SERVER" ]; then
+    echo "⚠️  Found nested server.js at $NESTED_SERVER, copying to .next/standalone/server.js"
+    cp "$NESTED_SERVER" .next/standalone/server.js
+  else
+    echo "❌ .next/standalone/server.js not found after build!"
+    exit 1
+  fi
+fi
 
 echo ""
-echo "🚀 Deploying on server..."
+echo "📡 Syncing build to server (protecting VPS sharp, media, and secrets)..."
+rsync -az --delete \
+  --exclude 'node_modules/sharp' \
+  --exclude 'node_modules/@img' \
+  --exclude '.env*' \
+  --exclude '*.p8' \
+  --exclude 'serviceAccountKey.json' \
+  .next/standalone/ "$SERVER:$REMOTE_PATH/.next/standalone/"
+
+rsync -az .next/static/ "$SERVER:$REMOTE_PATH/.next/standalone/.next/static/"
+
+rsync -az --delete \
+  --exclude 'media' \
+  public/ "$SERVER:$REMOTE_PATH/.next/standalone/public/"
+
+echo ""
+echo "🚀 Configuring and deploying on server..."
 ssh "$SERVER" bash -s <<'EOF'
+  set -euo pipefail
   cd /var/www/vhosts/afnoevents.co.uk
   source ~/.nvm/nvm.sh
 
-  echo "📦 Rebuilding native modules (sharp)..."
-  pnpm rebuild:native
+  echo "🔑 Ensuring secrets in standalone..."
+  [ -f .env ] && cp .env .next/standalone/.env
+  [ -f AuthKey.p8 ] && cp AuthKey.p8 .next/standalone/AuthKey.p8
+  [ -f serviceAccountKey.json ] && cp serviceAccountKey.json .next/standalone/serviceAccountKey.json
 
-  echo "🔄 Restarting PM2..."
-  pm2 delete multi-tenant-portfolio >/dev/null 2>&1 || true
-  pm2 start ecosystem.config.cjs
+  echo "📦 Ensuring VPS Linux sharp in standalone..."
+  mkdir -p .next/standalone/node_modules
+  rm -rf .next/standalone/node_modules/sharp .next/standalone/node_modules/@img
+  if [ -d node_modules/sharp ]; then
+    cp -r node_modules/sharp .next/standalone/node_modules/
+  fi
+  if [ -d node_modules/@img ]; then
+    cp -r node_modules/@img .next/standalone/node_modules/
+  fi
+
+  echo "🧪 Verifying sharp loads in standalone..."
+  node -e "
+    try {
+      const s = require('./.next/standalone/node_modules/sharp');
+      console.log('✅ Sharp verified in standalone:', s.versions.sharp);
+    } catch(e) {
+      console.warn('Fallback test with root sharp:', e.message);
+      const s = require('sharp');
+      console.log('✅ Sharp verified from root:', s.versions.sharp);
+    }
+  "
+
+  echo "🔄 Restarting PM2 process..."
+  pm2 reload multi-tenant-portfolio --update-env || pm2 restart multi-tenant-portfolio || pm2 start ecosystem.config.cjs
   pm2 save
 
   echo "⏳ Waiting for app to come up..."
   sleep 5
-  for i in 1 2 3 4 5 6; do
+  CODE="000"
+  for i in 1 2 3 4 5 6 7 8; do
     CODE=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/ || true)
     [ "$CODE" = "200" ] && break
     sleep 3
   done
   echo "ℹ️  http://localhost:8080 → HTTP $CODE"
-  [ "$CODE" = "200" ] || { echo "❌ App not healthy after restart — check pm2 logs"; exit 1; }
+  [ "$CODE" = "200" ] || { echo "❌ App not healthy after restart (HTTP $CODE) — check pm2 logs"; exit 1; }
 
   echo "✅ Deploy complete!"
 EOF

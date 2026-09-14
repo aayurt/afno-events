@@ -1,6 +1,11 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
 import redirects from './redirects.js'
+
+const filename = fileURLToPath(import.meta.url)
+const dirname = path.dirname(filename)
 
 const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
   ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
@@ -23,6 +28,7 @@ const nextConfig = {
   reactStrictMode: true,
   redirects,
   output: 'standalone',
+  outputFileTracingRoot: dirname,
   eslint: {
     ignoreDuringBuilds: true,
   },
