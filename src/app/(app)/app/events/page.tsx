@@ -18,6 +18,7 @@ type Args = {
 import { TAG_OPTIONS } from '@/config/tags'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { FavoriteButton } from './[slug]/favorite-button'
 
 function formatMonthDay(startDatetime: string | null) {
   if (!startDatetime) return ''
@@ -123,10 +124,11 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
           </Link>
         </div>
       ) : (
+        <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {events.map((event: any) => {
             const isFeatured = event.id === featuredEvent?.id
-            const { month, day } = formatMonthDay(event.startDatetime)
+            const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
             const isFree = event.pricing?.type === 'free'
             const priceText = isFree ? t('free') : event.pricing?.priceRange || t('paid')
             const stockClass = isFree ? 'text-muted-foreground' : 'text-primary text-[11px] font-bold'
@@ -174,6 +176,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                     <div className="absolute top-2 right-2">
                       <FavoriteButton eventId={event.id} />
                     </div>
+                  </div>
 
                     <CardHeader className="flex-1 p-4">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
@@ -211,11 +214,11 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                         </span>
                       </div>
                     </CardContent>
-                  </Card>
-                </Link>
-              </div>
+                </Card>
+              </Link>
             )
-          ))}
+          })}
+        </div>
 
           {totalPages > 1 && (
             <div className="flex justify-center gap-4 pt-8">
@@ -234,7 +237,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
               )}
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   )
