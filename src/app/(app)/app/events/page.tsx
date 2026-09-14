@@ -19,6 +19,14 @@ import { TAG_OPTIONS } from '@/config/tags'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
+function formatMonthDay(startDatetime: string | null) {
+  if (!startDatetime) return ''
+  const date = new Date(startDatetime)
+  const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+  const day = date.getDate()
+  return { month, day }
+}
+
 export default async function EventsPage({ searchParams: searchParamsPromise }: Args) {
   const t = await getScopedI18n('events')
   const { q, tag, page: pageStr } = await searchParamsPromise
@@ -44,7 +52,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
   }
 
   if (tag) {
-    where.tags = { in: tag }
+    where.tags = { in: [tag] }
   }
 
   const result = await payload.find({
@@ -58,6 +66,8 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
   const { docs: events, totalPages, page } = result
   const current = page ?? 1
+
+  const featuredEvent = events.find((e: any) => e.featured === true) || events[0] || null
 
   return (
     <div className="container py-12 space-y-10">
@@ -91,7 +101,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                 <Button
                   type="button"
                   variant={isActive ? 'default' : 'outline'}
-                  className="rounded-full"
+                  className="rounded-full px-3 py-1 text-sm"
                 >
                   {label}
                 </Button>
@@ -101,6 +111,10 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
         </div>
       </form>
 
+      <p className="my-8 text-primary/70 text-sm capitalize">
+        This week in Kathmandu Valley
+      </p>
+
       {events.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-xl text-muted-foreground">{t('noEventsFound')}</p>
@@ -109,91 +123,116 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {events.map((event: any) => (
-            <Link key={event.id} href={`/app/events/${event.slug || event.id}`}>
-              <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
-                <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
-                  {getCardImageUrl(event.coverImage) ? (
-                    <img
-                      src={getCardImageUrl(event.coverImage)!}
-                      alt={event.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                      <Calendar size={48} className="opacity-20" />
-                    </div>
-                  )}
-                  {event.pricing?.type === 'paid' && (
-                    <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
-                      {event.pricing.priceRange || t('paid')}
-                    </div>
-                  )}
-                  {event.pricing?.type === 'free' && (
-                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        {t('free')}
-                      </div>
-                  )}
-                </div>
-                <CardHeader className="flex-1">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <Calendar size={14} />
-                    {event.startDatetime
-                      ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })
-                      : t('tbd')}
-                  </div>
-                  <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                    {event.title}
-                  </CardTitle>
-                  <p className="text-sm text-muted-foreground line-clamp-2 mt-2">
-                    {event.description || t('noDescription')}
-                  </p>
-                </CardHeader>
-                <CardContent className="pt-0 mt-auto space-y-2">
-                  {event.location?.location && (
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <MapPin size={14} />
-                      {event.location.location}
-                    </p>
-                  )}
-                  {event.tags && event.tags.length > 0 && (
-                    <div className="flex gap-2 flex-wrap">
-                      {event.tags.slice(0, 3).map((t: string) => (
-                        <span
-                          key={t}
-                          className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          {events.map((event: any) => {
+            const isFeatured = event.id === featuredEvent?.id
+            const { month, day } = formatMonthDay(event.startDatetime)
+            const isFree = event.pricing?.type === 'free'
+            const priceText = isFree ? t('free') : event.pricing?.priceRange || t('paid')
+            const stockClass = isFree ? 'text-muted-foreground' : 'text-primary text-[11px] font-bold'
+            const stockText = isFree ? 'Free entry' : 'Available'
 
-      {totalPages > 1 && (
-        <div className="flex justify-center gap-4 pt-8">
-          {current > 1 && (
-            <Link href={`/app/events?page=${current - 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
-              <Button variant="outline">{t('previous')}</Button>
-            </Link>
-          )}
-          <span className="flex items-center text-muted-foreground">
-            {t('pageOf', { page: current, totalPages })}
-          </span>
-          {current < totalPages && (
-            <Link href={`/app/events?page=${current + 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
-              <Button variant="outline">{t('next')}</Button>
-            </Link>
+            return (
+              <Link
+                key={event.id}
+                href={`/app/events/${event.slug || event.id}`}
+                className="group overflow-hidden"
+              >
+                <Card className="rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-200 group-hover:shadow-xl group-hover:-translate-y-1">
+                  <div className="relative aspect-[4/5] bg-muted overflow-hidden shrink-0">
+                    <div
+                      className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-80"
+                      style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)' }}
+                    />
+                    {getCardImageUrl(event.coverImage) ? (
+                      <img
+                        src={getCardImageUrl(event.coverImage)!}
+                        alt={event.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div
+                        className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center"
+                      >
+                        <Calendar size={48} className="opacity-20" />
+                      </div>
+                    )}
+
+                    <div className="absolute top-2 left-2">
+                      <span
+                        className="bg-foreground/85 text-white text-xs font-semibold rounded-full px-2 py-0.5"
+                      >
+                        {event.tags?.[0] || t('allEvents')}
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-2 left-2 bg-white rounded-xl px-2.5 py-1.5 text-xs font-semibold">
+                      <span className="text-primary uppercase text-xs">{month}</span>
+                      <span className="ml-1 font-bold">{day}</span>
+                    </div>
+
+                    <div className="absolute top-2 right-2">
+                      <FavoriteButton eventId={event.id} />
+                    </div>
+
+                    <CardHeader className="flex-1 p-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                        <Calendar size={14} />
+                        {event.startDatetime
+                          ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })
+                          : t('tbd')}
+                      </div>
+                      <CardTitle className="text-xl font-bold tracking-tight line-clamp-2">
+                        {event.title}
+                      </CardTitle>
+                    </CardHeader>
+
+                    <CardContent className="p-4 flex-1 flex flex-col justify-between">
+                      <p className="font-bold tracking-tight text-sm line-clamp-1">
+                        {event.title}
+                      </p>
+                      {event.location?.location && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <MapPin size={12} />
+                          {event.location.location}
+                        </p>
+                      )}
+
+                      <div className="mt-2 flex items-baseline justify-between">
+                        <span className={stockClass}>
+                          {priceText}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {stockText}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </div>
+            )
+          ))}
+
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-4 pt-8">
+              {current > 1 && (
+                <Link href={`/app/events?page=${current - 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
+                  <Button variant="outline">{t('previous')}</Button>
+                </Link>
+              )}
+              <span className="flex items-center text-muted-foreground">
+                {t('pageOf', { page: current, totalPages })}
+              </span>
+              {current < totalPages && (
+                <Link href={`/app/events?page=${current + 1}${q ? `&q=${q}` : ''}${tag ? `&tag=${tag}` : ''}`}>
+                  <Button variant="outline">{t('next')}</Button>
+                </Link>
+              )}
+            </div>
           )}
         </div>
       )}
