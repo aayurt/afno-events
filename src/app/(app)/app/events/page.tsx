@@ -178,7 +178,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                     </div>
                   </div>
 
-                    <CardHeader className="flex-1 p-4">
+                    <CardHeader className="p-4 pb-1">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                         <Calendar size={14} />
                         {event.startDatetime
@@ -194,10 +194,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                       </CardTitle>
                     </CardHeader>
 
-                    <CardContent className="p-4 flex-1 flex flex-col justify-between">
-                      <p className="font-bold tracking-tight text-sm line-clamp-1">
-                        {event.title}
-                      </p>
+                    <CardContent className="p-4 flex flex-col flex-1 gap-2">
                       {event.location?.location && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <MapPin size={12} />
@@ -205,7 +202,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                         </p>
                       )}
 
-                      <div className="mt-2 flex items-baseline justify-between">
+                      <div className="mt-auto pt-3 flex items-baseline justify-between">
                         <span className={stockClass}>
                           {priceText}
                         </span>
