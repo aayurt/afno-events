@@ -8,6 +8,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { TicketPurchase } from './ticket-purchase'
 import { ShareButtons } from './share-buttons'
+import { FavoriteButton } from './favorite-button'
+import { AddToCalendarButton, CountdownChip } from './event-niceties'
+import { RemindMeButton } from './remind-me'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 
@@ -41,17 +44,46 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const end = e.endDatetime ? new Date(e.endDatetime) : null
   const eventStatus = start && start > now ? 'upcoming' : end && end < now ? 'past' : start && start <= now && (!end || end >= now) ? 'live' : null
 
-  const suggestedResult = await payload.find({
-    collection: 'events',
-    where: {
-      enabled: { equals: true },
-      id: { not_equals: e.id },
-    } as any,
-    limit: 3,
-    depth: 1,
-    sort: '-startDatetime',
-  })
-  const suggestedEvents = suggestedResult.docs as any[]
+  // Same-organiser rail ("More from this organiser"), mirroring mobile — shown
+  // only when the event belongs to a tenant and that tenant has other events.
+  const tenant = e.tenant && typeof e.tenant === 'object' ? e.tenant : null
+  const tenantId = tenant?.id ?? e.tenant ?? null
+  const tenantSlug: string | null = tenant?.slug || null
+  let relatedEvents: any[] = []
+  if (tenantId != null) {
+    const relatedResult = await payload.find({
+      collection: 'events',
+      where: {
+        and: [
+          { enabled: { equals: true } },
+          { tenant: { equals: tenantId } },
+          { id: { not_equals: e.id } },
+        ],
+      } as any,
+      limit: 8,
+      depth: 1,
+      sort: '-startDatetime',
+    })
+    relatedEvents = relatedResult.docs as any[]
+  }
+
+  // Approved attendee photos (EventPhotos) — shown inline, full gallery below.
+  let approvedPhotos: any[] = []
+  if (e.galleryEnabled) {
+    const photosResult = await payload.find({
+      collection: 'event-photos',
+      where: {
+        and: [
+          { event: { equals: e.id } },
+          { status: { equals: 'approved' } },
+        ],
+      },
+      limit: 12,
+      depth: 1,
+      sort: '-createdAt',
+    })
+    approvedPhotos = photosResult.docs as any[]
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -81,6 +113,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             </span>
           </div>
         )}
+        <div className="absolute top-6 right-6 z-10">
+          <FavoriteButton eventId={e.id} />
+        </div>
       </div>
 
       <div className="container -mt-32 relative z-10">
@@ -130,10 +165,35 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                   {e.description}
                 </p>
               )}
+              {e.startDatetime && (
+                <div className="mt-6">
+                  <CountdownChip
+                    startDatetime={e.startDatetime}
+                    endDatetime={e.endDatetime}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="border-t border-border pt-8">
-              <h2 className="text-xl font-semibold mb-4">{t('dateTime')}</h2>
+              <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+                <h2 className="text-xl font-semibold">{t('dateTime')}</h2>
+                <div className="flex items-center gap-2">
+                  <RemindMeButton
+                    eventId={e.id}
+                    eventTitle={e.title}
+                    startDatetime={e.startDatetime}
+                    eventPath={`/app/events/${e.slug || e.id}`}
+                  />
+                  <AddToCalendarButton
+                    title={e.title}
+                    description={e.description}
+                    location={e.location?.location}
+                    startDatetime={e.startDatetime}
+                    endDatetime={e.endDatetime}
+                  />
+                </div>
+              </div>
               {e.startDatetime ? (
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -220,20 +280,35 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             {e.tenant && (
               <div className="border-t border-border pt-8">
                 <h2 className="text-xl font-semibold mb-4">{t('organiser')}</h2>
-                <div className="flex items-center gap-4">
-                  {e.tenant.organisationImage ? (
-                    <img
-                      src={typeof e.tenant.organisationImage === 'object' ? e.tenant.organisationImage.url : ''}
-                      alt={e.tenant.name}
-                      className="w-16 h-16 rounded-xl object-cover"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
-                      <User size={24} className="text-muted-foreground" />
+                {e.tenant.slug ? (
+                  <Link href={`/app/organisers/${e.tenant.slug}`} className="group block">
+                    <div className="flex items-center gap-4">
+                      {getCardImageUrl(e.tenant.organisationImage) ? (
+                        <img
+                          src={getCardImageUrl(e.tenant.organisationImage) as string}
+                          alt={e.tenant.name}
+                          className="w-16 h-16 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
+                          <User size={24} className="text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="font-semibold text-lg group-hover:text-primary transition-colors">
+                          {e.tenant.name}
+                        </p>
+                        <p className="text-sm text-muted-foreground flex items-center gap-1 group-hover:text-primary/70 transition-colors">
+                          {t('viewOrganiserEvents')} <ArrowRight size={14} />
+                        </p>
+                      </div>
                     </div>
-                  )}
-                  <p className="font-semibold text-lg">{e.tenant.name}</p>
-                </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <p className="font-semibold text-lg">{e.tenant.name}</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -243,9 +318,9 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {e.showcaseImages.map((item: any, i: number) => (
                     <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
-                      {typeof item.image === 'object' && item.image.url ? (
+                      {getCardImageUrl(item.image) ? (
                         <img
-                          src={item.image.url}
+                          src={getCardImageUrl(item.image) as string}
                           alt=""
                           className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                         />
@@ -262,6 +337,41 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                     </Link>
                   </div>
                 )}
+              </div>
+            )}
+
+            {approvedPhotos.length > 0 && (
+              <div className="border-t border-border pt-8">
+                <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+                  <h2 className="text-xl font-semibold">{t('eventPhotos')}</h2>
+                  <Link
+                    href={`/app/events/${e.slug || e.id}/gallery`}
+                    className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1"
+                  >
+                    {t('viewFullGallery')} <ArrowRight size={14} />
+                  </Link>
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {approvedPhotos.map((photo: any) => {
+                    const img = typeof photo.image === 'object' ? photo.image : null
+                    const src = img?.sizes?.thumbnail?.url || img?.url
+                    if (!src) return null
+                    return (
+                      <Link
+                        key={photo.id}
+                        href={`/app/events/${e.slug || e.id}/gallery`}
+                        className="block aspect-square rounded-xl overflow-hidden bg-muted"
+                      >
+                        <img
+                          src={src}
+                          alt=""
+                          loading="lazy"
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                        />
+                      </Link>
+                    )
+                  })}
+                </div>
               </div>
             )}
 
@@ -290,21 +400,27 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
         </div>
       </div>
 
-      {suggestedEvents.length > 0 && (
+      {relatedEvents.length > 0 && (
         <section className="border-t border-border mt-16 pt-12">
           <div className="container">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">{t('suggestedEvents')}</h2>
-              <Link href="/app/events">
-                <Button variant="ghost" size="sm" className="gap-1 text-primary">
-                  {t('viewAll')} <ArrowRight size={16} />
-                </Button>
-              </Link>
+              <h2 className="text-2xl font-bold">{t('moreFromOrganiser')}</h2>
+              {tenantSlug && (
+                <Link href={`/app/organisers/${tenantSlug}`}>
+                  <Button variant="ghost" size="sm" className="gap-1 text-primary">
+                    {t('viewAll')} <ArrowRight size={16} />
+                  </Button>
+                </Link>
+              )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {suggestedEvents.map((ev: any) => (
-                <Link key={ev.id} href={`/app/events/${ev.slug || ev.id}`}>
-                  <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
+            <div className="flex gap-5 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
+              {relatedEvents.map((ev: any) => (
+                <Link
+                  key={ev.id}
+                  href={`/app/events/${ev.slug || ev.id}`}
+                  className="w-60 shrink-0 snap-start group"
+                >
+                  <Card className="overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
                     <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
                       {getCardImageUrl(ev.coverImage) ? (
                         <img
@@ -325,10 +441,12 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                             ? new Date(ev.startDatetime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                             : 'TBD'}
                         </p>
-                        <h3 className="font-semibold group-hover:text-primary transition-colors">{ev.title}</h3>
+                        <h3 className="font-semibold group-hover:text-primary transition-colors line-clamp-2">
+                          {ev.title}
+                        </h3>
                       </div>
                       {ev.location?.location && (
-                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2 truncate">
                           <MapPin size={12} /> {ev.location.location}
                         </p>
                       )}
