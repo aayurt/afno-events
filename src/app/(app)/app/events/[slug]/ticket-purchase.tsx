@@ -112,7 +112,7 @@ export function TicketPurchase({ event }: { event: any }) {
       {hasExternalLink ? (
         <Button
           size="lg"
-          className="w-full rounded-xl"
+          className="w-full rounded-full"
           onClick={handlePurchase}
           disabled={loading}
         >
@@ -124,38 +124,40 @@ export function TicketPurchase({ event }: { event: any }) {
         </Button>
       ) : ticketTypes.length > 0 ? (
         <>
-          <div className="space-y-3">
-            {ticketTypes.map((tt) => (
-              <div
-                key={tt.name}
-                className="flex items-center justify-between p-3 rounded-xl bg-muted/50"
-              >
-                <div className="flex-1">
-                  <p className="font-semibold text-sm">{tt.name}</p>
+          <div className="border border-border rounded-2xl divide-y divide-border bg-card overflow-hidden">
+            {ticketTypes.map((tt) => {
+              const q = quantities[tt.name] || 0
+              return (
+              <div key={tt.name} className="flex items-center justify-between gap-3 p-3.5">
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm tracking-tight">{tt.name}</p>
                   {tt.description && (
-                    <p className="text-xs text-muted-foreground">{tt.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{tt.description}</p>
                   )}
                   <p className="text-sm font-bold text-primary mt-1">£{tt.price}</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 rounded-full border border-border bg-background p-1 shrink-0">
                   <button
                     onClick={() => updateQuantity(tt.name, -1)}
-                    className="w-8 h-8 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30"
-                    disabled={loading}
+                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    disabled={loading || q === 0}
+                    aria-label={`Remove one ${tt.name}`}
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="w-6 text-center font-semibold">{quantities[tt.name] || 0}</span>
+                  <span className="w-6 text-center font-bold text-sm">{q}</span>
                   <button
                     onClick={() => updateQuantity(tt.name, 1)}
                     className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
                     disabled={loading}
+                    aria-label={`Add one ${tt.name}`}
                   >
                     <Plus size={14} />
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
 
           {totalTickets > 0 && (
@@ -167,7 +169,7 @@ export function TicketPurchase({ event }: { event: any }) {
 
           <Button
             size="lg"
-            className="w-full rounded-xl"
+            className="w-full rounded-full"
             onClick={handlePurchase}
             disabled={loading || totalTickets === 0}
           >
@@ -187,7 +189,7 @@ export function TicketPurchase({ event }: { event: any }) {
       ) : isFree ? (
         <Button
           size="lg"
-          className="w-full rounded-xl"
+          className="w-full rounded-full"
           onClick={handlePurchase}
           disabled={loading}
         >

@@ -87,7 +87,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative h-[50vh] md:h-[60vh] bg-muted overflow-hidden">
+      <div className="relative h-[380px] md:h-[440px] bg-muted overflow-hidden">
         {getCardImageUrl(e.coverImage) ? (
           <img
             src={getCardImageUrl(e.coverImage)!}
@@ -119,31 +119,22 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
       </div>
 
       <div className="container -mt-32 relative z-10">
-        <div className="lg:hidden flex items-center gap-4 p-4 mb-6 bg-background/80 backdrop-blur-sm rounded-2xl border border-border sticky top-14 z-30 -mx-4">
-          <div className="flex-1 min-w-0 space-y-1">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Calendar size={12} />
-              {start
-                ? new Date(start).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-                : t('tbd')}
-              {e.location?.location && (
-                <>
-                  <span>•</span>
-                  <MapPin size={12} />
-                  <span className="truncate">{e.location.location}</span>
-                </>
-              )}
-            </div>
+        {/* Mobile sticky buy bar */}
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-muted-foreground truncate">{e.title}</p>
             <p className="font-bold text-primary">
-              {e.pricing?.priceRange || (e.pricing?.type === 'free' ? 'Free' : 'N/A')}
+              {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
             </p>
           </div>
           <a href="#ticket-card">
-            <Button size="sm" className="rounded-xl shrink-0">
+            <Button size="lg" className="rounded-full px-6 shrink-0">
               {t('getTickets')}
             </Button>
           </a>
         </div>
+        <div className="h-20 lg:hidden" aria-hidden="true" />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-10">
             {e.tags && e.tags.length > 0 && (
@@ -159,7 +150,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             )}
 
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold tracking-tight">{e.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-balance">{e.title}</h1>
               {e.description && (
                 <p className="text-muted-foreground text-lg mt-6 leading-relaxed whitespace-pre-line">
                   {e.description}
@@ -175,9 +166,43 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               )}
             </div>
 
+            <div className="flex gap-3 flex-wrap">
+              <div className="rounded-2xl border border-border bg-card px-4 py-2.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t('dateTime')}</div>
+                <div className="font-bold text-sm mt-0.5">
+                  {start
+                    ? new Date(start).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+                    : t('tbd')}
+                  {start && (
+                    <span className="text-muted-foreground font-medium">
+                      {' '}· {new Date(start).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
+                </div>
+              </div>
+              {e.location?.location && (
+                <div className="rounded-2xl border border-border bg-card px-4 py-2.5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t('venue')}</div>
+                  <div className="font-bold text-sm mt-0.5 truncate max-w-52">{e.location.location}</div>
+                </div>
+              )}
+              {tenant && (
+                <div className="rounded-2xl border border-border bg-card px-4 py-2.5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t('organiser')}</div>
+                  <div className="font-bold text-sm mt-0.5">{tenant.name}</div>
+                </div>
+              )}
+              <div className="rounded-2xl border border-border bg-card px-4 py-2.5">
+                <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{t('price')}</div>
+                <div className="font-bold text-sm mt-0.5 text-primary">
+                  {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
+                </div>
+              </div>
+            </div>
+
             <div className="border-t border-border pt-8">
               <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
-                <h2 className="text-xl font-semibold">{t('dateTime')}</h2>
+                <h2 className="text-xl font-bold tracking-tight">{t('dateTime')}</h2>
                 <div className="flex items-center gap-2">
                   <RemindMeButton
                     eventId={e.id}
@@ -230,7 +255,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.location?.location && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">{t('venue')}</h2>
+                <h2 className="text-xl font-bold tracking-tight mb-4">{t('venue')}</h2>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <MapPin className="text-primary" size={24} />
@@ -257,7 +282,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.location?.latitude != null && e.location?.longitude != null && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">{t('map')}</h2>
+                <h2 className="text-xl font-bold tracking-tight mb-4">{t('map')}</h2>
                 <div className="aspect-[2/1] rounded-xl overflow-hidden bg-muted relative">
                   <iframe
                     src={`https://maps.google.com/maps?q=${e.location.latitude},${e.location.longitude}&z=15&output=embed`}
@@ -279,7 +304,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.tenant && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">{t('organiser')}</h2>
+                <h2 className="text-xl font-bold tracking-tight mb-4">{t('organiser')}</h2>
                 {e.tenant.slug ? (
                   <Link href={`/app/organisers/${e.tenant.slug}`} className="group block">
                     <div className="flex items-center gap-4">
@@ -314,7 +339,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
             {e.showcaseImages && e.showcaseImages.length > 0 && (
               <div className="border-t border-border pt-8">
-                <h2 className="text-xl font-semibold mb-4">{t('gallery')}</h2>
+                <h2 className="text-xl font-bold tracking-tight mb-4">{t('gallery')}</h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {e.showcaseImages.map((item: any, i: number) => (
                     <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
@@ -343,7 +368,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             {approvedPhotos.length > 0 && (
               <div className="border-t border-border pt-8">
                 <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
-                  <h2 className="text-xl font-semibold">{t('eventPhotos')}</h2>
+                  <h2 className="text-xl font-bold tracking-tight">{t('eventPhotos')}</h2>
                   <Link
                     href={`/app/events/${e.slug || e.id}/gallery`}
                     className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1"
@@ -376,7 +401,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             )}
 
             <div className="border-t border-border pt-8">
-              <h2 className="text-xl font-semibold mb-4">{t('shareWithFriends')}</h2>
+              <h2 className="text-xl font-bold tracking-tight mb-4">{t('shareWithFriends')}</h2>
               <ShareButtons />
             </div>
           </div>
@@ -404,7 +429,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
         <section className="border-t border-border mt-16 pt-12">
           <div className="container">
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold">{t('moreFromOrganiser')}</h2>
+              <h2 className="text-2xl font-extrabold tracking-tight">{t('moreFromOrganiser')}</h2>
               {tenantSlug && (
                 <Link href={`/app/organisers/${tenantSlug}`}>
                   <Button variant="ghost" size="sm" className="gap-1 text-primary">
@@ -414,14 +439,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               )}
             </div>
             <div className="flex gap-5 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
-              {relatedEvents.map((ev: any) => (
+              {relatedEvents.map((ev: any) => {
+                const rStart = ev.startDatetime ? new Date(ev.startDatetime) : null
+                const rMonth = rStart ? rStart.toLocaleString('en-US', { month: 'short' }).toUpperCase() : ''
+                const rDay = rStart ? rStart.getDate() : ''
+                return (
                 <Link
                   key={ev.id}
                   href={`/app/events/${ev.slug || ev.id}`}
                   className="w-60 shrink-0 snap-start group"
                 >
                   <Card className="overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full flex flex-col">
-                    <div className="aspect-[16/9] bg-muted relative overflow-hidden shrink-0">
+                    <div className="aspect-[16/10] bg-muted relative overflow-hidden shrink-0">
                       {getCardImageUrl(ev.coverImage) ? (
                         <img
                           src={getCardImageUrl(ev.coverImage)!}
@@ -433,18 +462,18 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                           <Calendar size={40} className="opacity-20" />
                         </div>
                       )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      {rStart && (
+                        <div className="absolute bottom-2 left-2 bg-white rounded-lg px-2 py-1 text-center leading-tight">
+                          <div className="text-[9px] font-extrabold uppercase tracking-wide text-primary">{rMonth}</div>
+                          <div className="text-sm font-extrabold text-foreground">{rDay}</div>
+                        </div>
+                      )}
                     </div>
                     <CardContent className="p-4 flex-1 flex flex-col justify-between">
-                      <div>
-                        <p className="text-xs text-muted-foreground mb-1">
-                          {ev.startDatetime
-                            ? new Date(ev.startDatetime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-                            : 'TBD'}
-                        </p>
-                        <h3 className="font-semibold group-hover:text-primary transition-colors line-clamp-2">
-                          {ev.title}
-                        </h3>
-                      </div>
+                      <h3 className="font-bold tracking-tight group-hover:text-primary transition-colors line-clamp-2">
+                        {ev.title}
+                      </h3>
                       {ev.location?.location && (
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-2 truncate">
                           <MapPin size={12} /> {ev.location.location}
@@ -453,7 +482,8 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                     </CardContent>
                   </Card>
                 </Link>
-              ))}
+                )
+              })}
             </div>
           </div>
         </section>

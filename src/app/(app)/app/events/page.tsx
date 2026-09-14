@@ -138,7 +138,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
               <Link
                 key={event.id}
                 href={`/app/events/${event.slug || event.id}`}
-                className="group overflow-hidden"
+                className={`group overflow-hidden ${isFeatured ? 'col-span-2 row-span-2 max-lg:col-span-2' : ''}`}
               >
                 <Card className="rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-200 group-hover:shadow-xl group-hover:-translate-y-1">
                   <div className="relative aspect-[4/5] bg-muted overflow-hidden shrink-0">
@@ -189,7 +189,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                             })
                           : t('tbd')}
                       </div>
-                      <CardTitle className="text-xl font-bold tracking-tight line-clamp-2">
+                      <CardTitle className={`font-bold tracking-tight line-clamp-2 ${isFeatured ? 'text-2xl' : 'text-base'}`}>
                         {event.title}
                       </CardTitle>
                     </CardHeader>
