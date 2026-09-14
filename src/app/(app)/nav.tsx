@@ -165,7 +165,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
   }, [userId])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {!isAuthPage && (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="mx-auto max-w-6xl flex items-center justify-between h-22 px-4">
@@ -195,11 +195,11 @@ export function AppNav({ children }: { children: React.ReactNode }) {
         </header>
       )}
 
-      <main className={cn(isAuthPage ? '' : 'pt-16 pb-24')}>
+      <main className={cn('flex-1', isAuthPage ? '' : 'pt-16 pb-6')}>
         {children}
         {!isAuthPage && (
-          <footer className="border-t border-border bg-background mt-16">
-            <div className="mx-auto max-w-6xl px-4 py-10">
+          <footer className="border-t border-border bg-background mt-12">
+            <div className="mx-auto max-w-6xl px-4 py-6">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-2.5">
                   <img src="/logo.png" alt="AfnoEvents" className="h-20 w-20" />
@@ -217,12 +217,13 @@ export function AppNav({ children }: { children: React.ReactNode }) {
                   ))}
                 </nav>
               </div>
-              <div className="mt-6 text-center text-xs text-muted-foreground/60">
+              <div className="mt-4 text-center text-xs text-muted-foreground/60">
                 &copy; {new Date().getFullYear()} AfnoEvent. All rights reserved.
               </div>
             </div>
           </footer>
         )}
+        {!isAuthPage && <div className="h-16" aria-hidden="true" />}
       </main>
 
       {!isAuthPage && (

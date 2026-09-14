@@ -527,6 +527,7 @@ export default function CircleDetailPage() {
             <h1 className="text-2xl font-bold">{t('signInTitle')}</h1>
             <p className="text-muted-foreground">{t('signInDesc')}</p>
           </div>
+          <div className="pt-2" />
           <Link href="/app/auth/login?redirect=/app/circles">
             <Button size="lg" className="w-full">{t('signIn')}</Button>
           </Link>

@@ -291,6 +291,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
             <h1 className="text-2xl font-bold">{t('signInRequired')}</h1>
             <p className="text-muted-foreground">{t('signInDescription')}</p>
           </div>
+          <div className="pt-2" />
           <Link href="/app/auth/login?redirect=/app/profile">
             <Button size="lg" className="w-full">{t('signIn')}</Button>
           </Link>

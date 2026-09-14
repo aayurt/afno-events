@@ -145,6 +145,7 @@ export default function MyTicketsPage() {
             <h1 className="text-2xl font-bold">{t('signInRequired')}</h1>
             <p className="text-muted-foreground">{t('signInDescription')}</p>
           </div>
+          <div className="pt-2" />
           <Link href="/app/auth/login?redirect=/app/tickets">
             <Button size="lg" className="w-full gap-2">
               <LogIn size={16} /> {t('signIn')}
