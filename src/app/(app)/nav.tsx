@@ -205,7 +205,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
                   <img src="/logo.png" alt="AfnoEvents" className="h-20 w-20" />
                   <span className="font-semibold text-sm">AfnoEvent</span>
                 </div>
-                <nav className="flex items-center gap-6 text-sm text-muted-foreground">
+                <nav className="flex items-center gap-6 text-sm text-muted-foreground capitalize">
                   {getFooterLinks(t).map(({ href, label }) => (
                     <Link
                       key={href}
