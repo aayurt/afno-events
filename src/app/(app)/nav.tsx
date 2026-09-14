@@ -172,7 +172,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
             <Link href="/app" className="flex items-center shrink-0">
               <img src="/logo.png" alt="AfnoEvents" className="h-20 w-20" />
             </Link>
-            <span className="font-semibold text-base absolute left-1/2 -translate-x-1/2">{pageTitle}</span>
+            <span className="font-semibold text-base absolute left-1/2 -translate-x-1/2 capitalize">{pageTitle}</span>
             {authChecked && signedIn ? (
               <div className="flex items-center gap-1 shrink-0">
                 <HeaderBell
@@ -236,7 +236,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
                   key={href}
                   href={href}
                   className={cn(
-                    'flex flex-col items-center gap-0.5 px-4 py-1.5 text-xs font-medium transition-colors rounded-lg',
+                    'flex flex-col items-center gap-0.5 px-4 py-1.5 text-xs font-medium capitalize transition-colors rounded-lg',
                     active
                       ? 'text-primary'
                       : 'text-muted-foreground hover:text-foreground',
