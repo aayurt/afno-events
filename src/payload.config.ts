@@ -31,6 +31,7 @@ import { CircleLocations } from './collections/CircleLocations'
 import { CircleMessages } from './collections/CircleMessages'
 import { CircleAlerts } from './collections/CircleAlerts'
 import { AlertCooldowns } from './collections/AlertCooldowns'
+import { Subscribers } from './collections/Subscribers'
 import { startCleanupScheduler } from './utilities/cleanup'
 import { trustedOriginsValues } from './trustedOrigin'
 import {
@@ -115,6 +116,7 @@ export default buildConfig({
     CircleLocations,
     CircleAlerts,
     AlertCooldowns,
+    Subscribers,
   ],
   endpoints: [
     {

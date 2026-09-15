@@ -2,6 +2,7 @@ import { renderEmailLayout } from '../components/EmailLayout'
 
 export interface NewEventNotificationProps {
   recipientName?: string
+  recipientEmail?: string
   eventTitle: string
   eventDateText: string
   eventVenue: string
@@ -10,11 +11,13 @@ export interface NewEventNotificationProps {
   eventDescription?: string
   coverImageUrl?: string
   organiserName?: string
+  unsubscribeUrl?: string
 }
 
 export function renderNewEventNotificationHtml(props: NewEventNotificationProps): string {
   const greeting = props.recipientName ? `Hi ${props.recipientName},` : 'Hi there,'
   const eventUrl = `https://afnoevents.co.uk/app/events/${props.eventSlugOrId}`
+  const unsubLink = props.unsubscribeUrl || 'https://afnoevents.co.uk/api/newsletter/unsubscribe'
 
   const content = `
     <!-- Top Alert Tag -->
@@ -77,8 +80,14 @@ export function renderNewEventNotificationHtml(props: NewEventNotificationProps)
       </p>
     </div>
 
-    <div style="margin-top: 24px; padding: 12px; background-color: #f1f5f9; border-radius: 10px; text-align: center; font-size: 11px; color: #64748b;">
-      You received this because you are subscribed to new event announcements on Afno Events UK.
+    <!-- Compliant Unsubscribe Footer -->
+    <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+      <p style="margin: 0 0 4px;">
+        You received this announcement because you subscribed to Afno Events UK drops.
+      </p>
+      <p style="margin: 0;">
+        No longer want to receive these emails? <a href="${unsubLink}" style="color: #64748b; text-decoration: underline;">Unsubscribe in 1 click</a>.
+      </p>
     </div>
   `
 

@@ -7,6 +7,7 @@ import { getPayload } from 'payload'
 import Link from 'next/link'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import { APP_STORE_URL } from '@/utilities/constants'
+import { NewsletterSection } from '@/components/NewsletterSection'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -108,15 +109,16 @@ export default async function HomePage() {
               <form action="/app/events" method="GET" className="bg-card border border-border p-2.5 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-2 max-w-xl">
                 <div className="flex-1 flex items-center px-3 gap-2 border-b sm:border-b-0 sm:border-r border-border pb-2 sm:pb-0">
                   <Search className="text-muted-foreground w-4 h-4 flex-shrink-0" />
-                  <Input 
+                  <input 
+                    type="text"
                     name="q" 
                     placeholder="Search artist, festival, or venue..." 
-                    className="bg-transparent text-sm w-full border-none shadow-none focus-visible:ring-0 p-0 h-9 placeholder:text-muted-foreground/60" 
+                    className="bg-transparent text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-muted-foreground/60 text-foreground shadow-none ring-0 appearance-none" 
                   />
                 </div>
                 <div className="w-full sm:w-44 flex items-center px-3 gap-2 border-b sm:border-b-0 sm:border-r border-border pb-2 sm:pb-0">
                   <MapPin className="text-muted-foreground w-3.5 h-3.5 flex-shrink-0" />
-                  <select className="bg-transparent text-xs w-full outline-none text-foreground cursor-pointer">
+                  <select className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-foreground cursor-pointer appearance-none shadow-none ring-0">
                     <option className="bg-card">All UK Cities</option>
                     <option className="bg-card">London</option>
                     <option className="bg-card">Aldershot</option>
@@ -336,61 +338,66 @@ export default async function HomePage() {
 
       {/* 🟢 Dual Platform & App Showcase */}
       <section className="py-20 bg-muted/20">
-        <div className="container px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="container px-4 sm:px-6 space-y-16">
           
-          {/* FOR COMMUNITY & FANS */}
-          <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-primary/40 transition-all">
-            <div className="space-y-4">
-              <span className="text-xs uppercase font-mono tracking-widest text-primary font-bold flex items-center gap-2">
-                <QrCode size={16} />
-                FOR COMMUNITY & FANS
-              </span>
-              <h3 className="text-3xl font-black tracking-tight text-foreground">
-                Get passes straight to your Apple Wallet.
-              </h3>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                Never search through spam emails for a ticket PDF again. Download Afno Events on iOS for 1-tap gate scans, attendee circles with friends, and gate location notifications.
-              </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* FOR COMMUNITY & FANS */}
+            <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-primary/40 transition-all">
+              <div className="space-y-4">
+                <span className="text-xs uppercase font-mono tracking-widest text-primary font-bold flex items-center gap-2">
+                  <QrCode size={16} />
+                  FOR COMMUNITY & FANS
+                </span>
+                <h3 className="text-3xl font-black tracking-tight text-foreground">
+                  Get passes straight to your Apple Wallet.
+                </h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Never search through spam emails for a ticket PDF again. Download Afno Events on iOS for 1-tap gate scans, attendee circles with friends, and gate location notifications.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
+                <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
+                  <Button size="lg" className="rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs px-8 py-3.5 hover:scale-105 active:scale-95 transition-all shadow-md">
+                    Download on App Store
+                  </Button>
+                </a>
+                <span className="text-xs text-muted-foreground font-medium">
+                  Android app in active review
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
-              <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
-                <Button size="lg" className="rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs px-8 py-3.5 hover:scale-105 active:scale-95 transition-all shadow-md">
-                  Download on App Store
-                </Button>
-              </a>
-              <span className="text-xs text-muted-foreground font-medium">
-                Android app in active review
-              </span>
+            {/* FOR UK ORGANISERS & PROMOTERS */}
+            <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-secondary/40 transition-all">
+              <div className="space-y-4">
+                <span className="text-xs uppercase font-mono tracking-widest text-secondary font-bold flex items-center gap-2">
+                  <ShieldCheck size={16} />
+                  FOR UK ORGANISERS & PROMOTERS
+                </span>
+                <h3 className="text-3xl font-black tracking-tight text-foreground">
+                  Promote & sell to 15,000+ UK Nepalis.
+                </h3>
+                <p className="text-base text-muted-foreground leading-relaxed">
+                  Free event listings, automated Stripe payouts, door scanner app for gate volunteers, and multi-tenant organiser profiles. Start selling in minutes.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
+                <Link href="/contact-us">
+                  <Button size="lg" className="rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs px-8 py-3.5 shadow-lg shadow-primary/25 hover:scale-105 active:scale-95 transition-all">
+                    Sign Up Your Event
+                  </Button>
+                </Link>
+                <Link href="/contact-us" className="text-xs text-muted-foreground hover:text-foreground font-medium underline">
+                  Speak with Team
+                </Link>
+              </div>
             </div>
           </div>
 
-          {/* FOR UK ORGANISERS & PROMOTERS */}
-          <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-secondary/40 transition-all">
-            <div className="space-y-4">
-              <span className="text-xs uppercase font-mono tracking-widest text-secondary font-bold flex items-center gap-2">
-                <ShieldCheck size={16} />
-                FOR UK ORGANISERS & PROMOTERS
-              </span>
-              <h3 className="text-3xl font-black tracking-tight text-foreground">
-                Promote & sell to 15,000+ UK Nepalis.
-              </h3>
-              <p className="text-base text-muted-foreground leading-relaxed">
-                Free event listings, automated Stripe payouts, door scanner app for gate volunteers, and multi-tenant organiser profiles. Start selling in minutes.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
-              <Link href="/contact-us">
-                <Button size="lg" className="rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs px-8 py-3.5 shadow-lg shadow-primary/25 hover:scale-105 active:scale-95 transition-all">
-                  Sign Up Your Event
-                </Button>
-              </Link>
-              <Link href="/contact-us" className="text-xs text-muted-foreground hover:text-foreground font-medium underline">
-                Speak with Team
-              </Link>
-            </div>
-          </div>
+          {/* 🟢 Newsletter & Event Drop Alerts */}
+          <NewsletterSection />
 
         </div>
       </section>

@@ -3,8 +3,8 @@ import { renderVerifyEmailHtml, VerifyEmailProps } from './templates/VerifyEmail
 import { renderPasswordResetHtml, PasswordResetProps } from './templates/PasswordReset'
 import { renderTicketPurchaseHtml, TicketPurchaseEmailProps } from './templates/TicketPurchase'
 import { renderNewEventNotificationHtml, NewEventNotificationProps } from './templates/NewEventNotification'
+import { generateUnsubscribeToken } from '@/app/api/newsletter/unsubscribe/route'
 
-// Lazy initialize Resend client
 let resendInstance: Resend | null = null
 
 function getResend(): Resend {
@@ -71,17 +71,29 @@ export async function sendTicketPurchaseEmail(to: string, props: TicketPurchaseE
 }
 
 /**
- * 4. Send New Event Announcement Notification
+ * 4. Send New Event Announcement with RFC 8058 1-Click Unsubscribe Headers
  */
-export async function sendNewEventNotification(to: string | string[], props: NewEventNotificationProps) {
+export async function sendNewEventNotification(to: string, props: Omit<NewEventNotificationProps, 'unsubscribeUrl'>) {
   const resend = getResend()
-  const html = renderNewEventNotificationHtml(props)
-  const recipients = Array.isArray(to) ? to : [to]
+  
+  // Generate secure unsubscribe URL per recipient
+  const token = generateUnsubscribeToken(to)
+  const unsubscribeUrl = `https://afnoevents.co.uk/api/newsletter/unsubscribe?email=${encodeURIComponent(to)}&token=${token}`
+
+  const html = renderNewEventNotificationHtml({
+    ...props,
+    recipientEmail: to,
+    unsubscribeUrl,
+  })
 
   return await resend.emails.send({
     from: EMAIL_SENDERS.info,
-    to: recipients,
+    to: [to],
     subject: `New Event: ${props.eventTitle} — Tickets Open Now`,
     html,
+    headers: {
+      'List-Unsubscribe': `<${unsubscribeUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
   })
 }
