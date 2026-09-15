@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { ArrowRight, Calendar, MapPin, Search, Sparkles, Volume2, VolumeX, ShieldCheck, QrCode } from 'lucide-react'
+import { ArrowRight, Calendar, MapPin, Search, Sparkles, ShieldCheck, QrCode } from 'lucide-react'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import Link from 'next/link'
@@ -28,45 +28,59 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
       
-      {/* 🟢 Immersive Cinema Split-Hero with Video Window & Animations */}
-      <section className="relative border-b border-border/70 overflow-hidden pt-6 pb-16 lg:pt-12 lg:pb-24">
+      {/* 🟢 Split-Hero with Cinematic Background Video & Crisp Foreground Spotlight */}
+      <section className="relative min-h-[92vh] flex items-center border-b border-border/80 overflow-hidden py-16 lg:py-24">
         
-        {/* Animated Radial Gradients */}
-        <div className="absolute top-0 left-1/4 -translate-x-1/2 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[150px] pointer-events-none -z-10 animate-pulse duration-1000" />
-        <div className="absolute bottom-0 right-10 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[140px] pointer-events-none -z-10" />
+        {/* Full-Bleed Video Background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none filter brightness-[0.28] contrast-[1.1] scale-105"
+        >
+          <source src="/video/afno-diverse.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
 
-        <div className="container px-4 sm:px-6">
+        {/* Multi-layered Vignette & Brand Gradients for Readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/60 z-0 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/60 z-0 pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[160px] pointer-events-none z-0 animate-pulse duration-1000" />
+        <div className="absolute bottom-10 right-10 w-[500px] h-[500px] bg-secondary/25 rounded-full blur-[150px] pointer-events-none z-0" />
+
+        <div className="container px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Left 7 Cols: Brand Message, Interactive Search Bar, Community Stats */}
-            <div className="lg:col-span-7 space-y-8 text-left z-10">
+            <div className="lg:col-span-7 space-y-8 text-left">
               
-              {/* Badge with gentle shimmer */}
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-bold uppercase tracking-wider shadow-sm hover:scale-105 transition-transform duration-300">
+              {/* Badge with subtle glowing border */}
+              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-primary/40 text-primary text-xs font-bold uppercase tracking-wider shadow-lg hover:scale-105 transition-transform duration-300">
                 <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
                 <span>The Home for UK Nepalese Events</span>
               </div>
 
               <div className="space-y-4">
-                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05]">
+                <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.05] text-white">
                   Experience the <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-rose-400 to-secondary hover:brightness-125 transition-all">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-rose-300 to-blue-400 drop-shadow-sm">
                     Energy & Community.
                   </span>
                 </h1>
-                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
-                  Discover arena concerts, summer festivals, and exclusive nightlife across the UK. Direct Apple Wallet passes, live gate scans, and community circles.
+                <p className="text-base sm:text-lg text-gray-300 leading-relaxed max-w-xl">
+                  Bringing Nepali concerts, cultural festivals, sports, and club nights across the UK into one verified ticketing platform. Direct Apple Wallet passes, live gate scans, and 0% listing fee.
                 </p>
               </div>
 
-              {/* Enhanced Interactive Floating Search Bar */}
-              <form action="/app/events" method="GET" className="bg-card/90 backdrop-blur-xl border border-border/90 p-2.5 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2 max-w-xl hover:border-primary/40 transition-colors">
+              {/* Integrated High-Contrast Search Box */}
+              <form action="/app/events" method="GET" className="bg-card/90 backdrop-blur-xl border border-white/15 p-2.5 rounded-2xl shadow-2xl flex flex-col sm:flex-row gap-2 max-w-xl hover:border-primary/50 transition-colors">
                 <div className="flex-1 flex items-center px-3 gap-2 border-b sm:border-b-0 sm:border-r border-border/80 pb-2 sm:pb-0">
                   <Search className="text-muted-foreground w-4 h-4 flex-shrink-0" />
                   <Input 
                     name="q" 
                     placeholder="Search artist, festival, or venue..." 
-                    className="bg-transparent text-sm w-full border-none shadow-none focus-visible:ring-0 p-0 h-9 placeholder:text-muted-foreground/60" 
+                    className="bg-transparent text-sm w-full border-none shadow-none focus-visible:ring-0 p-0 h-9 placeholder:text-muted-foreground/60 text-foreground" 
                   />
                 </div>
                 <div className="w-full sm:w-44 flex items-center px-3 gap-2 border-b sm:border-b-0 sm:border-r border-border/80 pb-2 sm:pb-0">
@@ -79,75 +93,65 @@ export default async function HomePage() {
                     <option className="bg-card">Wembley</option>
                   </select>
                 </div>
-                <Button type="submit" className="bg-primary text-primary-foreground font-bold text-xs px-6 py-2.5 rounded-xl hover:scale-105 active:scale-95 shadow-lg shadow-primary/30 transition-all flex-shrink-0">
+                <Button type="submit" className="bg-primary text-primary-foreground font-bold text-xs px-6 py-2.5 rounded-xl hover:scale-105 active:scale-95 shadow-lg shadow-primary/40 transition-all flex-shrink-0">
                   Find Events
                 </Button>
               </form>
 
               {/* Verified Metrics Strip */}
-              <div className="grid grid-cols-3 gap-6 pt-4 border-t border-border/70 max-w-xl">
+              <div className="grid grid-cols-3 gap-6 pt-4 border-t border-white/10 max-w-xl">
                 <div className="group cursor-default">
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight group-hover:text-primary transition-colors">{events.length}+</div>
-                  <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">Live Events</div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white group-hover:text-primary transition-colors">{events.length}+</div>
+                  <div className="text-xs text-gray-400 uppercase font-medium mt-0.5">Live Events</div>
                 </div>
                 <div className="group cursor-default">
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight group-hover:text-secondary transition-colors">8</div>
-                  <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">UK Cities</div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white group-hover:text-blue-400 transition-colors">8</div>
+                  <div className="text-xs text-gray-400 uppercase font-medium mt-0.5">UK Cities</div>
                 </div>
                 <div className="group cursor-default">
                   <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-primary">0%</div>
-                  <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">Listing Fee</div>
+                  <div className="text-xs text-gray-400 uppercase font-medium mt-0.5">Listing Fee</div>
                 </div>
               </div>
             </div>
 
-            {/* Right 5 Cols: Cinematic Video Player & Headliner Card */}
-            <div className="lg:col-span-5">
-              <div className="relative group">
-                
-                {/* Glow ring around video card */}
-                <div className="absolute -inset-1.5 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-[2.7rem] blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-700" />
-                
-                <div className="relative bg-card border border-border/90 rounded-[2.5rem] p-5 sm:p-6 shadow-2xl overflow-hidden backdrop-blur-md">
+            {/* Right 5 Cols: Spotlight Featured Event Card with Real Poster Image */}
+            {featuredEvent && (
+              <div className="lg:col-span-5">
+                <div className="relative group">
                   
-                  {/* Cinematic Looping Video Stage */}
-                  <div className="aspect-[16/10] sm:aspect-[4/3] rounded-2xl bg-black relative overflow-hidden mb-5 border border-border shadow-inner">
-                    <video
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 filter brightness-90"
-                    >
-                      <source src="/video/afno-diverse.mp4" type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
+                  {/* Subtle animated border aura */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-primary/40 to-secondary/40 rounded-[2.7rem] blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-700" />
+                  
+                  <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
+                    <div className="relative bg-card/95 backdrop-blur-xl border border-white/15 rounded-[2.5rem] p-6 shadow-2xl overflow-hidden group-hover:border-primary/50 transition-all duration-300">
+                      
+                      {/* Event Poster Image Window */}
+                      <div className="aspect-[4/3] rounded-2xl bg-muted/60 relative overflow-hidden mb-5 border border-border shadow-inner">
+                        {featuredCover ? (
+                          <img 
+                            src={featuredCover} 
+                            alt={featuredEvent.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-muted">
+                            <Calendar className="w-12 h-12 text-muted-foreground/40" />
+                          </div>
+                        )}
+                        
+                        <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
+                          Headliner Spotlight
+                        </div>
 
-                    {/* Gradient Overlay & Controls */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+                        <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-md border border-white/20 text-white text-xs font-mono font-bold px-3 py-1.5 rounded-xl shadow-lg">
+                          {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'From £35' : 'Free Entry'}
+                        </div>
+                      </div>
 
-                    {/* Floating live indicator */}
-                    <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md border border-white/20 text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Community Moments
-                    </div>
-
-                    <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground text-[10px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
-                      UK Tours
-                    </div>
-
-                    {/* Quick video badge at bottom */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-                      <span className="font-semibold drop-shadow-md">Festivals & Arena Concerts</span>
-                      <span className="text-[10px] opacity-75 font-mono">1080p HD</span>
-                    </div>
-                  </div>
-
-                  {/* Spotlight Event Details Below Video */}
-                  {featuredEvent && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-primary font-semibold">
+                      {/* Event Information */}
+                      <div className="space-y-2.5 text-left">
+                        <div className="flex items-center gap-2 text-xs text-primary font-semibold">
                           <Calendar className="w-3.5 h-3.5" />
                           <span>
                             {featuredEvent.startDatetime
@@ -156,48 +160,50 @@ export default async function HomePage() {
                                   month: 'short',
                                   year: 'numeric',
                                 })
-                              : 'Next Upcoming'}
+                              : 'Date TBD'}
                           </span>
+                          {featuredEvent.location?.location && (
+                            <>
+                              <span>&bull;</span>
+                              <span className="text-muted-foreground truncate max-w-[180px]">
+                                {featuredEvent.location.location.split(',')[0]}
+                              </span>
+                            </>
+                          )}
                         </div>
-                        <span className="font-mono font-bold bg-muted/60 px-2 py-0.5 rounded-md text-foreground">
-                          {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'From £35' : 'Free Entry'}
+
+                        <h2 className="text-2xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                          {featuredEvent.title}
+                        </h2>
+
+                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                          {featuredEvent.description || 'Experience the UK Nepalese diaspora live concert. Instant QR digital passes delivered directly to your device.'}
+                        </p>
+                      </div>
+
+                      {/* Bottom Status & CTA */}
+                      <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
+                        <div className="text-xs font-semibold text-emerald-500 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Open for Booking</span>
+                        </div>
+                        <span className="px-5 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors shadow-md">
+                          Book Tickets &rarr;
                         </span>
                       </div>
 
-                      <h2 className="text-xl font-extrabold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                        {featuredEvent.title}
-                      </h2>
-
-                      {featuredEvent.location?.location && (
-                        <div className="flex items-center text-xs text-muted-foreground truncate">
-                          <MapPin size={13} className="mr-1.5 flex-shrink-0 text-muted-foreground" />
-                          <span className="truncate">{featuredEvent.location.location.split(',')[0]}</span>
-                        </div>
-                      )}
-
-                      <div className="pt-3 border-t border-border/80 flex items-center justify-between">
-                        <span className="text-[11px] font-medium text-emerald-500 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          Instant QR Pass
-                        </span>
-                        <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
-                          <Button size="sm" className="rounded-xl bg-foreground text-background hover:bg-primary hover:text-primary-foreground font-bold text-xs px-4 py-2 transition-all">
-                            Book Tickets &rarr;
-                          </Button>
-                        </Link>
-                      </div>
                     </div>
-                  )}
+                  </Link>
 
                 </div>
               </div>
-            </div>
+            )}
 
           </div>
         </div>
       </section>
 
-      {/* 🟢 Live Trending Grid Section with Interactive Hover Lift */}
+      {/* 🟢 Live Trending Grid Section with Hover Lift */}
       <section className="py-16 bg-background w-full" id="events">
         <div className="container px-4 sm:px-6 space-y-10">
           
@@ -242,7 +248,7 @@ export default async function HomePage() {
                         </div>
                       </div>
 
-                      <CardHeader className="p-5 space-y-2">
+                      <CardHeader className="p-5 space-y-2 text-left">
                         <div className="flex items-center text-xs font-semibold text-primary">
                           <Calendar size={14} className="mr-1.5" />
                           {event.startDatetime
@@ -280,7 +286,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 🟢 Dual Platform & App Showcase (Interactive Card Glows) */}
+      {/* 🟢 Dual Platform & App Showcase */}
       <section className="border-t border-border py-16 bg-muted/20">
         <div className="container px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
           
