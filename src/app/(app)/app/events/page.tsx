@@ -138,9 +138,9 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
               <Link
                 key={event.id}
                 href={`/app/events/${event.slug || event.id}`}
-                className={`group overflow-hidden ${isFeatured ? 'col-span-2 row-span-2 max-lg:col-span-2' : ''}`}
+                className={`group overflow-hidden ${isFeatured ? 'col-span-2 row-span-2 max-lg:col-span-2 h-auto' : ''}`}
               >
-                <Card className="rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-200 group-hover:shadow-xl group-hover:-translate-y-1">
+                <Card className={`rounded-2xl overflow-hidden flex flex-col transition-all duration-200 group-hover:shadow-xl group-hover:-translate-y-1 ${isFeatured ? 'h-auto' : 'h-full'}`}>
                   <div className="relative aspect-[4/5] bg-muted overflow-hidden shrink-0">
                     <div
                       className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-80"
@@ -199,12 +199,6 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                         <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-relaxed">
                           <MapPin size={13} className="shrink-0 mt-0.5 text-muted-foreground/80" />
                           <span>{event.location.location}</span>
-                        </p>
-                      )}
-
-                      {event.description && (
-                        <p className="text-xs text-muted-foreground/85 line-clamp-2 leading-relaxed">
-                          {event.description}
                         </p>
                       )}
 
