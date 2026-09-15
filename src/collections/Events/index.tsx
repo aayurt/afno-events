@@ -456,12 +456,12 @@ export const Events: CollectionConfig = {
       },
     },
     {
-      name: 'isActive',
+      name: 'isBookable',
       type: 'checkbox',
       required: false,
       defaultValue: true,
       admin: {
-        description: 'Active event (Open for Booking)',
+        description: 'Open for booking (uncheck to disable booking/tickets)',
         position: 'sidebar',
       },
     },

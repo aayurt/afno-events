@@ -11,39 +11,56 @@ import { APP_STORE_URL } from '@/utilities/constants'
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
 
-  // 1. Fetch only enabled events, sorted by nearest upcoming startDatetime
-  const now = new Date()
+  // 1. Fetch only enabled events
   const result = await payload.find({
     collection: 'events',
     where: { 
       enabled: { equals: true },
     },
-    limit: 20,
+    limit: 30,
     depth: 1,
     sort: 'startDatetime',
   })
 
   const allEvents = result.docs as any[]
-  
-  // Sort by nearest upcoming date first
+  const nowMs = Date.now()
+
+  // Helper to check whether an event is bookable (not expired and isBookable !== false)
+  const isEventBookable = (ev: any) => {
+    const eventTime = ev.startDatetime ? new Date(ev.startDatetime).getTime() : 0
+    const isExpired = eventTime > 0 && eventTime < nowMs
+    const bookableFlag = ev.isBookable ?? true
+    return !isExpired && bookableFlag
+  }
+
+  // Helper to check whether an event is expired
+  const isEventExpired = (ev: any) => {
+    const eventTime = ev.startDatetime ? new Date(ev.startDatetime).getTime() : 0
+    return eventTime > 0 && eventTime < nowMs
+  }
+
+  // Sort events chronologically: nearest upcoming first
   const sortedEvents = [...allEvents].sort((a, b) => {
     const timeA = a.startDatetime ? new Date(a.startDatetime).getTime() : Infinity
     const timeB = b.startDatetime ? new Date(b.startDatetime).getTime() : Infinity
     return timeA - timeB
   })
 
-  // Nearest event in the spotlight
-  const featuredEvent = sortedEvents[0]
-  // Events for the carousel (all enabled events)
+  // Upcoming bookable events (future + isBookable: true)
+  const upcomingBookableEvents = sortedEvents.filter(isEventBookable)
+
+  // Spotlight shows strictly the NEAREST BOOKABLE event (fallback to first event if none bookable)
+  const featuredEvent = upcomingBookableEvents[0] || sortedEvents[0]
   const marqueeEvents = sortedEvents
 
   const featuredCover = featuredEvent ? getCardImageUrl(featuredEvent.coverImage) : null
-  const isOpenForBooking = featuredEvent ? (featuredEvent.isActive ?? true) : false
+  const featuredIsBookable = featuredEvent ? isEventBookable(featuredEvent) : false
+  const featuredIsExpired = featuredEvent ? isEventExpired(featuredEvent) : false
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
       
-      {/* Inline keyframes for guaranteed marquee animation */}
+      {/* Inline CSS animation to guarantee smooth continuous marquee scroll */}
       <style>{`
         @keyframes marqueeScroll {
           0% { transform: translateX(0%); }
@@ -52,14 +69,14 @@ export default async function HomePage() {
         .animate-marquee-track {
           display: flex;
           width: max-content;
-          animation: marqueeScroll 40s linear infinite;
+          animation: marqueeScroll 45s linear infinite;
         }
         .animate-marquee-track:hover {
           animation-play-state: paused;
         }
       `}</style>
 
-      {/* 🟢 Split-Hero: Left Brand/Search & Right Nearest Spotlight Card */}
+      {/* 🟢 Split-Hero: Left Brand/Search & Right Spotlight Card */}
       <section className="relative border-b border-border/80 overflow-hidden pt-8 pb-16 lg:py-20">
         {/* Subtle Ambient Radial Brand Glows */}
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-primary/15 rounded-full blur-[150px] pointer-events-none -z-10" />
@@ -129,7 +146,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right 5 Cols: Nearest Event Spotlight Card */}
+            {/* Right 5 Cols: Nearest Bookable Event Spotlight Card */}
             {featuredEvent && (
               <div className="lg:col-span-5">
                 <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
@@ -147,7 +164,7 @@ export default async function HomePage() {
                         </div>
                       )}
                       <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
-                        Next Up
+                        {featuredIsBookable ? 'Featured Spotlight' : featuredIsExpired ? 'Past Event' : 'Featured'}
                       </div>
                       <div className="absolute bottom-3 right-3 bg-card/90 backdrop-blur-md border border-border text-foreground text-xs font-mono font-bold px-3 py-1 rounded-xl shadow-lg">
                         {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'Paid' : 'Free Entry'}
@@ -185,20 +202,25 @@ export default async function HomePage() {
                     </div>
 
                     <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
-                      {isOpenForBooking ? (
+                      {featuredIsBookable ? (
                         <div className="text-xs font-semibold text-emerald-500 flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                           <span>Open for Booking</span>
                         </div>
+                      ) : featuredIsExpired ? (
+                        <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground/60" />
+                          <span>Event Expired</span>
+                        </div>
                       ) : (
                         <div className="text-xs font-semibold text-amber-500 flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-amber-500" />
-                          <span>Announcement Only</span>
+                          <span>Booking Closed</span>
                         </div>
                       )}
                       
                       <span className="px-5 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        {isOpenForBooking ? 'Book Tickets →' : 'View Details →'}
+                        {featuredIsBookable ? 'Book Tickets →' : 'View Details →'}
                       </span>
                     </div>
                   </div>
@@ -236,10 +258,11 @@ export default async function HomePage() {
         {/* Infinite Moving Marquee Track */}
         <div className="animate-marquee-track gap-6 pl-6">
           
-          {/* Repeat set 3x to ensure uninterrupted infinite scroll across wide viewports */}
+          {/* Repeat set 3x to guarantee seamless infinite movement across all viewport sizes */}
           {[...marqueeEvents, ...marqueeEvents, ...marqueeEvents].map((event: any, idx: number) => {
             const coverUrl = getCardImageUrl(event.coverImage)
-            const activeBooking = event.isActive ?? true
+            const bookable = isEventBookable(event)
+            const expired = isEventExpired(event)
 
             return (
               <Link 
@@ -253,15 +276,17 @@ export default async function HomePage() {
                     <img 
                       src={coverUrl} 
                       alt={event.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${expired ? 'grayscale contrast-75 opacity-70' : ''}`} 
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-muted">
                       <Calendar className="w-10 h-10 text-muted-foreground/30" />
                     </div>
                   )}
+
+                  {/* Price or Expired Badge */}
                   <div className="absolute top-3 right-3 bg-card/90 backdrop-blur-md text-card-foreground text-xs font-mono font-bold px-2.5 py-1 rounded-lg border border-border shadow-sm">
-                    {event.pricing?.type === 'paid' ? event.pricing.priceRange || 'Paid' : 'Free'}
+                    {expired ? 'Expired' : event.pricing?.type === 'paid' ? event.pricing.priceRange || 'Paid' : 'Free'}
                   </div>
                 </div>
 
@@ -292,12 +317,13 @@ export default async function HomePage() {
                     </h3>
                   </div>
 
+                  {/* Booking / Details State */}
                   <div className="pt-2 border-t border-border/50 flex items-center justify-between text-xs">
-                    <span className={activeBooking ? "text-emerald-500 font-medium" : "text-muted-foreground"}>
-                      {activeBooking ? "● Booking Open" : "Coming Soon"}
+                    <span className={bookable ? "text-emerald-500 font-medium" : "text-muted-foreground"}>
+                      {bookable ? "● Open for Booking" : expired ? "Event Expired" : "Booking Closed"}
                     </span>
                     <span className="font-bold text-foreground group-hover:text-primary underline">
-                      Tickets &rarr;
+                      {bookable ? 'Tickets →' : 'Details →'}
                     </span>
                   </div>
                 </div>
@@ -308,7 +334,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 🟢 Dual Platform & App Showcase (Exact Requested Copy & Hierarchy) */}
+      {/* 🟢 Dual Platform & App Showcase */}
       <section className="py-20 bg-muted/20">
         <div className="container px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
           
