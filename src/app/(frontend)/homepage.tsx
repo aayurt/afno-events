@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ArrowRight, Calendar, MapPin, Search, Sparkles, ShieldCheck, QrCode } from 'lucide-react'
 import configPromise from '@payload-config'
@@ -60,7 +60,7 @@ export default async function HomePage() {
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
       
-      {/* Inline CSS animation to guarantee smooth continuous marquee scroll */}
+      {/* Inline CSS animation for the infinite marquee */}
       <style>{`
         @keyframes marqueeScroll {
           0% { transform: translateX(0%); }
@@ -146,83 +146,75 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right 5 Cols: Nearest Bookable Event Spotlight Card */}
+            {/* Right 5 Cols: Nearest Bookable Event Spotlight Card in the image's sleek full-bleed style */}
             {featuredEvent && (
               <div className="lg:col-span-5">
                 <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
-                  <div className="bg-card text-card-foreground border border-border/90 rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden group hover:border-primary/50 transition-all duration-300">
-                    <div className="aspect-[4/3] rounded-2xl bg-muted relative overflow-hidden mb-5 border border-border shadow-inner">
-                      {featuredCover ? (
-                        <img 
-                          src={featuredCover} 
-                          alt={featuredEvent.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-muted">
-                          <Calendar className="w-12 h-12 text-muted-foreground/40" />
-                        </div>
-                      )}
-                      <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
+                  <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] rounded-[2rem] overflow-hidden border border-primary/50 shadow-2xl group cursor-pointer bg-card hover:border-primary transition-all duration-300">
+                    
+                    {/* Full-bleed background poster */}
+                    {featuredCover ? (
+                      <img 
+                        src={featuredCover} 
+                        alt={featuredEvent.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-muted">
+                        <Calendar className="w-16 h-16 text-muted-foreground/40" />
+                      </div>
+                    )}
+
+                    {/* Gradient scrim overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
+
+                    {/* Top status badges */}
+                    <div className="absolute top-5 left-5 flex items-center gap-2">
+                      <span className="bg-primary text-primary-foreground text-[10px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
                         {featuredIsBookable ? 'Featured Spotlight' : featuredIsExpired ? 'Past Event' : 'Featured'}
-                      </div>
-                      <div className="absolute bottom-3 right-3 bg-card/90 backdrop-blur-md border border-border text-foreground text-xs font-mono font-bold px-3 py-1 rounded-xl shadow-lg">
-                        {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'Paid' : 'Free Entry'}
-                      </div>
+                      </span>
                     </div>
 
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-xs text-primary font-semibold">
-                        <Calendar className="w-3.5 h-3.5" />
+                    {/* Bottom-aligned metadata & typography directly matching the design */}
+                    <div className="absolute inset-x-0 bottom-0 p-6 space-y-1.5 text-left">
+                      {/* Coral-red metadata line: [DAY MONTH] • [LOCATION] */}
+                      <div className="text-xs font-bold uppercase tracking-wider text-[#FF2A55] flex items-center gap-1.5 drop-shadow-md">
                         <span>
                           {featuredEvent.startDatetime
                             ? new Date(featuredEvent.startDatetime).toLocaleDateString('en-GB', {
                                 day: 'numeric',
                                 month: 'short',
-                                year: 'numeric',
-                              })
-                            : 'Date TBD'}
+                              }).toUpperCase()
+                            : 'DATE TBD'}
                         </span>
                         {featuredEvent.location?.location && (
                           <>
-                            <span>&bull;</span>
-                            <span className="text-muted-foreground truncate max-w-[180px]">
-                              {featuredEvent.location.location.split(',')[0]}
+                            <span>•</span>
+                            <span className="truncate max-w-[200px]">
+                              {featuredEvent.location.location.split(',')[0].toUpperCase()}
                             </span>
                           </>
                         )}
                       </div>
 
-                      <h2 className="text-2xl font-bold tracking-tight text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                      {/* Heavy, clean title */}
+                      <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors">
                         {featuredEvent.title}
                       </h2>
-                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                        {featuredEvent.description || 'Verified Nepalese community event in the UK. Instant mobile QR passes available.'}
-                      </p>
+
+                      {/* Clean inline price & booking status */}
+                      <div className="flex items-center justify-between pt-1">
+                        <span className="text-sm font-semibold text-gray-200 font-mono drop-shadow-sm">
+                          {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'Paid' : 'Free Entry'}
+                        </span>
+
+                        <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          Open for Booking →
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
-                      {featuredIsBookable ? (
-                        <div className="text-xs font-semibold text-emerald-500 flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                          <span>Open for Booking</span>
-                        </div>
-                      ) : featuredIsExpired ? (
-                        <div className="text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-muted-foreground/60" />
-                          <span>Event Expired</span>
-                        </div>
-                      ) : (
-                        <div className="text-xs font-semibold text-amber-500 flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-amber-500" />
-                          <span>Booking Closed</span>
-                        </div>
-                      )}
-                      
-                      <span className="px-5 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        {featuredIsBookable ? 'Book Tickets →' : 'View Details →'}
-                      </span>
-                    </div>
                   </div>
                 </Link>
               </div>
@@ -232,7 +224,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 🟢 THE FEATURE: Infinite Smooth-Scrolling Poster Marquee Carousel */}
+      {/* 🟢 THE FEATURE: Infinite Smooth-Scrolling Poster Marquee Carousel in the exact image card style */}
       <section className="py-14 overflow-hidden relative border-b border-border/80 group">
         
         <div className="container px-4 sm:px-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -256,7 +248,7 @@ export default async function HomePage() {
         <div className="absolute top-16 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none" />
 
         {/* Infinite Moving Marquee Track */}
-        <div className="animate-marquee-track gap-6 pl-6">
+        <div className="animate-marquee-track gap-5 pl-6">
           
           {/* Repeat set 3x to guarantee seamless infinite movement across all viewport sizes */}
           {[...marqueeEvents, ...marqueeEvents, ...marqueeEvents].map((event: any, idx: number) => {
@@ -268,65 +260,73 @@ export default async function HomePage() {
               <Link 
                 key={`${event.id}-${idx}`} 
                 href={`/app/events/${event.slug || event.id}`}
-                className="w-64 sm:w-72 h-[410px] rounded-3xl overflow-hidden bg-card text-card-foreground border border-border shrink-0 relative group shadow-xl hover:border-primary/60 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+                className="w-64 sm:w-72 h-[380px] sm:h-[420px] rounded-2xl sm:rounded-[1.4rem] overflow-hidden shrink-0 relative group shadow-2xl transition-all duration-300 cursor-pointer border border-border hover:border-primary/70 hover:scale-[1.02]"
               >
-                {/* Poster Artwork Window */}
-                <div className="relative w-full h-[250px] overflow-hidden bg-muted">
-                  {coverUrl ? (
-                    <img 
-                      src={coverUrl} 
-                      alt={event.title} 
-                      className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${expired ? 'grayscale contrast-75 opacity-70' : ''}`} 
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                      <Calendar className="w-10 h-10 text-muted-foreground/30" />
-                    </div>
-                  )}
-
-                  {/* Price or Expired Badge */}
-                  <div className="absolute top-3 right-3 bg-card/90 backdrop-blur-md text-card-foreground text-xs font-mono font-bold px-2.5 py-1 rounded-lg border border-border shadow-sm">
-                    {expired ? 'Expired' : event.pricing?.type === 'paid' ? event.pricing.priceRange || 'Paid' : 'Free'}
+                {/* Full-bleed poster image */}
+                {coverUrl ? (
+                  <img 
+                    src={coverUrl} 
+                    alt={event.title} 
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${expired ? 'grayscale contrast-75 opacity-60' : ''}`} 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-card">
+                    <Calendar className="w-12 h-12 text-muted-foreground/30" />
                   </div>
-                </div>
+                )}
 
-                {/* Event Information */}
-                <div className="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="text-[11px] font-semibold text-primary flex items-center gap-1">
-                      <Calendar size={12} />
-                      <span>
-                        {event.startDatetime
-                          ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                            })
-                          : 'Upcoming'}
+                {/* Dark gradient scrim at the bottom (matches screenshot gradient) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-5 flex flex-col justify-end pointer-events-none" />
+
+                {/* Bottom-aligned text content */}
+                <div className="absolute inset-x-0 bottom-0 p-5 space-y-1 text-left z-10">
+                  {/* Meta line: Date • Location in bright coral-red */}
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#FF2A55] drop-shadow-md">
+                    <span>
+                      {event.startDatetime
+                        ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                          }).toUpperCase()
+                        : 'UPCOMING'}
+                    </span>
+                    {event.location?.location && (
+                      <>
+                        <span> • </span>
+                        <span>{event.location.location.split(',')[0].toUpperCase()}</span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* High-contrast bold title */}
+                  <h3 className="text-lg font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors line-clamp-2">
+                    {event.title}
+                  </h3>
+
+                  {/* Clean unbadged price or status text */}
+                  <div className="pt-1 flex items-center justify-between">
+                    <span className="text-xs font-mono text-gray-300 drop-shadow-sm">
+                      {expired 
+                        ? 'Expired' 
+                        : event.pricing?.type === 'paid' 
+                          ? event.pricing.priceRange || 'Paid' 
+                          : 'Free'}
+                    </span>
+
+                    {bookable && (
+                      <span className="text-[10px] font-semibold text-emerald-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Book →
                       </span>
-                      {event.location?.location && (
-                        <>
-                          <span>&bull;</span>
-                          <span className="text-muted-foreground truncate max-w-[130px]">
-                            {event.location.location.split(',')[0]}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 mt-1 leading-snug">
-                      {event.title}
-                    </h3>
-                  </div>
-
-                  {/* Booking / Details State */}
-                  <div className="pt-2 border-t border-border/50 flex items-center justify-between text-xs">
-                    <span className={bookable ? "text-emerald-500 font-medium" : "text-muted-foreground"}>
-                      {bookable ? "● Open for Booking" : expired ? "Event Expired" : "Booking Closed"}
-                    </span>
-                    <span className="font-bold text-foreground group-hover:text-primary underline">
-                      {bookable ? 'Tickets →' : 'Details →'}
-                    </span>
+                    )}
                   </div>
                 </div>
+
+                {/* Subtle top badge if expired */}
+                {expired && (
+                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-muted-foreground text-[10px] font-mono px-2 py-0.5 rounded border border-white/10">
+                    Past
+                  </div>
+                )}
               </Link>
             )
           })}
