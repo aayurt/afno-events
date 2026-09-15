@@ -31,16 +31,16 @@ export async function GET(req: NextRequest) {
 
     // 1. Update Subscribers collection if exists
     const subResult = await payload.find({
-      collection: 'subscribers',
+      collection: 'subscribers' as any,
       where: { email: { equals: email } },
       limit: 1,
     })
 
     if (subResult.docs.length > 0) {
       await payload.update({
-        collection: 'subscribers',
-        id: subResult.docs[0].id,
-        data: { status: 'unsubscribed' },
+        collection: 'subscribers' as any,
+        id: (subResult.docs[0] as any).id,
+        data: { status: 'unsubscribed' } as any,
       })
     }
 
@@ -51,13 +51,14 @@ export async function GET(req: NextRequest) {
       limit: 1,
     })
 
-    if (userResult.docs.length > 0) {
+    const userDoc = userResult.docs[0]
+    if (userDoc) {
       await payload.update({
         collection: 'users',
-        id: userResult.docs[0].id,
+        id: userDoc.id,
         data: {
           notifications: {
-            ...userResult.docs[0].notifications,
+            ...userDoc.notifications,
             email: false,
           },
         },

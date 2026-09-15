@@ -20,21 +20,21 @@ export async function POST(req: NextRequest) {
 
     // Check if already subscribed
     const existing = await payload.find({
-      collection: 'subscribers',
+      collection: 'subscribers' as any,
       where: { email: { equals: email } },
       limit: 1,
     })
 
     if (existing.docs.length > 0) {
-      const sub = existing.docs[0]
+      const sub = existing.docs[0] as any
       if (sub.status === 'active') {
         return NextResponse.json({ message: 'You are already subscribed to Afno Events announcements!' })
       } else {
         // Reactivate
         await payload.update({
-          collection: 'subscribers',
+          collection: 'subscribers' as any,
           id: sub.id,
-          data: { status: 'active' },
+          data: { status: 'active' } as any,
         })
         return NextResponse.json({ message: 'Welcome back! Your subscription has been reactivated.' })
       }
@@ -42,11 +42,11 @@ export async function POST(req: NextRequest) {
 
     // Create new subscriber
     await payload.create({
-      collection: 'subscribers',
+      collection: 'subscribers' as any,
       data: {
         email,
         status: 'active',
-      },
+      } as any,
     })
 
     return NextResponse.json({
