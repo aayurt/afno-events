@@ -17,6 +17,7 @@ import {
   MapPin,
   ScanLine,
   ShieldAlert,
+  Users,
 } from 'lucide-react'
 
 type Me = {
@@ -221,18 +222,20 @@ export default function OrganiserDashboard() {
 function EventRow({ event }: { event: EventDoc }) {
   const img = coverUrl(event.coverImage)
   return (
-    <Link
-      href={`/app/events/${event.slug || event.id}`}
-      className="flex items-center gap-4 rounded-2xl border border-border bg-card p-3 hover:border-primary/50 transition-colors"
-    >
-      <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0 flex items-center justify-center">
-        {img ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={img} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <Calendar size={20} className="text-muted-foreground/40" />
-        )}
-      </div>
+    <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-3 hover:border-primary/50 transition-colors">
+      <Link
+        href={`/app/events/${event.slug || event.id}`}
+        className="flex-1"
+      >
+        <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0 flex items-center justify-center">
+          {img ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={img} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <Calendar size={20} className="text-muted-foreground/40" />
+          )}
+        </div>
+      </Link>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <p className="font-semibold truncate">{event.title}</p>
@@ -261,7 +264,15 @@ function EventRow({ event }: { event: EventDoc }) {
           )}
         </div>
       </div>
+      <Button
+        variant="outline"
+        size="icon"
+        className="shrink-0"
+        onClick={() => window.location.href = `/organiser/events/${event.id}/attendees`}
+      >
+        <Users size={14} />
+      </Button>
       <ExternalLink size={15} className="text-muted-foreground/50 shrink-0" />
-    </Link>
+    </div>
   )
 }
