@@ -11,24 +11,55 @@ import { APP_STORE_URL } from '@/utilities/constants'
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
 
-  // 1. Fetch live active events
+  // 1. Fetch only enabled events, sorted by nearest upcoming startDatetime
+  const now = new Date()
   const result = await payload.find({
     collection: 'events',
-    where: { enabled: { equals: true } },
-    limit: 15,
+    where: { 
+      enabled: { equals: true },
+    },
+    limit: 20,
     depth: 1,
-    sort: '-startDatetime',
+    sort: 'startDatetime',
   })
 
-  const events = result.docs as any[]
-  const featuredEvent = events[0]
-  const marqueeEvents = events.length > 0 ? events : []
+  const allEvents = result.docs as any[]
+  
+  // Sort by nearest upcoming date first
+  const sortedEvents = [...allEvents].sort((a, b) => {
+    const timeA = a.startDatetime ? new Date(a.startDatetime).getTime() : Infinity
+    const timeB = b.startDatetime ? new Date(b.startDatetime).getTime() : Infinity
+    return timeA - timeB
+  })
+
+  // Nearest event in the spotlight
+  const featuredEvent = sortedEvents[0]
+  // Events for the carousel (all enabled events)
+  const marqueeEvents = sortedEvents
+
   const featuredCover = featuredEvent ? getCardImageUrl(featuredEvent.coverImage) : null
+  const isOpenForBooking = featuredEvent ? (featuredEvent.isActive ?? true) : false
 
   return (
     <div className="flex flex-col min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
       
-      {/* 🟢 Split-Hero: Left Brand/Search & Right Spotlight Card */}
+      {/* Inline keyframes for guaranteed marquee animation */}
+      <style>{`
+        @keyframes marqueeScroll {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-track {
+          display: flex;
+          width: max-content;
+          animation: marqueeScroll 40s linear infinite;
+        }
+        .animate-marquee-track:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      {/* 🟢 Split-Hero: Left Brand/Search & Right Nearest Spotlight Card */}
       <section className="relative border-b border-border/80 overflow-hidden pt-8 pb-16 lg:py-20">
         {/* Subtle Ambient Radial Brand Glows */}
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-primary/15 rounded-full blur-[150px] pointer-events-none -z-10" />
@@ -84,7 +115,7 @@ export default async function HomePage() {
               {/* Verified Metrics Strip */}
               <div className="grid grid-cols-3 gap-6 pt-4 border-t border-border/80 max-w-xl">
                 <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight">{events.length}+</div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight">{marqueeEvents.length}+</div>
                   <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">Live Events</div>
                 </div>
                 <div>
@@ -98,12 +129,12 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right 5 Cols: Spotlight Featured Event Card */}
+            {/* Right 5 Cols: Nearest Event Spotlight Card */}
             {featuredEvent && (
               <div className="lg:col-span-5">
                 <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
-                  <div className="bg-card border border-border/90 rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden group hover:border-primary/50 transition-all duration-300">
-                    <div className="aspect-[4/3] rounded-2xl bg-muted/60 relative overflow-hidden mb-5 border border-border shadow-inner">
+                  <div className="bg-card text-card-foreground border border-border/90 rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden group hover:border-primary/50 transition-all duration-300">
+                    <div className="aspect-[4/3] rounded-2xl bg-muted relative overflow-hidden mb-5 border border-border shadow-inner">
                       {featuredCover ? (
                         <img 
                           src={featuredCover} 
@@ -116,9 +147,9 @@ export default async function HomePage() {
                         </div>
                       )}
                       <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
-                        Featured Spotlight
+                        Next Up
                       </div>
-                      <div className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-md border border-white/10 text-white text-xs font-mono font-bold px-3 py-1 rounded-xl shadow-lg">
+                      <div className="absolute bottom-3 right-3 bg-card/90 backdrop-blur-md border border-border text-foreground text-xs font-mono font-bold px-3 py-1 rounded-xl shadow-lg">
                         {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'Paid' : 'Free Entry'}
                       </div>
                     </div>
@@ -154,12 +185,20 @@ export default async function HomePage() {
                     </div>
 
                     <div className="mt-6 pt-4 border-t border-border flex items-center justify-between">
-                      <div className="text-xs font-semibold text-emerald-500 flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>Open for Booking</span>
-                      </div>
+                      {isOpenForBooking ? (
+                        <div className="text-xs font-semibold text-emerald-500 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Open for Booking</span>
+                        </div>
+                      ) : (
+                        <div className="text-xs font-semibold text-amber-500 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          <span>Announcement Only</span>
+                        </div>
+                      )}
+                      
                       <span className="px-5 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        Book Tickets &rarr;
+                        {isOpenForBooking ? 'Book Tickets →' : 'View Details →'}
                       </span>
                     </div>
                   </div>
@@ -180,7 +219,7 @@ export default async function HomePage() {
               <Sparkles size={14} />
               Confirmed Community Calendar
             </div>
-            <h2 className="text-3xl font-extrabold tracking-tight">Trending Across the UK</h2>
+            <h2 className="text-3xl font-extrabold tracking-tight text-foreground">Trending Across the UK</h2>
           </div>
           <Link href="/app/events">
             <Button variant="ghost" className="text-xs font-semibold hover:text-primary group">
@@ -190,22 +229,23 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        {/* Gradient edge masks for smooth fade */}
+        {/* Subtle Edge Mask Gradients */}
         <div className="absolute top-16 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none" />
         <div className="absolute top-16 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none" />
 
-        {/* Infinite CSS Animation Track */}
-        <div className="flex w-max animate-[marquee_35s_linear_infinite] hover:[animation-play-state:paused] gap-6 pl-6">
+        {/* Infinite Moving Marquee Track */}
+        <div className="animate-marquee-track gap-6 pl-6">
           
-          {/* Repeat set twice for infinite seamless loop */}
-          {[...marqueeEvents, ...marqueeEvents].map((event: any, idx: number) => {
+          {/* Repeat set 3x to ensure uninterrupted infinite scroll across wide viewports */}
+          {[...marqueeEvents, ...marqueeEvents, ...marqueeEvents].map((event: any, idx: number) => {
             const coverUrl = getCardImageUrl(event.coverImage)
+            const activeBooking = event.isActive ?? true
 
             return (
               <Link 
                 key={`${event.id}-${idx}`} 
                 href={`/app/events/${event.slug || event.id}`}
-                className="w-64 sm:w-72 h-[410px] rounded-3xl overflow-hidden bg-card border border-border/80 shrink-0 relative group shadow-xl hover:border-primary/60 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
+                className="w-64 sm:w-72 h-[410px] rounded-3xl overflow-hidden bg-card text-card-foreground border border-border shrink-0 relative group shadow-xl hover:border-primary/60 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
               >
                 {/* Poster Artwork Window */}
                 <div className="relative w-full h-[250px] overflow-hidden bg-muted">
@@ -220,7 +260,7 @@ export default async function HomePage() {
                       <Calendar className="w-10 h-10 text-muted-foreground/30" />
                     </div>
                   )}
-                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-white text-xs font-mono font-bold px-2.5 py-1 rounded-lg border border-white/10">
+                  <div className="absolute top-3 right-3 bg-card/90 backdrop-blur-md text-card-foreground text-xs font-mono font-bold px-2.5 py-1 rounded-lg border border-border shadow-sm">
                     {event.pricing?.type === 'paid' ? event.pricing.priceRange || 'Paid' : 'Free'}
                   </div>
                 </div>
@@ -253,7 +293,9 @@ export default async function HomePage() {
                   </div>
 
                   <div className="pt-2 border-t border-border/50 flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Get Pass</span>
+                    <span className={activeBooking ? "text-emerald-500 font-medium" : "text-muted-foreground"}>
+                      {activeBooking ? "● Booking Open" : "Coming Soon"}
+                    </span>
                     <span className="font-bold text-foreground group-hover:text-primary underline">
                       Tickets &rarr;
                     </span>
@@ -271,7 +313,7 @@ export default async function HomePage() {
         <div className="container px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-10">
           
           {/* FOR COMMUNITY & FANS */}
-          <div className="bg-card border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-primary/40 transition-all">
+          <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-primary/40 transition-all">
             <div className="space-y-4">
               <span className="text-xs uppercase font-mono tracking-widest text-primary font-bold flex items-center gap-2">
                 <QrCode size={16} />
@@ -298,7 +340,7 @@ export default async function HomePage() {
           </div>
 
           {/* FOR UK ORGANISERS & PROMOTERS */}
-          <div className="bg-card border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-secondary/40 transition-all">
+          <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-secondary/40 transition-all">
             <div className="space-y-4">
               <span className="text-xs uppercase font-mono tracking-widest text-secondary font-bold flex items-center gap-2">
                 <ShieldCheck size={16} />

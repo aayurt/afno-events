@@ -455,5 +455,15 @@ export const Events: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'isActive',
+      type: 'checkbox',
+      required: false,
+      defaultValue: true,
+      admin: {
+        description: 'Active event (Open for Booking)',
+        position: 'sidebar',
+      },
+    },
   ],
 }
