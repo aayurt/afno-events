@@ -1,14 +1,14 @@
 import type { CollectionConfig } from 'payload'
 import { anyone } from '@/access/anyone'
-import { isSuperAdmin } from '@/access/isSuperAdmin'
+import { isSuperAdminAccess } from '@/access/isSuperAdmin'
 
 export const Subscribers: CollectionConfig = {
   slug: 'subscribers',
   access: {
     create: anyone,
-    read: isSuperAdmin,
-    update: isSuperAdmin,
-    delete: isSuperAdmin,
+    read: isSuperAdminAccess,
+    update: isSuperAdminAccess,
+    delete: isSuperAdminAccess,
   },
   admin: {
     useAsTitle: 'email',
