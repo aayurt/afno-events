@@ -89,62 +89,66 @@ export const Events: CollectionConfig = {
       },
     ],
     afterChange: [
-      async ({ doc, operation, req }) => {
-        if ((operation === 'create' || operation === 'update') && req?.payload) {
-          try {
-            const users = await req.payload.find({
-              collection: 'users',
-              limit: 1000,
+      async ({ doc, previousDoc, operation, req }) => {
+        // Only notify users when an event is PUBLISHED for the first time
+        const isNewlyPublished = doc.enabled === true && (!previousDoc || previousDoc.enabled === false)
+        if (!isNewlyPublished || !req?.payload) {
+          return doc
+        }
+
+        try {
+          const users = await req.payload.find({
+            collection: 'users',
+            limit: 1000,
+          })
+          users.docs.forEach((user) => {
+            req.payload.create({
+              collection: 'notifications',
+              data: {
+                user: user.id,
+                title: 'Check out for ' + doc.title + ' event.',
+                message: doc.description || 'Check out the ' + doc.title + ' event.',
+                type: 'event',
+                link: `/events/${doc.slug}`,
+              },
             })
-            users.docs.forEach((user) => {
-              req.payload.create({
-                collection: 'notifications',
-                data: {
-                  user: user.id,
-                  title: 'Check out for ' + doc.title + ' event.',
-                  message: doc.description || 'Check out the ' + doc.title + ' event.',
-                  type: 'event',
-                  link: `/events/${doc.slug}`,
-                },
-              })
-            })
-            const ci = typeof doc.coverImage === 'object' ? doc.coverImage : null
-            const imageUrl = ci?.url
-            const eventTags: string[] = Array.isArray(doc.tags) ? doc.tags : []
-            if (eventTags.length > 0) {
-              for (const tag of eventTags) {
-                try {
-                  await sendFCMTopicNotification({
-                    topic: `category-${tag}`,
-                    notification: {
-                      title: 'New ' + tag + ' event: ' + doc.title,
-                      body: doc.description || 'Check out the ' + doc.title + ' event.',
-                      imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
-                      id: doc.id,
-                    },
-                  })
-                } catch (topicErr) {
-                  console.error(`FCM topic notification failed for category-${tag}:`, topicErr)
-                }
-              }
-            } else {
+          })
+          const ci = typeof doc.coverImage === 'object' ? doc.coverImage : null
+          const imageUrl = ci?.url
+          const eventTags: string[] = Array.isArray(doc.tags) ? doc.tags : []
+          if (eventTags.length > 0) {
+            for (const tag of eventTags) {
               try {
                 await sendFCMTopicNotification({
-                  topic: 'afno-app-event',
+                  topic: `category-${tag}`,
                   notification: {
-                    title: 'Check out for ' + doc.title + ' event.',
+                    title: 'New ' + tag + ' event: ' + doc.title,
                     body: doc.description || 'Check out the ' + doc.title + ' event.',
                     imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
                     id: doc.id,
                   },
                 })
               } catch (topicErr) {
-                console.error('FCM topic notification failed:', topicErr)
+                console.error(`FCM topic notification failed for category-${tag}:`, topicErr)
               }
             }
-          } catch (err) {
-            console.error('FCM notification failed (non-fatal):', err)
+          } else {
+            try {
+              await sendFCMTopicNotification({
+                topic: 'afno-app-event',
+                notification: {
+                  title: 'Check out for ' + doc.title + ' event.',
+                  body: doc.description || 'Check out the ' + doc.title + ' event.',
+                  imageUrl: typeof imageUrl === 'string' ? imageUrl : undefined,
+                  id: doc.id,
+                },
+              })
+            } catch (topicErr) {
+              console.error('FCM topic notification failed:', topicErr)
+            }
           }
+        } catch (err) {
+          console.error('FCM notification failed (non-fatal):', err)
         }
         return doc
       },
