@@ -17,7 +17,7 @@ export default async function RegisterPage({ searchParams }: Props) {
           <h1 className="text-3xl font-bold tracking-tight">{t('createAccount')}</h1>
           <p className="text-muted-foreground">{t('joinToday')}</p>
         </div>
-        <SignUpForm redirectPath={redirect || '/app'} />
+        <SignUpForm redirectPath={redirect || '/app/events'} />
       </div>
     </div>
   )

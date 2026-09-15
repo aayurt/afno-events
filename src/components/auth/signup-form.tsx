@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import './index.scss'
 
-export default function SignUpForm({ redirectPath = '/app' }: { redirectPath?: string }) {
+export default function SignUpForm({ redirectPath = '/app/events' }: { redirectPath?: string }) {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')

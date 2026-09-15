@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, BellRing, Calendar, LayoutDashboard, Ticket, User, Users, type LucideIcon } from 'lucide-react'
+import { Bell, BellRing, Calendar, Ticket, User, Users, type LucideIcon } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { authClient } from '@/lib/auth/client'
 import { fireDueReminders } from '@/lib/reminders'
@@ -47,7 +47,6 @@ function HeaderBell({
 }
 
 const getTabs = (t: (key: any, params?: any) => any) => [
-  { href: '/app', label: t('dashboard'), icon: LayoutDashboard },
   { href: '/app/events', label: t('events'), icon: Calendar },
   { href: '/app/tickets', label: t('tickets'), icon: Ticket },
   { href: '/app/circles', label: t('circles'), icon: Users },
@@ -59,12 +58,11 @@ export function AppNav({ children }: { children: React.ReactNode }) {
   const t = useScopedI18n('nav')
 
   const isActive = (href: string) => {
-    if (href === '/app') return pathname === '/app'
+    if (href === '/app/events') return pathname === '/app' || pathname.startsWith('/app/events')
     return pathname.startsWith(href)
   }
 
   const pageTitleMap: Record<string, string> = {
-    '/app': t('discover'),
     '/app/events': t('events'),
     '/app/tickets': t('tickets'),
     '/app/circles': t('circles'),
@@ -169,7 +167,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
       {!isAuthPage && (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="mx-auto max-w-6xl flex items-center justify-between h-22 px-4">
-            <Link href="/app" className="flex items-center shrink-0">
+            <Link href="/app/events" className="flex items-center shrink-0">
               <img src="/logo.png" alt="AfnoEvents" className="h-20 w-20" />
             </Link>
             <span className="font-semibold text-base absolute left-1/2 -translate-x-1/2 capitalize">{pageTitle}</span>

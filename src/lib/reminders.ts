@@ -38,7 +38,7 @@ export function getReminder(eventId: number | string): StoredReminder | null {
       minutes: typeof parsed.minutes === 'number' ? parsed.minutes : 0,
       title: parsed.title,
       body: typeof parsed.body === 'string' ? parsed.body : '',
-      path: typeof parsed.path === 'string' ? parsed.path : '/app',
+      path: typeof parsed.path === 'string' ? parsed.path : '/app/events',
     }
   } catch {
     return null

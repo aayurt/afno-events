@@ -19,7 +19,7 @@ export default async function LoginPage({ searchParams }: Props) {
         </div>
         <LoginForm
           title="Sign in to AfnoEvent"
-          afterLoginPath={redirect || '/app'}
+          afterLoginPath={redirect || '/app/events'}
           requiredRole={null}
           enableSignUp
           signUpUrl="/app/auth/register"
