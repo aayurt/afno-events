@@ -196,9 +196,15 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
                     <CardContent className="px-4 pt-3 pb-4 flex flex-col flex-1 min-h-[7.5rem] gap-2">
                       {event.location?.location && (
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <MapPin size={12} />
-                          {event.location.location}
+                        <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-relaxed">
+                          <MapPin size={13} className="shrink-0 mt-0.5 text-muted-foreground/80" />
+                          <span>{event.location.location}</span>
+                        </p>
+                      )}
+
+                      {event.description && (
+                        <p className="text-xs text-muted-foreground/85 line-clamp-2 leading-relaxed">
+                          {event.description}
                         </p>
                       )}
 
