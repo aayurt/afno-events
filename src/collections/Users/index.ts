@@ -315,7 +315,20 @@ export const Users: CollectionConfig = {
       path: '/subscribed-categories',
       method: 'post',
       handler: async (req) => {
-        if (!req.user) {
+        let user: any = req.user
+        if (!user) {
+          try {
+            const authResult = await req.payload.auth({
+              headers: req.headers,
+              canSetHeaders: false,
+            })
+            user = authResult?.user ?? null
+          } catch {
+            user = null
+          }
+        }
+
+        if (!user) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
@@ -340,8 +353,9 @@ export const Users: CollectionConfig = {
         try {
           await req.payload.update({
             collection: 'users',
-            id: req.user.id,
+            id: user.id,
             data: { subscribedCategories: categories } as any,
+            overrideAccess: true,
           })
           return Response.json({ success: true, categories })
         } catch (error) {
