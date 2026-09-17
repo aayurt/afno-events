@@ -128,11 +128,13 @@ export default function OrganiserDashboard() {
 
   if (boot === 'loading') {
     return (
-      <div className="mx-auto max-w-md px-4 py-8 space-y-4">
+      <div className="mx-auto max-w-5xl px-4 py-8 space-y-4">
         <Skeleton className="h-10 w-48 rounded-xl" />
         <Skeleton className="h-20 w-full rounded-2xl" />
-        <Skeleton className="h-64 w-full rounded-2xl" />
-        <Skeleton className="h-48 w-full rounded-2xl" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Skeleton className="h-64 w-full rounded-2xl" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
+        </div>
       </div>
     )
   }
@@ -160,66 +162,85 @@ export default function OrganiserDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center pb-24 select-none">
-      <div className="w-full max-w-md flex flex-col flex-1 border-x border-border/40 shadow-sm relative">
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center pb-24 sm:pb-12 select-none">
+      <div className="w-full max-w-md sm:max-w-4xl lg:max-w-5xl px-4 sm:px-6 py-4 sm:py-8 flex flex-col flex-1 relative">
 
-        {/* Sticky Mobile App Header */}
-        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-              <Building2 size={18} className="text-primary" />
+        {/* Responsive Top Header */}
+        <header className="mb-6 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <Building2 size={20} className="text-primary" />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5">
-                <h1 className="font-bold text-xs truncate">
-                  {me?.tenants.map((t) => t.name).join(', ') || me?.user.name || 'Organiser'}
+              <div className="flex items-center gap-2">
+                <h1 className="font-bold text-sm sm:text-base truncate">
+                  {me?.tenants.map((t) => t.name).join(', ') || me?.user.name || 'Organiser Portal'}
                 </h1>
                 {liveEvents.length > 0 && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" title="Live event in progress" />
+                  <span className="flex items-center gap-1.5 border border-emerald-500/40 bg-emerald-500/10 text-emerald-500 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Live
+                  </span>
                 )}
               </div>
-              <p className="text-[10px] text-muted-foreground font-mono truncate">
+              <p className="text-xs text-muted-foreground font-mono truncate">
                 {events.length} {events.length === 1 ? 'Show' : 'Shows'} Configured
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-8 px-2.5 text-xs text-muted-foreground gap-1.5 shrink-0">
-            <LogOut size={14} />
-            <span className="hidden sm:inline">Sign out</span>
-          </Button>
+
+          {/* Desktop header action buttons */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex rounded-xl gap-1.5 h-9">
+              <Link href="/app/admin/check-in">
+                <ScanLine size={15} className="text-primary" />
+                <span>Door Scanner</span>
+              </Link>
+            </Button>
+            <Button asChild size="sm" className="hidden sm:inline-flex rounded-xl font-bold gap-1.5 h-9 bg-primary text-primary-foreground shadow-sm">
+              <Link href="/organiser/events/new">
+                <Plus size={16} />
+                <span>New Event</span>
+              </Link>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-9 px-2.5 text-xs text-muted-foreground gap-1.5">
+              <LogOut size={15} />
+              <span className="hidden md:inline">Sign out</span>
+            </Button>
+          </div>
         </header>
 
         {/* 3-Metric Glance Ribbon */}
-        <div className="grid grid-cols-3 border-b border-border bg-card/50 divide-x divide-border font-mono text-center">
-          <div className="px-3 py-3 text-left">
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block font-sans">Active Shows</span>
-            <span className="text-sm font-bold text-foreground">
+        <div className="grid grid-cols-3 border border-border rounded-2xl bg-card/60 divide-x divide-border font-mono text-center mb-6 shadow-xs">
+          <div className="px-3 sm:px-4 py-3 sm:py-3.5 text-left">
+            <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground block font-sans">Active Shows</span>
+            <span className="text-base sm:text-lg font-bold text-foreground">
               {events.filter((e) => e.enabled !== false).length}
             </span>
           </div>
-          <div className="px-3 py-3">
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block font-sans">Live Tonight</span>
-            <span className="text-sm font-bold text-foreground">
+          <div className="px-3 sm:px-4 py-3 sm:py-3.5">
+            <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground block font-sans">Live Tonight</span>
+            <span className="text-base sm:text-lg font-bold text-foreground">
               {liveEvents.length > 0 ? `${liveEvents.length} Show` : 'None'}
             </span>
           </div>
-          <div className="px-3 py-3 text-right">
-            <span className="text-[9px] uppercase tracking-wider text-muted-foreground block font-sans">Drafts</span>
-            <span className="text-sm font-bold text-muted-foreground">
+          <div className="px-3 sm:px-4 py-3 sm:py-3.5 text-right">
+            <span className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground block font-sans">Drafts</span>
+            <span className="text-base sm:text-lg font-bold text-muted-foreground">
               {draftEvents.length}
             </span>
           </div>
         </div>
 
         {/* Filter Pills */}
-        <div className="px-4 py-2.5 border-b border-border flex items-center gap-1.5 overflow-x-auto bg-card/30">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 mb-6 no-scrollbar">
           <button
             type="button"
             onClick={() => setActiveTab('all')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold shrink-0 transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors ${
               activeTab === 'all'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted/60 text-muted-foreground hover:text-foreground'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
             All ({events.length})
@@ -227,10 +248,10 @@ export default function OrganiserDashboard() {
           <button
             type="button"
             onClick={() => setActiveTab('live')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold shrink-0 transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors ${
               activeTab === 'live'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted/60 text-muted-foreground hover:text-foreground'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
             Live Tonight ({liveEvents.length})
@@ -238,10 +259,10 @@ export default function OrganiserDashboard() {
           <button
             type="button"
             onClick={() => setActiveTab('upcoming')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold shrink-0 transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors ${
               activeTab === 'upcoming'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted/60 text-muted-foreground hover:text-foreground'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
             Upcoming ({upcomingEvents.length})
@@ -249,150 +270,153 @@ export default function OrganiserDashboard() {
           <button
             type="button"
             onClick={() => setActiveTab('draft')}
-            className={`px-3 py-1 rounded-full text-xs font-semibold shrink-0 transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors ${
               activeTab === 'draft'
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted/60 text-muted-foreground hover:text-foreground'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted/70 text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
             Drafts ({draftEvents.length})
           </button>
         </div>
 
-        {/* Event Stream (Cards) */}
-        <main className="p-4 space-y-4 flex-1">
+        {/* Event Stream (Responsive Grid: 1 col on mobile, 2 cols on tablet/desktop) */}
+        <main className="flex-1">
           {filteredEvents.length === 0 ? (
-            <div className="border border-border rounded-2xl bg-card/40 p-8 text-center space-y-3">
-              <Calendar size={28} className="mx-auto text-muted-foreground/50" />
+            <div className="border border-border rounded-2xl bg-card/40 p-12 text-center space-y-3">
+              <Calendar size={32} className="mx-auto text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground">No events found in this category.</p>
-              <Button asChild size="sm" className="rounded-xl gap-1">
+              <Button asChild size="sm" className="rounded-xl gap-1.5 mt-2">
                 <Link href="/organiser/events/new">
-                  <Plus size={14} /> Create Event
+                  <Plus size={15} /> Create Event
                 </Link>
               </Button>
             </div>
           ) : (
-            filteredEvents.map((event) => {
-              const img = coverUrl(event.coverImage)
-              const isLive = liveEvents.some((l) => l.id === event.id)
-              const isDraft = event.enabled === false
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredEvents.map((event) => {
+                const img = coverUrl(event.coverImage)
+                const isLive = liveEvents.some((l) => l.id === event.id)
+                const isDraft = event.enabled === false
 
-              return (
-                <div
-                  key={event.id}
-                  className={`border rounded-2xl bg-card p-4 space-y-3.5 shadow-sm transition-colors ${
-                    isLive ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
-                  }`}
-                >
-                  <div className="flex items-start gap-3 min-w-0">
-                    <Link
-                      href={`/app/events/${event.id}`}
-                      target="_blank"
-                      className="w-14 h-18 rounded-xl bg-muted overflow-hidden border border-border shrink-0 flex items-center justify-center group"
-                    >
-                      {img ? (
-                        <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      ) : (
-                        <Calendar size={20} className="text-muted-foreground/40" />
-                      )}
-                    </Link>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {isLive && (
-                          <span className="border border-emerald-500/50 bg-emerald-500/10 text-emerald-500 font-mono uppercase text-[9px] px-1.5 py-0.5 rounded font-bold">
-                            Live Tonight
-                          </span>
+                return (
+                  <div
+                    key={event.id}
+                    className={`border rounded-2xl bg-card p-4 space-y-4 shadow-xs transition-all hover:border-border/80 flex flex-col justify-between ${
+                      isLive ? 'border-primary/60 ring-1 ring-primary/20' : 'border-border'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3.5 min-w-0">
+                      <Link
+                        href={`/app/events/${event.id}`}
+                        target="_blank"
+                        className="w-16 h-20 rounded-xl bg-muted overflow-hidden border border-border shrink-0 flex items-center justify-center group"
+                      >
+                        {img ? (
+                          <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        ) : (
+                          <Calendar size={22} className="text-muted-foreground/40" />
                         )}
-                        {isDraft && (
-                          <span className="border border-border bg-muted text-muted-foreground font-mono uppercase text-[9px] px-1.5 py-0.5 rounded font-bold">
-                            Draft
-                          </span>
-                        )}
-                        {event.pricing?.priceRange && (
-                          <span className="text-[10px] font-mono font-semibold text-primary">
-                            {event.pricing.priceRange}
-                          </span>
-                        )}
-                      </div>
-
-                      <h2 className="font-bold text-sm text-foreground mt-1 leading-snug truncate">
-                        {event.title}
-                      </h2>
-
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                        {event.startDatetime && (
-                          <span className="flex items-center gap-1 font-mono text-[11px]">
-                            <Calendar size={11} />
-                            {new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                            })}
-                          </span>
-                        )}
-                        {event.location?.location && (
-                          <span className="flex items-center gap-1 truncate text-[11px]">
-                            <MapPin size={11} className="shrink-0" />
-                            <span className="truncate">{event.location.location}</span>
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Thumb Action Row */}
-                  <div className="space-y-2 pt-1">
-                    <Button
-                      asChild
-                      className="w-full rounded-xl font-bold text-xs h-9 gap-2 shadow-sm"
-                    >
-                      <Link href="/app/admin/check-in">
-                        <QrCode size={15} /> Open Door Scanner
                       </Link>
-                    </Button>
 
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSelectedEventForSheet(event)}
-                        className="rounded-xl text-[11px] h-8 font-medium px-2"
-                      >
-                        <Ticket size={12} className="mr-1" /> Tiers
-                      </Button>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {isLive && (
+                            <span className="border border-emerald-500/50 bg-emerald-500/10 text-emerald-500 font-mono uppercase text-[9px] px-1.5 py-0.5 rounded font-bold">
+                              Live Tonight
+                            </span>
+                          )}
+                          {isDraft && (
+                            <span className="border border-border bg-muted text-muted-foreground font-mono uppercase text-[9px] px-1.5 py-0.5 rounded font-bold">
+                              Draft
+                            </span>
+                          )}
+                          {event.pricing?.priceRange && (
+                            <span className="text-[10px] font-mono font-semibold text-primary">
+                              {event.pricing.priceRange}
+                            </span>
+                          )}
+                        </div>
 
+                        <h2 className="font-bold text-sm sm:text-base text-foreground mt-1 leading-snug truncate">
+                          {event.title}
+                        </h2>
+
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-muted-foreground mt-1.5">
+                          {event.startDatetime && (
+                            <span className="flex items-center gap-1 font-mono text-[11px] shrink-0">
+                              <Calendar size={12} />
+                              {new Date(event.startDatetime).toLocaleDateString('en-GB', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                              })}
+                            </span>
+                          )}
+                          {event.location?.location && (
+                            <span className="flex items-center gap-1 truncate text-[11px]">
+                              <MapPin size={12} className="shrink-0" />
+                              <span className="truncate">{event.location.location}</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Row */}
+                    <div className="space-y-2 pt-1 border-t border-border/60">
                       <Button
                         asChild
-                        variant="outline"
-                        size="sm"
-                        className="rounded-xl text-[11px] h-8 font-medium px-2"
+                        className="w-full rounded-xl font-bold text-xs h-9 gap-2 shadow-xs"
                       >
-                        <Link href={`/organiser/events/${event.id}/attendees`}>
-                          <Users size={12} className="mr-1" /> Attendees
+                        <Link href="/app/admin/check-in">
+                          <QrCode size={15} /> Open Door Scanner
                         </Link>
                       </Button>
 
-                      <Button
-                        asChild
-                        variant="outline"
-                        size="sm"
-                        className="rounded-xl text-[11px] h-8 font-medium px-2"
-                      >
-                        <Link href={`/organiser/events/${event.id}/edit`}>
-                          Edit
-                        </Link>
-                      </Button>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedEventForSheet(event)}
+                          className="rounded-xl text-[11px] h-8 font-medium px-2 hover:border-primary/40"
+                        >
+                          <Ticket size={12} className="mr-1" /> Tiers
+                        </Button>
+
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl text-[11px] h-8 font-medium px-2 hover:border-primary/40"
+                        >
+                          <Link href={`/organiser/events/${event.id}/attendees`}>
+                            <Users size={12} className="mr-1" /> Attendees
+                          </Link>
+                        </Button>
+
+                        <Button
+                          asChild
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl text-[11px] h-8 font-medium px-2 hover:border-primary/40"
+                        >
+                          <Link href={`/organiser/events/${event.id}/edit`}>
+                            Edit
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            })
+                )
+              })}
+            </div>
           )}
         </main>
 
-        {/* Floating Thumb Action Bar */}
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between z-40">
+        {/* Floating Mobile Bottom Action Bar (Only visible on mobile screens) */}
+        <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between z-40">
           <Button
             asChild
             variant="outline"
@@ -413,12 +437,12 @@ export default function OrganiserDashboard() {
           </Button>
         </div>
 
-        {/* Slide-Up Bottom Sheet: Ticket Tier Inspection */}
+        {/* Modal / Slide-Up Sheet: Ticket Tier Inspection */}
         {selectedEventForSheet && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs">
-            <div className="w-full max-w-md bg-card border-t border-border rounded-t-3xl p-5 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom duration-200">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4">
+            <div className="w-full max-w-md sm:max-w-lg bg-card border border-border rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[85vh] overflow-y-auto animate-in slide-in-from-bottom sm:zoom-in-95 duration-200">
               <div
-                className="w-10 h-1 bg-muted rounded-full mx-auto cursor-pointer"
+                className="sm:hidden w-10 h-1 bg-muted rounded-full mx-auto cursor-pointer"
                 onClick={() => setSelectedEventForSheet(null)}
               />
 
@@ -427,7 +451,7 @@ export default function OrganiserDashboard() {
                   <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground block">
                     Ticket Tiers & Pricing
                   </span>
-                  <h3 className="text-base font-bold text-foreground mt-0.5 truncate">
+                  <h3 className="text-base sm:text-lg font-bold text-foreground mt-0.5 truncate">
                     {selectedEventForSheet.title}
                   </h3>
                   <p className="text-xs text-muted-foreground mt-0.5 truncate">
@@ -449,15 +473,15 @@ export default function OrganiserDashboard() {
                 {selectedEventForSheet.pricing?.ticketTypes && selectedEventForSheet.pricing.ticketTypes.length > 0 ? (
                   <div className="border border-border rounded-xl bg-background divide-y divide-border">
                     {selectedEventForSheet.pricing.ticketTypes.map((tier, idx) => (
-                      <div key={idx} className="p-3 flex items-center justify-between gap-3 font-mono">
+                      <div key={idx} className="p-3 sm:p-3.5 flex items-center justify-between gap-3 font-mono">
                         <div className="min-w-0 flex-1 font-sans">
-                          <p className="font-bold text-xs text-foreground truncate">{tier.name}</p>
+                          <p className="font-bold text-xs sm:text-sm text-foreground truncate">{tier.name}</p>
                           {tier.description && (
-                            <p className="text-[10px] text-muted-foreground truncate">{tier.description}</p>
+                            <p className="text-[11px] text-muted-foreground truncate mt-0.5">{tier.description}</p>
                           )}
                         </div>
                         <div className="text-right shrink-0">
-                          <span className="font-bold text-xs text-primary">
+                          <span className="font-bold text-xs sm:text-sm text-primary">
                             £{tier.price.toFixed(2)}
                           </span>
                         </div>
@@ -465,19 +489,19 @@ export default function OrganiserDashboard() {
                     ))}
                   </div>
                 ) : (
-                  <div className="p-4 border border-border rounded-xl bg-background text-center text-xs text-muted-foreground">
+                  <div className="p-6 border border-border rounded-xl bg-background text-center text-xs text-muted-foreground">
                     Free Event / Single Admission
                   </div>
                 )}
               </div>
 
               <div className="grid grid-cols-2 gap-2 pt-2">
-                <Button asChild variant="outline" className="rounded-xl text-xs h-9">
+                <Button asChild variant="outline" className="rounded-xl text-xs h-9 sm:h-10">
                   <Link href={`/organiser/events/${selectedEventForSheet.id}/edit`}>
                     Edit Show
                   </Link>
                 </Button>
-                <Button asChild className="rounded-xl text-xs h-9">
+                <Button asChild className="rounded-xl text-xs h-9 sm:h-10">
                   <Link href={`/organiser/events/${selectedEventForSheet.id}/attendees`}>
                     Attendee Roster
                   </Link>
