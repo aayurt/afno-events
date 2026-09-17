@@ -31,9 +31,7 @@ export default function OrganiserLoginPage() {
       .then((result) => {
         if (!active) return
         const user = result.data?.user as { role?: string } | undefined
-        if (user && user.role === 'super-admin') {
-          router.replace('/admin')
-        } else if (user && user.role === 'admin') {
+        if (user && (user.role === 'admin' || user.role === 'super-admin')) {
           router.replace('/organiser/dashboard')
         } else if (user) {
           setNotOrganiser(true)
@@ -62,15 +60,35 @@ export default function OrganiserLoginPage() {
         setError((result as any).error?.message || 'Failed to sign in')
         return
       }
-      const session = await authClient.getSession()
-      const role = (session.data?.user as { role?: string } | undefined)?.role
-      if (role === 'super-admin') {
-        window.location.href = '/admin'
-      } else if (role === 'admin') {
-        window.location.href = '/organiser/dashboard'
-      } else {
-        setNotOrganiser(true)
+
+      // Check role from signIn result or getSession
+      const user = (result as any)?.data?.user
+      let role = user?.role
+
+      if (!role) {
+        const session = await authClient.getSession().catch(() => null)
+        role = (session?.data?.user as { role?: string } | undefined)?.role
       }
+
+      if (role === 'admin' || role === 'super-admin') {
+        window.location.href = '/organiser/dashboard'
+        return
+      }
+
+      // Authoritative verification via /api/organiser/me
+      const meRes = await fetch('/api/organiser/me', { credentials: 'include' }).catch(() => null)
+      if (meRes && meRes.ok) {
+        window.location.href = '/organiser/dashboard'
+        return
+      }
+
+      if (meRes && meRes.status === 403) {
+        setNotOrganiser(true)
+        return
+      }
+
+      // Default landing for organiser portal logins
+      window.location.href = '/organiser/dashboard'
     } catch (err: any) {
       setError(err?.message || 'An unexpected error occurred')
     } finally {
