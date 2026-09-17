@@ -113,7 +113,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
       </form>
 
       <p className="my-8 text-primary/70 text-sm capitalize">
-        This week in Kathmandu Valley
+        This week in UK
       </p>
 
       {events.length === 0 ? (
