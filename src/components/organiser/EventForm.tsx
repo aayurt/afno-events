@@ -158,12 +158,14 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent, overridePublish?: boolean) => {
+    if (e) e.preventDefault()
     if (!title.trim()) {
       setError('Please enter an event title.')
       return
     }
+
+    const willPublish = overridePublish !== undefined ? overridePublish : isPublish
 
     setIsSubmitting(true)
     setError(null)
@@ -196,7 +198,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
         priceRange: pricingType === 'paid' ? priceRange || `£${ticketRows[0]?.price || 0}` : 'Free',
         ticketTypes,
       },
-      publish: isPublish,
+      publish: willPublish,
     }
 
     try {
@@ -526,43 +528,81 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
         </CardContent>
       </Card>
 
-      {/* 7. Publish Immediately Toggle */}
+      {/* 7. Publishing & Visibility Status */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-5">
-          <label className="flex items-start gap-3.5 cursor-pointer">
-            <input
-              type="checkbox"
-              id="publish"
-              checked={isPublish}
-              onChange={(e) => setIsPublish(e.target.checked)}
-              className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary"
-            />
-            <div className="min-w-0">
-              <p className="font-semibold text-sm text-foreground">Publish Immediately</p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                When unchecked, the show is saved as a Draft visible only to you on the dashboard.
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <Sparkles size={18} className="text-primary" />
+            <span>7. Visibility Status</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setIsPublish(false)}
+              className={`p-4 rounded-xl border text-left transition-all ${
+                !isPublish
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                  : 'border-border bg-card/50 hover:bg-muted/50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-xs">Save as Draft</span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Draft</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                Stores your event privately under the <strong>Drafts</strong> tab on your dashboard. Hidden from fans until published.
               </p>
-            </div>
-          </label>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsPublish(true)}
+              className={`p-4 rounded-xl border text-left transition-all ${
+                isPublish
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                  : 'border-border bg-card/50 hover:bg-muted/50'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-xs">Publish Live</span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">Live</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                Immediately makes the event visible on the public exploration feed and enables fans to purchase tickets.
+              </p>
+            </button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Form Action Controls */}
-      <div className="flex items-center gap-3 pt-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
         <Button
-          type="submit"
-          size="lg"
+          type="button"
+          onClick={(e) => handleSubmit(e, true)}
           disabled={isSubmitting}
           className="rounded-xl px-8 font-bold text-sm h-11 shadow-sm bg-primary text-primary-foreground"
         >
-          {isSubmitting && <Loader2 size={16} className="animate-spin mr-2" />}
-          {submitLabel}
+          {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+          {submitLabel === 'Save Changes' ? 'Save & Publish' : 'Publish Show'}
         </Button>
+
         <Button
           type="button"
           variant="outline"
+          onClick={(e) => handleSubmit(e, false)}
+          disabled={isSubmitting}
+          className="rounded-xl px-6 font-semibold text-sm h-11 border-border"
+        >
+          Save as Draft
+        </Button>
+
+        <Button
+          type="button"
+          variant="ghost"
           onClick={() => router.push('/organiser/dashboard')}
-          className="rounded-xl h-11 px-6 text-sm"
+          className="rounded-xl h-11 px-5 text-sm text-muted-foreground hover:text-foreground"
         >
           Cancel
         </Button>
