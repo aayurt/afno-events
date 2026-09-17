@@ -77,7 +77,16 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   if (body.coverImage !== undefined) updateData.coverImage = body.coverImage ? Number(body.coverImage) : null
   if (body.startDatetime !== undefined) updateData.startDatetime = body.startDatetime
   if (body.endDatetime !== undefined) updateData.endDatetime = body.endDatetime
-  if (body.location !== undefined) updateData.location = { location: body.location?.location || '' }
+  if (body.location !== undefined) {
+    updateData.location = body.location
+      ? {
+          location: body.location.location || '',
+          mapLocation: body.location.mapLocation || body.location.location || '',
+          latitude: body.location.latitude !== undefined ? Number(body.location.latitude) : undefined,
+          longitude: body.location.longitude !== undefined ? Number(body.location.longitude) : undefined,
+        }
+      : null
+  }
   if (body.tags !== undefined) updateData.tags = body.tags
   if (body.publish !== undefined) updateData.enabled = !!body.publish
 

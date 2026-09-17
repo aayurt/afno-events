@@ -55,7 +55,14 @@ export async function POST(req: NextRequest) {
       coverImage: body.coverImage ? Number(body.coverImage) : undefined,
       startDatetime: body.startDatetime || new Date().toISOString(),
       endDatetime: body.endDatetime || new Date().toISOString(),
-      location: body.location?.location ? { location: body.location.location } : undefined,
+      location: body.location
+        ? {
+            location: body.location.location || '',
+            mapLocation: body.location.mapLocation || body.location.location || '',
+            latitude: body.location.latitude !== undefined ? Number(body.location.latitude) : undefined,
+            longitude: body.location.longitude !== undefined ? Number(body.location.longitude) : undefined,
+          }
+        : undefined,
       tags: Array.isArray(body.tags) ? body.tags : [],
       pricing: {
         type: isPaid ? 'paid' : 'free',

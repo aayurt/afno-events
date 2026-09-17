@@ -8,12 +8,25 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
-import { Calendar, ImageIcon, Loader2, Plus, Trash2, UploadCloud } from 'lucide-react'
+import { VenueMapPicker, VenueLocation } from './VenueMapPicker'
+import {
+  Calendar,
+  Clock,
+  ImageIcon,
+  Loader2,
+  MapPin,
+  Plus,
+  Sparkles,
+  Tag,
+  Ticket,
+  Trash2,
+  UploadCloud,
+} from 'lucide-react'
 
 type TicketTier = {
   name: string
   price: number
-  description?: string
+  description?: string | null
   stripePriceID?: string | null
 }
 
@@ -25,109 +38,95 @@ export type EventFormData = {
   coverImageUrl?: string | null
   startDatetime?: string
   endDatetime?: string
-  location?: { location?: string }
+  location?: {
+    location?: string
+    mapLocation?: string
+    latitude?: number
+    longitude?: number
+  } | null
   tags?: string[]
   pricing?: {
-    type: 'free' | 'paid'
-    priceRange?: string
-    ticketTypes?: TicketTier[]
-  }
+    type?: 'free' | 'paid' | null
+    priceRange?: string | null
+    ticketTypes?: TicketTier[] | null
+  } | null
   publish?: boolean
 }
 
 type Props = {
-  initial?: EventFormData
+  initial?: EventFormData | null
   onSubmit: (data: any) => Promise<void>
   submitLabel: string
 }
 
 export function EventForm({ initial, onSubmit, submitLabel }: Props) {
   const router = useRouter()
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
-  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
-  const [coverImageId, setCoverImageId] = useState<string | null>(null)
+  const [title, setTitle] = useState(initial?.title || '')
+  const [description, setDescription] = useState(initial?.description || '')
+  const [coverImageId, setCoverImageId] = useState<number | null>(initial?.coverImage || null)
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(initial?.coverImageUrl || null)
   const [isUploading, setIsUploading] = useState(false)
-  const [startDatetime, setStartDatetime] = useState('')
-  const [endDatetime, setEndDatetime] = useState('')
-  const [location, setLocation] = useState('')
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
-  const [pricingType, setPricingType] = useState<'free' | 'paid'>('free')
-  const [priceRange, setPriceRange] = useState('Free')
-  const [ticketRows, setTicketRows] = useState<
-    { name: string; price: number; description: string }[]
-  >([{ name: '', price: 0, description: '' }])
-  const [isPublish, setIsPublish] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleTagChange = (value: string) => {
-    setSelectedTags(prev => {
-      if (prev.includes(value)) return prev.filter(v => v !== value)
-      return [...prev, value]
-    })
+  const toLocalInput = (iso?: string) => {
+    if (!iso) return ''
+    try {
+      const d = new Date(iso)
+      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+    } catch {
+      return ''
+    }
+  }
+
+  const [startDatetime, setStartDatetime] = useState(toLocalInput(initial?.startDatetime))
+  const [endDatetime, setEndDatetime] = useState(toLocalInput(initial?.endDatetime))
+  
+  const [locationData, setLocationData] = useState<VenueLocation>({
+    location: initial?.location?.location || '',
+    mapLocation: initial?.location?.mapLocation || '',
+    latitude: initial?.location?.latitude,
+    longitude: initial?.location?.longitude,
+  })
+
+  const [selectedTags, setSelectedTags] = useState<string[]>(initial?.tags || [])
+  const [pricingType, setPricingType] = useState<'free' | 'paid'>(initial?.pricing?.type || 'free')
+  const [priceRange, setPriceRange] = useState(initial?.pricing?.priceRange || '')
+  
+  const [ticketRows, setTicketRows] = useState<TicketTier[]>(
+    initial?.pricing?.ticketTypes && initial.pricing.ticketTypes.length > 0
+      ? initial.pricing.ticketTypes.map((t) => ({
+          name: t.name || 'General Admission',
+          price: t.price ?? 15,
+          description: t.description || '',
+          stripePriceID: t.stripePriceID || null,
+        }))
+      : [{ name: 'General Admission', price: 15, description: 'Standard event entry' }]
+  )
+
+  const [isPublish, setIsPublish] = useState(initial?.publish ?? true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleTagToggle = (tagValue: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagValue) ? prev.filter((t) => t !== tagValue) : [...prev, tagValue]
+    )
   }
 
   const addTicketRow = () => {
-    setTicketRows(prev => {
-      if (prev.length >= 5) return prev
-      return [...prev, { name: '', price: 0, description: '' }]
+    setTicketRows((prev) => [...prev, { name: '', price: 20, description: '' }])
+  }
+
+  const updateTicketRow = (idx: number, field: keyof TicketTier, val: any) => {
+    setTicketRows((prev) => {
+      const next = [...prev]
+      next[idx] = { ...next[idx], [field]: val } as TicketTier
+      return next
     })
   }
 
   const removeTicketRow = (idx: number) => {
-    setTicketRows(prev => {
-      if (prev.length <= 1) return prev
-      return prev.slice(0, -1)
-    })
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    const ticketTypes = pricingType === 'paid'
-      ? ticketRows.map(row => ({ name: row.name, price: row.price, description: row.description }))
-      : [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
-
-    const formData = {
-      title,
-      description,
-      coverImage: coverImageId,
-      startDatetime,
-      endDatetime,
-      location,
-      tags: selectedTags,
-      pricing: {
-        type: pricingType,
-        priceRange,
-        ticketTypes,
-      },
-      publish: isPublish,
-    }
-
-    try {
-      const res = await fetch('/api/organiser/events', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include',
-      })
-
-      if (!res.ok) {
-        const err = await res.json()
-        alert(err.error || 'Failed to create event')
-        return
-      }
-
-      const data = await res.json()
-      router.push(`/organiser/events/${data.id}`)
-    } catch (err) {
-      alert('Failed to create event')
-    } finally {
-      setIsSubmitting(false)
-    }
+    if (ticketRows.length <= 1) return
+    setTicketRows((prev) => prev.filter((_, i) => i !== idx))
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,293 +134,439 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
     if (!file) return
 
     setIsUploading(true)
+    setError(null)
+    const fd = new FormData()
+    fd.append('file', file)
+
     try {
       const res = await fetch('/api/organiser/media', {
         method: 'POST',
-        body: new FormData(),
+        body: fd,
         credentials: 'include',
       })
       if (!res.ok) {
-        const err = await res.json()
-        alert(err.error || 'Upload failed')
-        return
+        const err = await res.json().catch(() => ({ error: 'Upload failed' }))
+        throw new Error(err.error || 'Failed to upload image')
       }
       const data = await res.json()
-      setCoverImageId(data.id.toString())
+      setCoverImageId(data.id)
       setCoverImageUrl(data.url)
-    } catch (err) {
-      alert('Upload failed')
+    } catch (err: any) {
+      setError(err.message || 'Image upload failed')
     } finally {
       setIsUploading(false)
     }
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!title.trim()) {
+      setError('Please enter an event title.')
+      return
+    }
+
+    setIsSubmitting(true)
+    setError(null)
+
+    const ticketTypes =
+      pricingType === 'paid'
+        ? ticketRows.map((r) => ({
+            name: r.name,
+            price: Number(r.price) || 0,
+            description: r.description || '',
+            stripePriceID: r.stripePriceID || null,
+          }))
+        : [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
+
+    const payloadData: any = {
+      title,
+      description,
+      coverImage: coverImageId,
+      startDatetime: startDatetime ? new Date(startDatetime).toISOString() : new Date().toISOString(),
+      endDatetime: endDatetime ? new Date(endDatetime).toISOString() : new Date().toISOString(),
+      location: {
+        location: locationData.location || '',
+        mapLocation: locationData.mapLocation || locationData.location || '',
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+      },
+      tags: selectedTags,
+      pricing: {
+        type: pricingType,
+        priceRange: pricingType === 'paid' ? priceRange || `£${ticketRows[0]?.price || 0}` : 'Free',
+        ticketTypes,
+      },
+      publish: isPublish,
+    }
+
+    try {
+      await onSubmit(payloadData)
+    } catch (err: any) {
+      setError(err.message || 'Failed to save event. Please check inputs.')
+      setIsSubmitting(false)
+    }
+  }
+
   return (
-    <div className="p-6">
-      <h2 className="text-xl font-semibold mb-6">Create Event</h2>
+    <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
+      {error && (
+        <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-semibold">
+          {error}
+        </div>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Basics section */}
-        <Card>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="title">Title <span className="text-red-500">*</span></Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={e => setTitle((e.target as HTMLInputElement).value)}
-                  placeholder="Event title"
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={e => setDescription((e.target as HTMLTextAreaElement).value)}
-                  placeholder="Description of the event"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* 1. Basic Info */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <Sparkles size={18} className="text-primary" />
+            <span>1. Event Details</span>
+          </div>
 
-        {/* Poster Image section */}
-        <Card>
-          <CardContent>
-            <div className="flex items-center gap-4 mb-4">
-              <UploadCloud className="h-5 w-5 text-muted-foreground" />
-              <Label>Poster Image</Label>
-            </div>
-            {isUploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : !coverImageUrl ? (
-              <div className="border rounded border-border p-4 text-muted-foreground hover:border-primary cursor-pointer">
-                <ImageIcon className="h-6 w-6 mb-2" />
-                <span>Click to upload poster image</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-              </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <img
-                  src={coverImageUrl}
-                  alt="Poster"
-                  className="w-24 h-16 rounded object-cover"
-                />
-                <div>
-                  <p className="font-medium">Preview</p>
-                  <p className="text-xs text-muted-foreground">{coverImageUrl.substring(0, 50)}...</p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => { setCoverImageUrl(null); setCoverImageId(null) }}
-                >
-                  <Trash2 size={16} /> Remove
-                </Button>
-              </div>
-            )}
-            <input
-              type="hidden"
-              name="coverImageId"
-              value={coverImageId || ''}
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-sm font-semibold">
+              Event Title <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Nepali New Year Cultural Night 2026"
+              className="h-11 rounded-xl text-base"
+              required
             />
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* When & Where section */}
-        <Card>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Starts <span className="text-red-500">*</span></Label>
-                <Input
-                  type="datetime-local"
-                  id="startDatetime"
-                  value={startDatetime || ''}
-                  onChange={e => setStartDatetime((e.target as HTMLInputElement).value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label>Ends</Label>
-                <Input
-                  type="datetime-local"
-                  id="endDatetime"
-                  value={endDatetime || ''}
-                  onChange={e => setEndDatetime((e.target as HTMLInputElement).value)}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 mt-4">
-              <div>
-                <Label>Venue</Label>
-                <Input
-                  type="text"
-                  id="location"
-                  value={location || ''}
-                  onChange={e => setLocation((e.target as HTMLInputElement).value)}
-                  placeholder="Venue name or address"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-semibold">
+              Description & Highlights
+            </Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Provide event details, schedule, age restrictions, performers, food & drink, parking..."
+              rows={4}
+              className="rounded-xl resize-y text-sm leading-relaxed"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Category section */}
-        <Card>
-          <CardContent>
-            <Label>Tags</Label>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              {TAG_OPTIONS.map((tag) => (
-                <Label
-                  key={tag.value}
-                  className="flex items-center gap-1 border rounded px-2 py-1 text-sm"
-                  onClick={() => handleTagChange(tag.value)}
-                  style={{
-                    background:
-                      selectedTags.includes(tag.value) ? 'bg-primary' : 'bg-background',
-                    color:
-                      selectedTags.includes(tag.value)
-                        ? 'bg-primary-foreground'
-                        : 'text-primary',
-                  }}>
-                  <span>{tag.label}</span>
-                </Label>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+      {/* 2. Poster Artwork */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <UploadCloud size={18} className="text-primary" />
+            <span>2. Poster Artwork</span>
+          </div>
 
-        {/* Tickets section */}
-        <Card>
-          <CardContent>
-            <Label>Pricing Type</Label>
-            <div className="grid grid-cols-2 gap-2 mt-2">
-              <Button
-                variant="outline"
-                onClick={() => setPricingType('free')}
-                disabled={pricingType === 'free'}
-                className={pricingType === 'free' ? 'border-primary text-primary' : ''}
-              >
-                Free
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setPricingType('paid')}
-                disabled={pricingType === 'paid'}
-                className={pricingType === 'paid' ? 'border-primary text-primary' : ''}
-              >
-                Paid
-              </Button>
+          <div className="flex flex-col sm:flex-row items-start gap-5 pt-1">
+            <div className="w-32 h-44 rounded-2xl bg-muted/50 border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xs relative">
+              {coverImageUrl ? (
+                <img src={coverImageUrl} alt="Poster" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-center p-2 text-muted-foreground/50">
+                  <ImageIcon size={32} className="mx-auto mb-1 opacity-50" />
+                  <span className="text-[10px] font-mono uppercase">4:5 Ratio</span>
+                </div>
+              )}
             </div>
 
-            {pricingType === 'paid' && (
-              <div className="mt-4 space-y-3">
-                <Label>Price Range</Label>
-                <Input
-                  type="text"
-                  placeholder="e.g. £5.00 - £15.00"
-                  value={priceRange || ''}
-                  onChange={e => setPriceRange((e.target as HTMLInputElement).value)}
-                />
+            <div className="space-y-3 flex-1">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Upload your official event flyer or poster. High-resolution JPG, PNG or WebP (up to 25MB). Tall portrait artwork displays best in the mobile discovery feed.
+              </p>
 
-                <div className="space-y-2">
-                  {ticketRows.map((row, idx) => (
-                    <div key={idx} className="border rounded p-3">
-                      <div className="grid grid-cols-2 gap-3">
-                        <Input
-                          value={row.name}
-                          onChange={e => {
-                            setTicketRows(prev =>
-                              prev.map((r, i) =>
-                                i === idx ? { ...r, name: (e.target as HTMLInputElement).value } : r,
-                              ),
-                            )
-                          }}
-                        />
-                        <Input
-                          type="number"
-                          value={row.price}
-                          onChange={e => {
-                            setTicketRows(prev =>
-                              prev.map((r, i) =>
-                                i === idx ? { ...r, price: Number((e.target as HTMLInputElement).value) } : r,
-                              ),
-                            )
-                          }}
-                        />
-                        <Textarea
-                          value={row.description || ''}
-                          onChange={e => {
-                            setTicketRows(prev =>
-                              prev.map((r, i) =>
-                                i === idx ? { ...r, description: (e.target as HTMLTextAreaElement).value } : r,
-                              ),
-                            )
-                          }}
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeTicketRow(idx)}
-                        >
-                          <Trash2 size={14} />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+              <div className="flex items-center gap-2">
+                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border hover:bg-muted/60 text-xs font-semibold cursor-pointer transition-colors shadow-xs">
+                  <UploadCloud size={15} />
+                  <span>{coverImageUrl ? 'Change Poster' : 'Choose File'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                    className="hidden"
+                  />
+                </label>
 
+                {coverImageUrl && (
                   <Button
-                    variant="link"
-                    onClick={() => addTicketRow()}
-                    className="text-primary hover:text-primary/90"
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setCoverImageUrl(null)
+                      setCoverImageId(null)
+                    }}
+                    className="text-destructive text-xs hover:bg-destructive/10 h-9"
                   >
-                    <Plus size={14} /> Add ticket type
+                    <Trash2 size={14} className="mr-1" /> Remove
+                  </Button>
+                )}
+              </div>
+
+              {isUploading && (
+                <div className="flex items-center gap-2 text-xs text-primary font-medium">
+                  <Loader2 size={14} className="animate-spin" /> Uploading image to server…
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 3. Schedule */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <Calendar size={18} className="text-primary" />
+            <span>3. Date & Time</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            <div className="space-y-2">
+              <Label htmlFor="startDatetime" className="text-xs font-semibold">
+                Event Starts <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                type="datetime-local"
+                id="startDatetime"
+                value={startDatetime}
+                onChange={(e) => setStartDatetime(e.target.value)}
+                className="h-10 rounded-xl font-mono text-xs"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="endDatetime" className="text-xs font-semibold">
+                Event Ends
+              </Label>
+              <Input
+                type="datetime-local"
+                id="endDatetime"
+                value={endDatetime}
+                onChange={(e) => setEndDatetime(e.target.value)}
+                className="h-10 rounded-xl font-mono text-xs"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 4. Venue & Interactive Map */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <MapPin size={18} className="text-primary" />
+            <span>4. Venue & Map Location</span>
+          </div>
+
+          <VenueMapPicker
+            value={locationData}
+            onChange={(loc) => setLocationData(loc)}
+          />
+        </CardContent>
+      </Card>
+
+      {/* 5. Categories & Tags */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-3">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <Tag size={18} className="text-primary" />
+            <span>5. Categories & Discovery Tags</span>
+          </div>
+          <p className="text-xs text-muted-foreground">Select tags to help attendees find your show in category filters.</p>
+
+          <div className="flex flex-wrap gap-2 pt-2">
+            {TAG_OPTIONS.map((tag) => {
+              const active = selectedTags.includes(tag.value)
+              return (
+                <button
+                  type="button"
+                  key={tag.value}
+                  onClick={() => handleTagToggle(tag.value)}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                    active
+                      ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                      : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  {tag.label}
+                </button>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 6. Tickets & Pricing */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-5">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <Ticket size={18} className="text-primary" />
+            <span>6. Tickets & Pricing</span>
+          </div>
+
+          {/* Free vs Paid Toggle */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPricingType('free')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                pricingType === 'free'
+                  ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                  : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+              }`}
+            >
+              Free Event
+            </button>
+            <button
+              type="button"
+              onClick={() => setPricingType('paid')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                pricingType === 'paid'
+                  ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                  : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
+              }`}
+            >
+              Paid Tickets (Stripe)
+            </button>
+          </div>
+
+          {pricingType === 'paid' ? (
+            <div className="space-y-4 pt-2">
+              <div className="space-y-2">
+                <Label htmlFor="priceRange" className="text-xs font-semibold">
+                  Display Price Range
+                </Label>
+                <Input
+                  id="priceRange"
+                  value={priceRange}
+                  onChange={(e) => setPriceRange(e.target.value)}
+                  placeholder="e.g. £15 - £35 or From £15"
+                  className="h-10 rounded-xl text-sm"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-semibold">Ticket Tiers</Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addTicketRow}
+                    className="h-8 gap-1 text-xs rounded-xl"
+                  >
+                    <Plus size={13} /> Add Tier
                   </Button>
                 </div>
+
+                <div className="space-y-3">
+                  {ticketRows.map((row, idx) => (
+                    <div key={idx} className="p-4 rounded-2xl border border-border bg-muted/20 space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <Input
+                            value={row.name}
+                            onChange={(e) => updateTicketRow(idx, 'name', e.target.value)}
+                            placeholder="Tier Name (e.g. Early Bird, VIP, General Admission)"
+                            className="h-9 rounded-xl text-xs font-semibold bg-background"
+                            required
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-1.5 w-32 shrink-0">
+                          <span className="text-sm font-bold text-muted-foreground">£</span>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={row.price}
+                            onChange={(e) => updateTicketRow(idx, 'price', parseFloat(e.target.value) || 0)}
+                            placeholder="Price"
+                            className="h-9 rounded-xl text-xs font-mono font-bold bg-background"
+                            required
+                          />
+                        </div>
+
+                        {ticketRows.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeTicketRow(idx)}
+                            className="text-muted-foreground hover:text-destructive h-9 w-9 shrink-0"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        )}
+                      </div>
+
+                      <Input
+                        value={row.description || ''}
+                        onChange={(e) => updateTicketRow(idx, 'description', e.target.value)}
+                        placeholder="Perks, entrance window, or inclusions (optional)"
+                        className="h-8 rounded-xl text-xs bg-background"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="p-4 rounded-2xl border border-border bg-muted/30 text-xs text-muted-foreground space-y-1">
+              <p className="font-semibold text-foreground">Free Registration Tier</p>
+              <p>Attendees will receive a free admission QR ticket upon registration.</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-            {pricingType === 'free' && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                Free Admission: General free admission
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Publish toggle */}
-        <Card>
-          <CardContent className="flex items-start gap-3">
+      {/* 7. Publish Immediately Toggle */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-5">
+          <label className="flex items-start gap-3.5 cursor-pointer">
             <input
               type="checkbox"
+              id="publish"
               checked={isPublish}
               onChange={(e) => setIsPublish(e.target.checked)}
-              id="publish"
+              className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary"
             />
-            <Label htmlFor="publish">
-              Publish immediately (make visible to fans)
-            </Label>
-          </CardContent>
-        </Card>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm text-foreground">Publish Immediately</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                When unchecked, the show is saved as a Draft visible only to you on the dashboard.
+              </p>
+            </div>
+          </label>
+        </CardContent>
+      </Card>
 
-        <div className="mt-6">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4" />
-            ) : null}
-            Create Event
-          </Button>
-        </div>
-      </form>
-    </div>
+      {/* Form Action Controls */}
+      <div className="flex items-center gap-3 pt-2">
+        <Button
+          type="submit"
+          size="lg"
+          disabled={isSubmitting}
+          className="rounded-xl px-8 font-bold text-sm h-11 shadow-sm bg-primary text-primary-foreground"
+        >
+          {isSubmitting && <Loader2 size={16} className="animate-spin mr-2" />}
+          {submitLabel}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push('/organiser/dashboard')}
+          className="rounded-xl h-11 px-6 text-sm"
+        >
+          Cancel
+        </Button>
+      </div>
+    </form>
   )
 }
