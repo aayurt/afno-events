@@ -128,12 +128,79 @@ export default function OrganiserDashboard() {
 
   if (boot === 'loading') {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-8 space-y-4">
-        <Skeleton className="h-10 w-48 rounded-xl" />
-        <Skeleton className="h-20 w-full rounded-2xl" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Skeleton className="h-64 w-full rounded-2xl" />
-          <Skeleton className="h-64 w-full rounded-2xl" />
+      <div className="min-h-screen bg-background text-foreground flex flex-col items-center pb-24 sm:pb-12 select-none">
+        <div className="w-full max-w-md sm:max-w-4xl lg:max-w-5xl px-4 sm:px-6 py-4 sm:py-8 flex flex-col flex-1 relative">
+          {/* Header Skeleton */}
+          <header className="mb-6 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <Skeleton className="w-10 h-10 rounded-xl shrink-0" />
+              <div className="space-y-1.5 min-w-0">
+                <Skeleton className="h-4 w-36 sm:w-48 rounded" />
+                <Skeleton className="h-3 w-20 rounded" />
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Skeleton className="hidden sm:block h-9 w-32 rounded-xl" />
+              <Skeleton className="hidden sm:block h-9 w-28 rounded-xl" />
+              <Skeleton className="h-8 w-8 sm:w-20 rounded-lg" />
+            </div>
+          </header>
+
+          {/* 3-Metric Glance Ribbon Skeleton */}
+          <div className="grid grid-cols-3 border border-border rounded-2xl bg-card/60 divide-x divide-border mb-6 shadow-xs overflow-hidden">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="px-3 sm:px-4 py-3 sm:py-3.5 space-y-2">
+                <Skeleton className="h-2.5 w-16 sm:w-20 rounded" />
+                <Skeleton className="h-5 sm:h-6 w-10 sm:w-14 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Filter Pills Skeleton */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 mb-6">
+            <Skeleton className="h-8 w-20 rounded-full shrink-0" />
+            <Skeleton className="h-8 w-24 rounded-full shrink-0" />
+            <Skeleton className="h-8 w-28 rounded-full shrink-0" />
+            <Skeleton className="h-8 w-20 rounded-full shrink-0" />
+          </div>
+
+          {/* Event Cards Grid Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="rounded-2xl border border-border bg-card/60 p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-xs"
+              >
+                <div className="flex items-start gap-3.5">
+                  <Skeleton className="w-20 sm:w-24 aspect-[4/5] rounded-xl shrink-0" />
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Skeleton className="h-4 w-16 rounded-full" />
+                      <Skeleton className="h-3 w-12 rounded" />
+                    </div>
+                    <Skeleton className="h-5 w-3/4 rounded" />
+                    <Skeleton className="h-3.5 w-1/2 rounded" />
+                    <Skeleton className="h-3 w-2/3 rounded" />
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-border/50">
+                  <Skeleton className="h-11 w-full rounded-xl" />
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                    <Skeleton className="h-8 w-full rounded-lg" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Floating Bottom Bar Skeleton (Mobile only) */}
+          <div className="sm:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md bg-background/95 backdrop-blur border-t border-border px-4 py-3 flex items-center justify-between gap-3 z-40">
+            <Skeleton className="h-11 flex-1 rounded-xl" />
+            <Skeleton className="h-11 flex-1 rounded-xl" />
+          </div>
         </div>
       </div>
     )

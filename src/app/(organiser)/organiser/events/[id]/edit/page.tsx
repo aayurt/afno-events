@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, ExternalLink, Loader2, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { EventForm, EventFormData } from '@/components/organiser/EventForm'
 
 export default function EditEventPage() {
@@ -74,8 +75,45 @@ export default function EditEventPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={32} />
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10 space-y-6">
+        <div>
+          <Skeleton className="h-4 w-32 rounded mb-3" />
+          <div className="flex items-center justify-between">
+            <div className="space-y-1.5">
+              <Skeleton className="h-8 w-56 rounded-lg" />
+              <Skeleton className="h-3.5 w-40 rounded" />
+            </div>
+            <Skeleton className="h-8 w-20 rounded-full" />
+          </div>
+        </div>
+
+        {/* 1. Basics Skeleton */}
+        <div className="rounded-2xl border border-border/80 p-6 space-y-4">
+          <Skeleton className="h-5 w-32 rounded" />
+          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-24 w-full rounded-xl" />
+        </div>
+
+        {/* 2. Poster Skeleton */}
+        <div className="rounded-2xl border border-border/80 p-6 space-y-4">
+          <Skeleton className="h-5 w-36 rounded" />
+          <Skeleton className="h-48 w-36 rounded-2xl" />
+        </div>
+
+        {/* 3. Date / Time Skeleton */}
+        <div className="rounded-2xl border border-border/80 p-6 space-y-4">
+          <Skeleton className="h-5 w-32 rounded" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Skeleton className="h-11 w-full rounded-xl" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
+        </div>
+
+        {/* Bottom Actions Skeleton */}
+        <div className="flex gap-3 pt-2">
+          <Skeleton className="h-11 w-36 rounded-xl" />
+          <Skeleton className="h-11 w-32 rounded-xl" />
+        </div>
       </div>
     )
   }

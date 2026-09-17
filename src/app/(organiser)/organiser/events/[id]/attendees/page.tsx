@@ -7,6 +7,7 @@ import { ArrowLeft, CheckCircle2, Copy, ExternalLink, Loader2, Search, Ticket, U
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Attendee = {
   id: number
@@ -96,8 +97,50 @@ export default function AttendeesPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <Loader2 className="animate-spin text-primary" size={32} />
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:py-10 space-y-8">
+        <div>
+          <Skeleton className="h-4 w-32 rounded mb-3" />
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-64 rounded-lg" />
+              <Skeleton className="h-4 w-48 rounded" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-9 w-28 rounded-xl" />
+              <Skeleton className="h-9 w-28 rounded-xl" />
+            </div>
+          </div>
+        </div>
+
+        {/* 3 Stats cards skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border border-border/80 p-5 space-y-2">
+              <Skeleton className="h-3 w-20 rounded" />
+              <Skeleton className="h-7 w-24 rounded" />
+              <Skeleton className="h-3 w-32 rounded" />
+            </div>
+          ))}
+        </div>
+
+        {/* Search Bar Skeleton */}
+        <Skeleton className="h-11 w-full rounded-xl" />
+
+        {/* Attendees list rows skeleton */}
+        <div className="rounded-2xl border border-border divide-y divide-border overflow-hidden">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="p-4 flex items-center justify-between gap-4">
+              <div className="space-y-1.5 min-w-0">
+                <Skeleton className="h-4 w-40 rounded" />
+                <Skeleton className="h-3 w-32 rounded" />
+              </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <Skeleton className="h-5 w-20 rounded-full" />
+                <Skeleton className="h-5 w-16 rounded" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
