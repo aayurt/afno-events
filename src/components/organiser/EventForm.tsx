@@ -10,7 +10,38 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Calendar, ImageIcon, Loader2, Plus, Trash2, UploadCloud } from 'lucide-react'
 
-export default function EventForm() {
+type TicketTier = {
+  name: string
+  price: number
+  description?: string
+  stripePriceID?: string | null
+}
+
+export type EventFormData = {
+  id?: number
+  title: string
+  description?: string
+  coverImage?: number | null
+  coverImageUrl?: string | null
+  startDatetime?: string
+  endDatetime?: string
+  location?: { location?: string }
+  tags?: string[]
+  pricing?: {
+    type: 'free' | 'paid'
+    priceRange?: string
+    ticketTypes?: TicketTier[]
+  }
+  publish?: boolean
+}
+
+type Props = {
+  initial?: EventFormData
+  onSubmit: (data: any) => Promise<void>
+  submitLabel: string
+}
+
+export function EventForm({ initial, onSubmit, submitLabel }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
