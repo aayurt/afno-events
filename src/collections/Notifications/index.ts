@@ -19,7 +19,22 @@ export const Notifications: CollectionConfig = {
             path: '/mark-all-read',
             method: 'post',
             handler: async (req) => {
-                if (!req.user) {
+                // Next route handlers don't auto-run Payload auth strategies —
+                // resolve the (Better Auth) session from cookies if needed.
+                let user: any = (req as any).user
+                if (!user) {
+                    try {
+                        const authResult = await req.payload.auth({
+                            headers: req.headers,
+                            canSetHeaders: false,
+                        })
+                        user = authResult?.user ?? null
+                    } catch {
+                        user = null
+                    }
+                }
+
+                if (!user) {
                     return Response.json({ error: 'Unauthorized' }, { status: 401 })
                 }
 
@@ -30,7 +45,7 @@ export const Notifications: CollectionConfig = {
                             and: [
                                 {
                                     user: {
-                                        equals: req.user.id,
+                                        equals: user.id,
                                     },
                                 },
                                 {
@@ -43,6 +58,7 @@ export const Notifications: CollectionConfig = {
                         data: {
                             read: true,
                         },
+                        overrideAccess: true,
                     })
 
                     return Response.json({ success: true })

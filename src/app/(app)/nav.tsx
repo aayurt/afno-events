@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, BellRing, Calendar, Ticket, User, Users, type LucideIcon } from 'lucide-react'
+import { Bell, Calendar, Ticket, User, Users, UsersRound, type LucideIcon } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { authClient } from '@/lib/auth/client'
 import { fireDueReminders } from '@/lib/reminders'
@@ -176,13 +176,13 @@ export function AppNav({ children }: { children: React.ReactNode }) {
                 <HeaderBell
                   href="/app/circles/alerts"
                   title={t('squadAlerts')}
-                  icon={Bell}
+                  icon={UsersRound}
                   unread={alertsUnread}
                 />
                 <HeaderBell
                   href="/app/notifications"
                   title={t('notificationsBell')}
-                  icon={BellRing}
+                  icon={Bell}
                   unread={notifsUnread}
                 />
               </div>
