@@ -29,7 +29,9 @@ export default function OrganiserLoginPage() {
       .getSession()
       .then((result) => {
         const user = result.data?.user as { role?: string } | undefined
-        if (user && (user.role === 'admin' || user.role === 'super-admin')) {
+        if (user && user.role === 'super-admin') {
+          router.replace('/admin')
+        } else if (user && user.role === 'admin') {
           router.replace('/organiser/dashboard')
         } else if (user) {
           setNotOrganiser(true)
@@ -52,7 +54,9 @@ export default function OrganiserLoginPage() {
       }
       const session = await authClient.getSession()
       const role = (session.data?.user as { role?: string } | undefined)?.role
-      if (role === 'admin' || role === 'super-admin') {
+      if (role === 'super-admin') {
+        window.location.href = '/admin'
+      } else if (role === 'admin') {
         window.location.href = '/organiser/dashboard'
       } else {
         setNotOrganiser(true)

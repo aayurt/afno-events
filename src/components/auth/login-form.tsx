@@ -101,8 +101,9 @@ export default function LoginForm({
         if (result.data?.user) {
           const user = result.data.user as { role?: unknown }
           // User is logged in, check role
-          if (user.role && user.role === requiredRole) {
-            router.push(afterLoginPath)
+          if (user.role && (user.role === requiredRole || user.role === 'super-admin' || (requiredRole === 'admin' && user.role === 'admin'))) {
+            const target = afterLoginPath === '/admin' && user.role === 'admin' ? '/organiser/dashboard' : afterLoginPath
+            router.push(target)
             return
           } else {
             setAccessDenied(true)
@@ -130,7 +131,10 @@ export default function LoginForm({
       }
 
       // Success - redirect to admin/dashboard depending on role
-      window.location.href = afterLoginPath
+      const session = await getClient().getSession().catch(() => null)
+      const role = (session?.data?.user as { role?: string } | undefined)?.role
+      const target = afterLoginPath === '/admin' && role === 'admin' ? '/organiser/dashboard' : afterLoginPath
+      window.location.href = target
     } catch (err: any) {
       setError(err?.message || 'An unexpected error occurred')
     } finally {
