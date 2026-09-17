@@ -12,9 +12,13 @@ import { VenueMapPicker, VenueLocation } from './VenueMapPicker'
 import {
   Calendar,
   Clock,
+  Eye,
+  Globe,
   ImageIcon,
   Loader2,
+  Lock,
   MapPin,
+  PauseCircle,
   Plus,
   Sparkles,
   Tag,
@@ -537,86 +541,148 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
         </CardContent>
       </Card>
 
-      {/* 7. Availability & Booking Controls (isEnabled & isBookable) */}
+      {/* 7. Public Visibility & Listing Status (isEnabled) */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-5">
-          <div className="flex items-center gap-2 text-foreground font-semibold">
-            <Sparkles size={18} className="text-primary" />
-            <span>7. Availability & Booking Controls</span>
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-foreground font-semibold">
+              <Globe size={18} className="text-primary" />
+              <span>7. Public Visibility & Listing Status</span>
+            </div>
+            <span
+              className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold ${
+                isEnabled
+                  ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                  : 'bg-muted text-muted-foreground border border-border'
+              }`}
+            >
+              {isEnabled ? 'Enabled / Live' : 'Disabled / Draft'}
+            </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            {/* isEnabled card */}
-            <div
-              onClick={() => setIsEnabled(!isEnabled)}
-              className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-3 select-none ${
-                isEnabled
-                  ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/20'
-                  : 'border-border bg-card/60 hover:bg-muted/40'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-xs sm:text-sm">Listing Status (isEnabled)</span>
-                <span
-                  className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
-                    isEnabled ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {isEnabled ? 'Enabled' : 'Draft'}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                When enabled, this show is listed publicly on the fan discovery feed. When disabled, it is saved privately as a draft.
-              </p>
-              <div className="flex items-center gap-2 pt-1 text-xs font-semibold">
-                <input
-                  type="checkbox"
-                  checked={isEnabled}
-                  onChange={(e) => setIsEnabled(e.target.checked)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <span className={isEnabled ? 'text-foreground' : 'text-muted-foreground'}>
-                  {isEnabled ? 'Listed & Publicly Visible' : 'Unlisted Private Draft'}
-                </span>
-              </div>
-            </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Controls whether the event is discoverable across the Afno Events public exploration feeds and mobile apps.
+          </p>
 
-            {/* isBookable card */}
-            <div
-              onClick={() => setIsBookable(!isBookable)}
-              className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-3 select-none ${
-                isBookable
-                  ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/20'
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setIsEnabled(true)}
+              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+                isEnabled
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
                   : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs sm:text-sm">Booking Access (isBookable)</span>
-                <span
-                  className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
-                    isBookable ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {isBookable ? 'Booking Open' : 'Booking Paused'}
+                <span className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <Eye size={16} className="text-emerald-500" />
+                  Public Listing (Enabled)
+                </span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                  Active
                 </span>
               </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                When enabled, attendees can book tickets or register. Uncheck to pause ticket sales (e.g. Sold Out or Door Sales Only).
+                Visible to everyone on the homepage, search, and category feeds.
               </p>
-              <div className="flex items-center gap-2 pt-1 text-xs font-semibold">
-                <input
-                  type="checkbox"
-                  checked={isBookable}
-                  onChange={(e) => setIsBookable(e.target.checked)}
-                  onClick={(e) => e.stopPropagation()}
-                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
-                />
-                <span className={isBookable ? 'text-foreground' : 'text-muted-foreground'}>
-                  {isBookable ? 'Online Booking Active' : 'Ticket Sales Paused'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsEnabled(false)}
+              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+                !isEnabled
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                  : 'border-border bg-card/60 hover:bg-muted/40'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <Lock size={16} className="text-muted-foreground" />
+                  Unlisted Draft (Disabled)
+                </span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-bold">
+                  Private
                 </span>
               </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Hidden from fans. Stored privately on your dashboard until you publish.
+              </p>
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 8. Ticket Sales & Online Booking (isBookable) */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-foreground font-semibold">
+              <Ticket size={18} className="text-primary" />
+              <span>8. Ticket Sales & Online Booking</span>
             </div>
+            <span
+              className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold ${
+                isBookable
+                  ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                  : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+              }`}
+            >
+              {isBookable ? 'Booking Open' : 'Booking Paused'}
+            </span>
+          </div>
+
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Controls whether attendees can register or buy tickets online. You can keep the show listed while pausing ticket checkout.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => setIsBookable(true)}
+              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+                isBookable
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                  : 'border-border bg-card/60 hover:bg-muted/40'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <Ticket size={16} className="text-emerald-500" />
+                  Open for Booking (isBookable)
+                </span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                  Open
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Attendees can purchase tickets or register online immediately.
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsBookable(false)}
+              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+                !isBookable
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                  : 'border-border bg-card/60 hover:bg-muted/40'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <PauseCircle size={16} className="text-amber-500" />
+                  Booking Paused / Closed
+                </span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 font-bold">
+                  Paused
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Keeps event details visible, but disables ticket checkout (Sold Out, Door Only, Coming Soon).
+              </p>
+            </button>
           </div>
         </CardContent>
       </Card>
