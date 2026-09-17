@@ -9,7 +9,22 @@ import Link from 'next/link'
 import { SearchIcon, ExternalLink } from 'lucide-react'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
-  const navItems = data?.navItems || []
+  const navItems = (data?.navItems || []).map((item) => {
+    // Route Organisation/Organiser links to /organiser
+    if (
+      item.link?.url === '/admin' ||
+      item.link?.label?.toLowerCase().includes('organis')
+    ) {
+      return {
+        ...item,
+        link: {
+          ...item.link,
+          url: '/organiser',
+        },
+      }
+    }
+    return item
+  })
 
   return (
     <nav className="flex gap-3 items-center">
