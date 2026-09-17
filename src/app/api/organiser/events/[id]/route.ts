@@ -88,7 +88,10 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       : null
   }
   if (body.tags !== undefined) updateData.tags = body.tags
-  if (body.publish !== undefined) updateData.enabled = !!body.publish
+  if (body.enabled !== undefined) updateData.enabled = !!body.enabled
+  else if (body.publish !== undefined) updateData.enabled = !!body.publish
+
+  if (body.isBookable !== undefined) updateData.isBookable = !!body.isBookable
 
   updateData.pricing = {
     type: isPaid ? 'paid' : 'free',

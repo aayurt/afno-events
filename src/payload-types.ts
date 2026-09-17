@@ -944,6 +944,10 @@ export interface Event {
    * Enable or disable this event
    */
   enabled: boolean;
+  /**
+   * Open for booking (uncheck to disable booking/tickets)
+   */
+  isBookable?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }

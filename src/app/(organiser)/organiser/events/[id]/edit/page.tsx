@@ -42,6 +42,8 @@ export default function EditEventPage() {
           location: data.location,
           tags: data.tags || [],
           pricing: data.pricing,
+          enabled: data.enabled ?? true,
+          isBookable: data.isBookable ?? true,
           publish: data.enabled ?? true,
         })
       } catch (err: any) {

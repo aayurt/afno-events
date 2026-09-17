@@ -50,6 +50,8 @@ export type EventFormData = {
     priceRange?: string | null
     ticketTypes?: TicketTier[] | null
   } | null
+  enabled?: boolean
+  isBookable?: boolean
   publish?: boolean
 }
 
@@ -102,7 +104,8 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
       : [{ name: 'General Admission', price: 15, description: 'Standard event entry' }]
   )
 
-  const [isPublish, setIsPublish] = useState(initial?.publish ?? true)
+  const [isEnabled, setIsEnabled] = useState(initial?.enabled ?? (initial?.publish ?? true))
+  const [isBookable, setIsBookable] = useState(initial?.isBookable ?? true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -158,14 +161,18 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent, overridePublish?: boolean) => {
+  const handleSubmit = async (
+    e?: React.FormEvent,
+    forceStatus?: { enabled?: boolean; isBookable?: boolean }
+  ) => {
     if (e) e.preventDefault()
     if (!title.trim()) {
       setError('Please enter an event title.')
       return
     }
 
-    const willPublish = overridePublish !== undefined ? overridePublish : isPublish
+    const finalEnabled = forceStatus?.enabled !== undefined ? forceStatus.enabled : isEnabled
+    const finalBookable = forceStatus?.isBookable !== undefined ? forceStatus.isBookable : isBookable
 
     setIsSubmitting(true)
     setError(null)
@@ -198,7 +205,9 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
         priceRange: pricingType === 'paid' ? priceRange || `£${ticketRows[0]?.price || 0}` : 'Free',
         ticketTypes,
       },
-      publish: willPublish,
+      enabled: finalEnabled,
+      isBookable: finalBookable,
+      publish: finalEnabled,
     }
 
     try {
@@ -528,50 +537,86 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
         </CardContent>
       </Card>
 
-      {/* 7. Publishing & Visibility Status */}
+      {/* 7. Availability & Booking Controls (isEnabled & isBookable) */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-6 space-y-5">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Sparkles size={18} className="text-primary" />
-            <span>7. Visibility Status</span>
+            <span>7. Availability & Booking Controls</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <button
-              type="button"
-              onClick={() => setIsPublish(false)}
-              className={`p-4 rounded-xl border text-left transition-all ${
-                !isPublish
-                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
-                  : 'border-border bg-card/50 hover:bg-muted/50'
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+            {/* isEnabled card */}
+            <div
+              onClick={() => setIsEnabled(!isEnabled)}
+              className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-3 select-none ${
+                isEnabled
+                  ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/20'
+                  : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs">Save as Draft</span>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground">Draft</span>
+                <span className="font-bold text-xs sm:text-sm">Listing Status (isEnabled)</span>
+                <span
+                  className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                    isEnabled ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {isEnabled ? 'Enabled' : 'Draft'}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                Stores your event privately under the <strong>Drafts</strong> tab on your dashboard. Hidden from fans until published.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                When enabled, this show is listed publicly on the fan discovery feed. When disabled, it is saved privately as a draft.
               </p>
-            </button>
+              <div className="flex items-center gap-2 pt-1 text-xs font-semibold">
+                <input
+                  type="checkbox"
+                  checked={isEnabled}
+                  onChange={(e) => setIsEnabled(e.target.checked)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                />
+                <span className={isEnabled ? 'text-foreground' : 'text-muted-foreground'}>
+                  {isEnabled ? 'Listed & Publicly Visible' : 'Unlisted Private Draft'}
+                </span>
+              </div>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => setIsPublish(true)}
-              className={`p-4 rounded-xl border text-left transition-all ${
-                isPublish
-                  ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
-                  : 'border-border bg-card/50 hover:bg-muted/50'
+            {/* isBookable card */}
+            <div
+              onClick={() => setIsBookable(!isBookable)}
+              className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between space-y-3 select-none ${
+                isBookable
+                  ? 'border-primary/60 bg-primary/5 ring-1 ring-primary/20'
+                  : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs">Publish Live</span>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 font-bold">Live</span>
+                <span className="font-bold text-xs sm:text-sm">Booking Access (isBookable)</span>
+                <span
+                  className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                    isBookable ? 'bg-emerald-500/10 text-emerald-500' : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {isBookable ? 'Booking Open' : 'Booking Paused'}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                Immediately makes the event visible on the public exploration feed and enables fans to purchase tickets.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                When enabled, attendees can book tickets or register. Uncheck to pause ticket sales (e.g. Sold Out or Door Sales Only).
               </p>
-            </button>
+              <div className="flex items-center gap-2 pt-1 text-xs font-semibold">
+                <input
+                  type="checkbox"
+                  checked={isBookable}
+                  onChange={(e) => setIsBookable(e.target.checked)}
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
+                />
+                <span className={isBookable ? 'text-foreground' : 'text-muted-foreground'}>
+                  {isBookable ? 'Online Booking Active' : 'Ticket Sales Paused'}
+                </span>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -580,20 +625,20 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
         <Button
           type="button"
-          onClick={(e) => handleSubmit(e, true)}
+          onClick={(e) => handleSubmit(e, { enabled: true, isBookable })}
           disabled={isSubmitting}
           className="rounded-xl px-8 font-bold text-sm h-11 shadow-sm bg-primary text-primary-foreground"
         >
           {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
-          {submitLabel === 'Save Changes' ? 'Save & Publish' : 'Publish Show'}
+          {submitLabel === 'Save Changes' ? 'Save & Publish Live' : 'Publish Show Live'}
         </Button>
 
         <Button
           type="button"
           variant="outline"
-          onClick={(e) => handleSubmit(e, false)}
+          onClick={(e) => handleSubmit(e, { enabled: false, isBookable })}
           disabled={isSubmitting}
-          className="rounded-xl px-6 font-semibold text-sm h-11 border-border"
+          className="rounded-xl px-6 font-semibold text-sm h-11 border-border bg-card"
         >
           Save as Draft
         </Button>
