@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { authClient } from '@/lib/auth/client'
@@ -24,10 +24,12 @@ export default function OrganiserLoginPage() {
   const [notOrganiser, setNotOrganiser] = useState(false)
 
   // Already signed in? Route them straight in (or show the not-organiser note).
-  useState(() => {
+  useEffect(() => {
+    let active = true
     authClient
       .getSession()
       .then((result) => {
+        if (!active) return
         const user = result.data?.user as { role?: string } | undefined
         if (user && user.role === 'super-admin') {
           router.replace('/admin')
@@ -35,11 +37,19 @@ export default function OrganiserLoginPage() {
           router.replace('/organiser/dashboard')
         } else if (user) {
           setNotOrganiser(true)
+          setChecking(false)
+        } else {
+          setChecking(false)
         }
-        setChecking(false)
       })
-      .catch(() => setChecking(false))
-  })
+      .catch(() => {
+        if (active) setChecking(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
