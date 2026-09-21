@@ -63,9 +63,10 @@ type Props = {
   initial?: EventFormData | null
   onSubmit: (data: any) => Promise<void>
   submitLabel: string
+  isTenantVerified?: boolean
 }
 
-export function EventForm({ initial, onSubmit, submitLabel }: Props) {
+export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = true }: Props) {
   const router = useRouter()
   const [title, setTitle] = useState(initial?.title || '')
   const [description, setDescription] = useState(initial?.description || '')
@@ -567,6 +568,12 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
             Controls whether the event is discoverable across the Afno Events public exploration feeds and mobile apps.
           </p>
 
+          {!isTenantVerified && (
+            <div className="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs text-amber-700 dark:text-amber-400">
+              Your organiser account is currently pending admin verification. Submitting this event will place it in <strong>Pending Review</strong> so our team can approve it before it goes live to fans.
+            </div>
+          )}
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             <button
               type="button"
@@ -699,7 +706,11 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
           className="rounded-xl px-6 font-bold text-sm h-11 w-full sm:w-auto shadow-sm bg-primary text-primary-foreground"
         >
           {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
-          {submitLabel === 'Save Changes' ? 'Save & Publish Live' : 'Publish Show Live'}
+          {!isTenantVerified
+            ? 'Submit for Review'
+            : submitLabel === 'Save Changes'
+              ? 'Save & Publish Live'
+              : 'Publish Show Live'}
         </Button>
 
         <Button

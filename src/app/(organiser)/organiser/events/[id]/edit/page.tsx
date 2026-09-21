@@ -16,6 +16,19 @@ export default function EditEventPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [eventData, setEventData] = useState<EventFormData | null>(null)
+  const [isTenantVerified, setIsTenantVerified] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/organiser/me', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.tenants && Array.isArray(data.tenants)) {
+          const verified = data.tenants.some((t: any) => t.verified || t.status === 'verified')
+          setIsTenantVerified(Boolean(verified))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -153,7 +166,12 @@ export default function EditEventPage() {
         </div>
       </div>
 
-      <EventForm initial={eventData} onSubmit={handleUpdate} submitLabel="Save Changes" />
+      <EventForm
+        initial={eventData}
+        onSubmit={handleUpdate}
+        submitLabel="Save Changes"
+        isTenantVerified={isTenantVerified}
+      />
     </div>
   )
 }

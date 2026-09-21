@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -7,6 +8,19 @@ import { EventForm } from '@/components/organiser/EventForm'
 
 export default function NewEventPage() {
   const router = useRouter()
+  const [isTenantVerified, setIsTenantVerified] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/organiser/me', { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.tenants && Array.isArray(data.tenants)) {
+          const verified = data.tenants.some((t: any) => t.verified || t.status === 'verified')
+          setIsTenantVerified(Boolean(verified))
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const handleCreate = async (formData: any) => {
     const res = await fetch('/api/organiser/events', {
@@ -34,7 +48,7 @@ export default function NewEventPage() {
         <p className="text-xs sm:text-sm text-muted-foreground">Add details, poster artwork, and ticket pricing.</p>
       </div>
 
-      <EventForm onSubmit={handleCreate} submitLabel="Create Event" />
+      <EventForm onSubmit={handleCreate} submitLabel="Create Event" isTenantVerified={isTenantVerified} />
     </div>
   )
 }

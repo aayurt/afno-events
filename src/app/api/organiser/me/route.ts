@@ -45,7 +45,13 @@ export async function GET(req: NextRequest) {
       limit: 20,
       overrideAccess: true,
     })
-    tenants = result.docs.map((t: any) => ({ id: t.id, name: t.name, slug: t.slug }))
+    tenants = result.docs.map((t: any) => ({
+      id: t.id,
+      name: t.name,
+      slug: t.slug,
+      verified: Boolean(t.verified || t.status === 'verified'),
+      status: t.status || (t.verified ? 'verified' : 'pending'),
+    }))
   }
 
   return NextResponse.json({

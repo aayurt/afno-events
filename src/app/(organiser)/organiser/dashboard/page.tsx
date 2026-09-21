@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import {
   Building2,
   Calendar,
+  Clock,
   ExternalLink,
   LogOut,
   MapPin,
@@ -23,7 +24,7 @@ import {
 
 type Me = {
   user: { id: number; email: string; name?: string; role: string }
-  tenants: { id: number; name: string; slug: string }[]
+  tenants: { id: number; name: string; slug: string; verified?: boolean; status?: string }[]
 }
 
 type TicketTier = {
@@ -40,6 +41,7 @@ type EventDoc = {
   startDatetime?: string
   endDatetime?: string
   enabled?: boolean
+  approvalStatus?: 'draft' | 'pending_review' | 'approved' | 'rejected' | null
   location?: { location?: string } | null
   coverImage?: unknown
   pricing?: {
@@ -228,6 +230,8 @@ export default function OrganiserDashboard() {
     )
   }
 
+  const isTenantVerified = Boolean(me?.tenants?.some((t) => t.verified || t.status === 'verified'))
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center pb-24 sm:pb-12 select-none">
       <div className="w-full max-w-md sm:max-w-4xl lg:max-w-5xl px-4 sm:px-6 py-4 sm:py-8 flex flex-col flex-1 relative">
@@ -276,6 +280,24 @@ export default function OrganiserDashboard() {
             </Button>
           </div>
         </header>
+
+        {/* Account Under Verification Review Banner */}
+        {!isTenantVerified && me && (
+          <div className="mb-6 p-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 flex items-start gap-3">
+            <Clock className="text-amber-500 shrink-0 mt-0.5" size={18} />
+            <div className="space-y-1 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-foreground text-sm">Account Under Review</span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold">
+                  Pending Verification
+                </span>
+              </div>
+              <p className="text-muted-foreground leading-relaxed">
+                You can draft events, configure ticket tiers, and upload artwork right away. Shows submitted for publishing will be verified by our team before going live to fans.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* 3-Metric Glance Ribbon */}
         <div className="grid grid-cols-3 border border-border rounded-2xl bg-card/60 divide-x divide-border font-mono text-center mb-6 shadow-xs">
@@ -396,6 +418,11 @@ export default function OrganiserDashboard() {
                           {isDraft && (
                             <span className="border border-border bg-muted text-muted-foreground font-mono uppercase text-[9px] px-1.5 py-0.5 rounded font-bold">
                               Draft
+                            </span>
+                          )}
+                          {event.approvalStatus === 'pending_review' && (
+                            <span className="border border-amber-500/40 bg-amber-500/15 text-amber-600 dark:text-amber-400 font-mono uppercase text-[9px] px-1.5 py-0.5 rounded font-bold">
+                              Pending Review
                             </span>
                           )}
                           {event.pricing?.priceRange && (

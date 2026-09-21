@@ -179,12 +179,20 @@ export default function OrganiserLoginPage() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">
-          Want to sell tickets for your event?{' '}
-          <Link href="/contact-us" className="underline hover:text-foreground">
-            Get in touch
-          </Link>
-        </p>
+        <div className="text-center space-y-2 text-xs text-muted-foreground">
+          <p>
+            New promoter or organisation?{' '}
+            <Link href="/organiser/register" className="font-semibold text-primary hover:underline">
+              Register for Organiser Access →
+            </Link>
+          </p>
+          <p>
+            Want to speak with our team first?{' '}
+            <Link href="/contact-us" className="underline hover:text-foreground">
+              Contact us
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

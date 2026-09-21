@@ -50,7 +50,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     return NextResponse.json({ error: resolved.error }, { status: resolved.status })
   }
 
-  const { payload, event, eventId } = resolved
+  const { payload, user, event, eventId } = resolved
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Body required' }, { status: 400 })
 
@@ -88,8 +88,31 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
       : null
   }
   if (body.tags !== undefined) updateData.tags = body.tags
-  if (body.enabled !== undefined) updateData.enabled = !!body.enabled
-  else if (body.publish !== undefined) updateData.enabled = !!body.publish
+  
+  const tenantId = (event as any).tenant?.id || (event as any).tenant
+  let isTenantVerified = user.role === 'super-admin'
+  if (!isTenantVerified && tenantId) {
+    const tenantDoc = await payload.findByID({
+      collection: 'tenants',
+      id: Number(tenantId),
+      overrideAccess: true,
+    }).catch(() => null)
+    isTenantVerified = Boolean((tenantDoc as any)?.verified || (tenantDoc as any)?.status === 'verified')
+  }
+
+  if (body.enabled !== undefined || body.publish !== undefined) {
+    const wantPublish = body.enabled !== undefined ? !!body.enabled : !!body.publish
+    if (wantPublish && !isTenantVerified) {
+      updateData.enabled = false
+      updateData.approvalStatus = 'pending_review'
+    } else if (isTenantVerified) {
+      updateData.enabled = wantPublish
+      updateData.approvalStatus = 'approved'
+    } else {
+      updateData.enabled = false
+      updateData.approvalStatus = 'draft'
+    }
+  }
 
   if (body.isBookable !== undefined) updateData.isBookable = !!body.isBookable
 

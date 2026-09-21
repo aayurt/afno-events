@@ -469,5 +469,20 @@ export const Events: CollectionConfig = {
         position: 'sidebar',
       },
     },
+    {
+      name: 'approvalStatus',
+      type: 'select',
+      defaultValue: 'approved',
+      options: [
+        { label: 'Draft', value: 'draft' },
+        { label: 'Pending Admin Review', value: 'pending_review' },
+        { label: 'Approved', value: 'approved' },
+        { label: 'Rejected', value: 'rejected' },
+      ],
+      admin: {
+        position: 'sidebar',
+        description: 'Review status for organiser-submitted events',
+      },
+    },
   ],
 }

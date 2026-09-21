@@ -47,6 +47,20 @@ export async function POST(req: NextRequest) {
     ticketTypes = [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
   }
 
+  let isTenantVerified = user.role === 'super-admin'
+  if (!isTenantVerified && assignedTenant) {
+    const tenantDoc = await payload.findByID({
+      collection: 'tenants',
+      id: assignedTenant,
+      overrideAccess: true,
+    }).catch(() => null)
+    isTenantVerified = Boolean((tenantDoc as any)?.verified || (tenantDoc as any)?.status === 'verified')
+  }
+
+  const requestedPublish = body.enabled !== undefined ? !!body.enabled : (body.publish !== undefined ? !!body.publish : true)
+  const finalEnabled = isTenantVerified ? requestedPublish : false
+  const finalApprovalStatus = isTenantVerified ? 'approved' : (requestedPublish ? 'pending_review' : 'draft')
+
   const newEvent = await payload.create({
     collection: 'events',
     data: {
@@ -69,14 +83,18 @@ export async function POST(req: NextRequest) {
         priceRange: isPaid ? body.pricing?.priceRange || '' : 'Free',
         ticketTypes,
       },
-      enabled: body.enabled !== undefined ? !!body.enabled : (body.publish !== undefined ? !!body.publish : true),
+      enabled: finalEnabled,
       isBookable: body.isBookable !== undefined ? !!body.isBookable : true,
+      approvalStatus: finalApprovalStatus,
       tenant: assignedTenant,
     },
     overrideAccess: true,
   })
 
-  return NextResponse.json({ id: newEvent.id })
+  return NextResponse.json({
+    id: newEvent.id,
+    pendingApproval: !isTenantVerified && requestedPublish,
+  })
 }
 
 /**
