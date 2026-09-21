@@ -223,7 +223,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
+    <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8 w-full max-w-3xl">
       {error && (
         <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-semibold">
           {error}
@@ -232,7 +232,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 1. Basic Info */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-5">
+        <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Sparkles size={18} className="text-primary" />
             <span>1. Event Details</span>
@@ -247,7 +247,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Nepali New Year Cultural Night 2026"
-              className="h-11 rounded-xl text-base"
+              className="h-11 rounded-xl text-sm sm:text-base w-full"
               required
             />
           </div>
@@ -262,7 +262,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide event details, schedule, age restrictions, performers, food & drink, parking..."
               rows={4}
-              className="rounded-xl resize-y text-sm leading-relaxed"
+              className="rounded-xl resize-y text-sm leading-relaxed w-full"
             />
           </div>
         </CardContent>
@@ -270,13 +270,13 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 2. Poster Artwork */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <UploadCloud size={18} className="text-primary" />
             <span>2. Poster Artwork</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start gap-5 pt-1">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 pt-1">
             <div className="w-32 h-44 rounded-2xl bg-muted/50 border border-border flex items-center justify-center shrink-0 overflow-hidden shadow-xs relative">
               {coverImageUrl ? (
                 <img src={coverImageUrl} alt="Poster" className="w-full h-full object-cover" />
@@ -288,12 +288,12 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
               )}
             </div>
 
-            <div className="space-y-3 flex-1">
+            <div className="space-y-3 flex-1 w-full text-center sm:text-left">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Upload your official event flyer or poster. High-resolution JPG, PNG or WebP (up to 25MB). Tall portrait artwork displays best in the mobile discovery feed.
               </p>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border hover:bg-muted/60 text-xs font-semibold cursor-pointer transition-colors shadow-xs">
                   <UploadCloud size={15} />
                   <span>{coverImageUrl ? 'Change Poster' : 'Choose File'}</span>
@@ -315,7 +315,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
                       setCoverImageUrl(null)
                       setCoverImageId(null)
                     }}
-                    className="text-destructive text-xs hover:bg-destructive/10 h-9"
+                    className="text-destructive text-xs hover:bg-destructive/10 h-9 rounded-xl"
                   >
                     <Trash2 size={14} className="mr-1" /> Remove
                   </Button>
@@ -323,7 +323,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
               </div>
 
               {isUploading && (
-                <div className="flex items-center gap-2 text-xs text-primary font-medium">
+                <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-primary font-medium">
                   <Loader2 size={14} className="animate-spin" /> Uploading image to server…
                 </div>
               )}
@@ -334,13 +334,13 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 3. Schedule */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Calendar size={18} className="text-primary" />
             <span>3. Date & Time</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1">
             <div className="space-y-2">
               <Label htmlFor="startDatetime" className="text-xs font-semibold">
                 Event Starts <span className="text-destructive">*</span>
@@ -350,7 +350,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
                 id="startDatetime"
                 value={startDatetime}
                 onChange={(e) => setStartDatetime(e.target.value)}
-                className="h-10 rounded-xl font-mono text-xs"
+                className="h-10 rounded-xl font-mono text-xs w-full min-w-0"
                 required
               />
             </div>
@@ -364,7 +364,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
                 id="endDatetime"
                 value={endDatetime}
                 onChange={(e) => setEndDatetime(e.target.value)}
-                className="h-10 rounded-xl font-mono text-xs"
+                className="h-10 rounded-xl font-mono text-xs w-full min-w-0"
               />
             </div>
           </div>
@@ -373,7 +373,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 4. Venue & Interactive Map */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-4">
+        <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <MapPin size={18} className="text-primary" />
             <span>4. Venue & Map Location</span>
@@ -388,14 +388,14 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 5. Categories & Tags */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-3">
+        <CardContent className="p-4 sm:p-6 space-y-3">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Tag size={18} className="text-primary" />
             <span>5. Categories & Discovery Tags</span>
           </div>
           <p className="text-xs text-muted-foreground">Select tags to help attendees find your show in category filters.</p>
 
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 pt-2">
             {TAG_OPTIONS.map((tag) => {
               const active = selectedTags.includes(tag.value)
               return (
@@ -403,7 +403,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
                   type="button"
                   key={tag.value}
                   onClick={() => handleTagToggle(tag.value)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                     active
                       ? 'bg-primary text-primary-foreground border-primary shadow-xs'
                       : 'bg-card text-muted-foreground border-border hover:border-primary/50'
@@ -419,18 +419,18 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 6. Tickets & Pricing */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-5">
+        <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-5">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Ticket size={18} className="text-primary" />
             <span>6. Tickets & Pricing</span>
           </div>
 
           {/* Free vs Paid Toggle */}
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 gap-2 sm:flex sm:gap-2">
             <button
               type="button"
               onClick={() => setPricingType('free')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border text-center ${
                 pricingType === 'free'
                   ? 'bg-primary text-primary-foreground border-primary shadow-xs'
                   : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
@@ -441,7 +441,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
             <button
               type="button"
               onClick={() => setPricingType('paid')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border text-center ${
                 pricingType === 'paid'
                   ? 'bg-primary text-primary-foreground border-primary shadow-xs'
                   : 'bg-muted/50 text-muted-foreground border-border hover:bg-muted'
@@ -462,7 +462,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
                   value={priceRange}
                   onChange={(e) => setPriceRange(e.target.value)}
                   placeholder="e.g. £15 - £35 or From £15"
-                  className="h-10 rounded-xl text-sm"
+                  className="h-10 rounded-xl text-sm w-full"
                 />
               </div>
 
@@ -482,50 +482,53 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
                 <div className="space-y-3">
                   {ticketRows.map((row, idx) => (
-                    <div key={idx} className="p-4 rounded-2xl border border-border bg-muted/20 space-y-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex-1 min-w-0">
+                    <div key={idx} className="p-3.5 sm:p-4 rounded-2xl border border-border bg-muted/20 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
+                        <div className="flex-1 min-w-0 w-full">
                           <Input
                             value={row.name}
                             onChange={(e) => updateTicketRow(idx, 'name', e.target.value)}
-                            placeholder="Tier Name (e.g. Early Bird, VIP, General Admission)"
-                            className="h-9 rounded-xl text-xs font-semibold bg-background"
+                            placeholder="Tier Name (e.g. Early Bird, VIP)"
+                            className="h-10 sm:h-9 rounded-xl text-xs font-semibold bg-background w-full"
                             required
                           />
                         </div>
 
-                        <div className="flex items-center gap-1.5 w-32 shrink-0">
-                          <span className="text-sm font-bold text-muted-foreground">£</span>
-                          <Input
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            value={row.price}
-                            onChange={(e) => updateTicketRow(idx, 'price', parseFloat(e.target.value) || 0)}
-                            placeholder="Price"
-                            className="h-9 rounded-xl text-xs font-mono font-bold bg-background"
-                            required
-                          />
-                        </div>
+                        <div className="flex items-center gap-2 w-full sm:w-auto">
+                          <div className="flex items-center gap-1.5 flex-1 sm:w-32 sm:shrink-0">
+                            <span className="text-sm font-bold text-muted-foreground">£</span>
+                            <Input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={row.price}
+                              onChange={(e) => updateTicketRow(idx, 'price', parseFloat(e.target.value) || 0)}
+                              placeholder="Price"
+                              className="h-10 sm:h-9 rounded-xl text-xs font-mono font-bold bg-background flex-1 sm:w-full"
+                              required
+                            />
+                          </div>
 
-                        {ticketRows.length > 1 && (
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeTicketRow(idx)}
-                            className="text-muted-foreground hover:text-destructive h-9 w-9 shrink-0"
-                          >
-                            <Trash2 size={16} />
-                          </Button>
-                        )}
+                          {ticketRows.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeTicketRow(idx)}
+                              className="text-muted-foreground hover:text-destructive h-10 sm:h-9 px-2.5 sm:px-2 shrink-0 rounded-xl"
+                            >
+                              <Trash2 size={15} />
+                              <span className="sm:hidden text-xs ml-1 font-medium">Remove</span>
+                            </Button>
+                          )}
+                        </div>
                       </div>
 
                       <Input
                         value={row.description || ''}
                         onChange={(e) => updateTicketRow(idx, 'description', e.target.value)}
                         placeholder="Perks, entrance window, or inclusions (optional)"
-                        className="h-8 rounded-xl text-xs bg-background"
+                        className="h-9 sm:h-8 rounded-xl text-xs bg-background w-full"
                       />
                     </div>
                   ))}
@@ -543,14 +546,14 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 7. Public Visibility & Listing Status (isEnabled) */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-foreground font-semibold">
-              <Globe size={18} className="text-primary" />
-              <span>7. Public Visibility & Listing Status</span>
+        <CardContent className="p-4 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-foreground font-semibold min-w-0">
+              <Globe size={18} className="text-primary shrink-0" />
+              <span className="truncate">7. Public Visibility & Listing Status</span>
             </div>
             <span
-              className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold ${
+              className={`text-[10px] sm:text-[11px] font-mono uppercase px-2 sm:px-2.5 py-0.5 rounded-full font-bold shrink-0 ${
                 isEnabled
                   ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                   : 'bg-muted text-muted-foreground border border-border'
@@ -568,18 +571,18 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
             <button
               type="button"
               onClick={() => setIsEnabled(true)}
-              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+              className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
                 isEnabled
                   ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
                   : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <Eye size={16} className="text-emerald-500" />
-                  Public Listing (Enabled)
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-xs sm:text-sm text-foreground flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <Eye size={16} className="text-emerald-500 shrink-0" />
+                  <span className="truncate">Public Listing (Enabled)</span>
                 </span>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold shrink-0">
                   Active
                 </span>
               </div>
@@ -591,18 +594,18 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
             <button
               type="button"
               onClick={() => setIsEnabled(false)}
-              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+              className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
                 !isEnabled
                   ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
                   : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <Lock size={16} className="text-muted-foreground" />
-                  Unlisted Draft (Disabled)
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-xs sm:text-sm text-foreground flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <Lock size={16} className="text-muted-foreground shrink-0" />
+                  <span className="truncate">Unlisted Draft (Disabled)</span>
                 </span>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-bold">
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-bold shrink-0">
                   Private
                 </span>
               </div>
@@ -616,14 +619,14 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
 
       {/* 8. Ticket Sales & Online Booking (isBookable) */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
-        <CardContent className="p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-foreground font-semibold">
-              <Ticket size={18} className="text-primary" />
-              <span>8. Ticket Sales & Online Booking</span>
+        <CardContent className="p-4 sm:p-6 space-y-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-foreground font-semibold min-w-0">
+              <Ticket size={18} className="text-primary shrink-0" />
+              <span className="truncate">8. Ticket Sales & Online Booking</span>
             </div>
             <span
-              className={`text-[11px] font-mono uppercase px-2.5 py-0.5 rounded-full font-bold ${
+              className={`text-[10px] sm:text-[11px] font-mono uppercase px-2 sm:px-2.5 py-0.5 rounded-full font-bold shrink-0 ${
                 isBookable
                   ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
                   : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
@@ -641,18 +644,18 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
             <button
               type="button"
               onClick={() => setIsBookable(true)}
-              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+              className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
                 isBookable
                   ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
                   : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <Ticket size={16} className="text-emerald-500" />
-                  Open for Booking (isBookable)
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-xs sm:text-sm text-foreground flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <Ticket size={16} className="text-emerald-500 shrink-0" />
+                  <span className="truncate">Open for Booking (isBookable)</span>
                 </span>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold">
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-500 font-bold shrink-0">
                   Open
                 </span>
               </div>
@@ -664,18 +667,18 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
             <button
               type="button"
               onClick={() => setIsBookable(false)}
-              className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
+              className={`p-3.5 sm:p-4 rounded-xl border text-left transition-all flex flex-col justify-between space-y-2.5 ${
                 !isBookable
                   ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
                   : 'border-border bg-card/60 hover:bg-muted/40'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <PauseCircle size={16} className="text-amber-500" />
-                  Booking Paused / Closed
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-bold text-xs sm:text-sm text-foreground flex items-center gap-1.5 sm:gap-2 min-w-0">
+                  <PauseCircle size={16} className="text-amber-500 shrink-0" />
+                  <span className="truncate">Booking Paused / Closed</span>
                 </span>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 font-bold">
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-500 font-bold shrink-0">
                   Paused
                 </span>
               </div>
@@ -693,7 +696,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
           type="button"
           onClick={(e) => handleSubmit(e, { enabled: true, isBookable })}
           disabled={isSubmitting}
-          className="rounded-xl px-8 font-bold text-sm h-11 shadow-sm bg-primary text-primary-foreground"
+          className="rounded-xl px-6 font-bold text-sm h-11 w-full sm:w-auto shadow-sm bg-primary text-primary-foreground"
         >
           {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
           {submitLabel === 'Save Changes' ? 'Save & Publish Live' : 'Publish Show Live'}
@@ -704,7 +707,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
           variant="outline"
           onClick={(e) => handleSubmit(e, { enabled: false, isBookable })}
           disabled={isSubmitting}
-          className="rounded-xl px-6 font-semibold text-sm h-11 border-border bg-card"
+          className="rounded-xl px-6 font-semibold text-sm h-11 w-full sm:w-auto border-border bg-card"
         >
           Save as Draft
         </Button>
@@ -713,7 +716,7 @@ export function EventForm({ initial, onSubmit, submitLabel }: Props) {
           type="button"
           variant="ghost"
           onClick={() => router.push('/organiser/dashboard')}
-          className="rounded-xl h-11 px-5 text-sm text-muted-foreground hover:text-foreground"
+          className="rounded-xl h-11 px-5 text-sm text-muted-foreground hover:text-foreground w-full sm:w-auto"
         >
           Cancel
         </Button>

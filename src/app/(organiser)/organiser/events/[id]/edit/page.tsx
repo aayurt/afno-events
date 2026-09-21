@@ -130,22 +130,22 @@ export default function EditEventPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3">
+          <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors">
             <ArrowLeft size={14} /> Back to Dashboard
           </Link>
-          <h1 className="text-2xl font-bold tracking-tight">Edit Event</h1>
-          <p className="text-sm text-muted-foreground">Update event details, artwork, and tickets.</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Edit Event</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Update event details, artwork, and tickets.</p>
         </div>
-        <div className="flex gap-2">
-          <Button asChild variant="outline" size="sm" className="gap-1.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="outline" size="sm" className="gap-1.5 flex-1 sm:flex-initial h-9 rounded-xl">
             <Link href={`/organiser/events/${id}/attendees`}>
               <Users size={14} /> Attendees
             </Link>
           </Button>
-          <Button asChild variant="ghost" size="sm" className="gap-1.5">
+          <Button asChild variant="ghost" size="sm" className="gap-1.5 flex-1 sm:flex-initial h-9 rounded-xl border border-border/60 sm:border-transparent">
             <Link href={`/app/events/${id}`} target="_blank">
               View Public <ExternalLink size={14} />
             </Link>

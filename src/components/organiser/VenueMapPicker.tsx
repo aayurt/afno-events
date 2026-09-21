@@ -157,14 +157,14 @@ export function VenueMapPicker({ value, onChange }: Props) {
       {showMap && (
         <div className="p-4 rounded-2xl border border-border bg-muted/20 space-y-3">
           <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative flex-1 min-w-0">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
-                placeholder="Search location to drop pin (city, street, venue)..."
-                className="pl-9 h-9 rounded-xl text-xs bg-background"
+                placeholder="Search city, venue or postcode..."
+                className="pl-9 h-9 rounded-xl text-xs bg-background w-full"
               />
             </div>
             <Button
@@ -176,29 +176,29 @@ export function VenueMapPicker({ value, onChange }: Props) {
               className="rounded-xl h-9 text-xs gap-1 px-3 shrink-0"
             >
               {isSearching ? <Loader2 size={13} className="animate-spin" /> : <Navigation size={13} />}
-              Search
+              <span className="hidden sm:inline">Search</span>
             </Button>
           </div>
 
           {/* Search suggestions dropdown */}
           {results.length > 0 && (
-            <div className="border border-border rounded-xl bg-card overflow-hidden divide-y divide-border text-xs shadow-md">
+            <div className="border border-border rounded-xl bg-card overflow-hidden divide-y divide-border text-xs shadow-md max-h-48 overflow-y-auto">
               {results.map((r, i) => (
                 <button
                   type="button"
                   key={i}
                   onClick={() => handleSelectResult(r)}
-                  className="w-full text-left p-2.5 hover:bg-muted/50 transition-colors flex items-start gap-2"
+                  className="w-full text-left p-2.5 hover:bg-muted/50 transition-colors flex items-start gap-2 min-w-0"
                 >
                   <MapPin size={14} className="text-primary shrink-0 mt-0.5" />
-                  <span className="truncate">{r.display_name}</span>
+                  <span className="truncate flex-1">{r.display_name}</span>
                 </button>
               ))}
             </div>
           )}
 
           {/* Interactive Leaflet Map */}
-          <div className="h-64 w-full rounded-xl overflow-hidden border border-border shadow-xs">
+          <div className="h-56 sm:h-72 w-full rounded-xl overflow-hidden border border-border shadow-xs">
             <LeafletMap
               latitude={value?.latitude || 51.5312} // Default London
               longitude={value?.longitude || -0.1226}
@@ -207,9 +207,9 @@ export function VenueMapPicker({ value, onChange }: Props) {
           </div>
 
           {value?.mapLocation && (
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-mono">
-              <span className="font-semibold text-foreground">Selected pin:</span>
-              <span className="truncate">{value.mapLocation}</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-mono min-w-0">
+              <span className="font-semibold text-foreground shrink-0">Selected:</span>
+              <span className="truncate flex-1">{value.mapLocation}</span>
             </div>
           )}
         </div>

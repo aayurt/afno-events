@@ -25,13 +25,13 @@ export default function NewEventPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
       <div>
-        <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3">
+        <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors">
           <ArrowLeft size={14} /> Back to Dashboard
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">Create New Event</h1>
-        <p className="text-sm text-muted-foreground">Add details, poster artwork, and ticket pricing.</p>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Create New Event</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Add details, poster artwork, and ticket pricing.</p>
       </div>
 
       <EventForm onSubmit={handleCreate} submitLabel="Create Event" />
