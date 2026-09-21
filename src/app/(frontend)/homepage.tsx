@@ -384,7 +384,7 @@ export default async function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
-                <Link href="/contact-us">
+                <Link href="/organiser/events/new">
                   <Button size="lg" className="rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs px-8 py-3.5 shadow-lg shadow-primary/25 hover:scale-105 active:scale-95 transition-all">
                     Sign Up Your Event
                   </Button>
