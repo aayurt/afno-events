@@ -1,4 +1,4 @@
-import clsx from 'clsx'
+import { cn } from '@/utilities/ui'
 import React from 'react'
 
 interface Props {
@@ -14,13 +14,12 @@ export const Logo = (props: Props) => {
   const priority = priorityFromProps || 'low'
 
   return (
-    // <h1 className="text-4xl">Afno Events</h1>
     <img
       alt="Afno Events Logo"
       loading={loading}
       fetchPriority={priority}
       decoding="async"
-      className={clsx('max-w-[9.375rem] w-full h-[100px]', className)}
+      className={cn('max-w-[9.375rem] w-full h-[100px] object-contain', className)}
       src="/logo.png"
     />
   )
