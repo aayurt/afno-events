@@ -14,7 +14,7 @@ function slugify(text: string): string {
 export async function POST(req: NextRequest) {
   const payload = await getPayload({ config: configPromise })
   try {
-    const body = await req.json()
+    const body = await req.json().catch(() => ({}))
     const { name, email, password, organisationName, phone } = body
 
     if (!organisationName?.trim()) {
@@ -40,30 +40,18 @@ export async function POST(req: NextRequest) {
     const cleanName = (name || user?.name || organisationName).trim()
     const cleanPhone = (phone || user?.phoneNumber || '').trim()
 
-    if (!user) {
-      if (!cleanEmail || !password?.trim()) {
-        return NextResponse.json(
-          { error: 'Email and password are required to create an account.' },
-          { status: 400 },
-        )
-      }
-
-      // 1. Check if user already exists
-      const existing = await payload.find({
+    // If user not signed in yet, find existing user by email
+    if (!user && cleanEmail) {
+      const userRes = await payload.find({
         collection: 'users',
         where: { email: { equals: cleanEmail } },
         limit: 1,
         overrideAccess: true,
       })
-      if (existing.totalDocs > 0) {
-        return NextResponse.json(
-          { error: 'An account with this email already exists. Please sign in.' },
-          { status: 400 },
-        )
-      }
+      user = userRes.docs[0] || null
     }
 
-    // 2. Generate unique slug for the tenant
+    // 1. Generate unique slug for the tenant
     let slug = slugify(organisationName)
     if (!slug) slug = `org-${Date.now()}`
     const existingTenant = await payload.find({
@@ -76,13 +64,13 @@ export async function POST(req: NextRequest) {
       slug = `${slug}-${Math.floor(1000 + Math.random() * 9000)}`
     }
 
-    // 3. Create Tenant (Pending & Unverified)
+    // 2. Create Tenant (Pending & Unverified)
     const tenant = await payload.create({
       collection: 'tenants',
       data: {
         name: organisationName.trim(),
         slug,
-        contactInfo: { phone: cleanPhone, email: cleanEmail },
+        contactInfo: { phone: cleanPhone, email: cleanEmail || user?.email || '' },
         enabled: false,
         verified: false,
         status: 'pending',
@@ -90,15 +78,15 @@ export async function POST(req: NextRequest) {
       overrideAccess: true,
     })
 
-    // 4. Create or update User as 'admin' belonging to this tenant
+    // 3. Update existing user or create user with Assigned Tenant
     if (user) {
-      // User signed up via Better Auth in client right before this call
       user = await payload.update({
         collection: 'users',
         id: user.id,
         data: {
           role: 'admin',
-          phoneNumber: cleanPhone,
+          phoneNumber: cleanPhone || user.phoneNumber || '',
+          tenant: tenant.id,
           tenants: [
             {
               tenant: tenant.id,
@@ -106,17 +94,26 @@ export async function POST(req: NextRequest) {
             },
           ],
         } as any,
+        context: { allowRoleUpdate: true },
         overrideAccess: true,
       })
     } else {
+      if (!cleanEmail) {
+        return NextResponse.json(
+          { error: 'Email is required to register an organisation.' },
+          { status: 400 },
+        )
+      }
+
       user = await payload.create({
         collection: 'users',
         data: {
           name: cleanName,
           email: cleanEmail,
-          password,
+          password: password || undefined,
           role: 'admin',
           phoneNumber: cleanPhone,
+          tenant: tenant.id,
           tenants: [
             {
               tenant: tenant.id,
@@ -124,6 +121,7 @@ export async function POST(req: NextRequest) {
             },
           ],
         } as any,
+        context: { allowRoleUpdate: true },
         overrideAccess: true,
       })
     }

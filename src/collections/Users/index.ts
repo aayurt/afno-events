@@ -377,11 +377,13 @@ export const Users: CollectionConfig = {
         if (data.email) {
           data.email = data.email.toLowerCase()
         }
-        if (!req.user) {
-          data.role = 'user'
-        }
-        if (req.user && !(isAdmin({ req }) || isSuperAdminAccess({ req }))) {
-          data.role = 'user'
+        if (!req.context?.allowRoleUpdate) {
+          if (!req.user) {
+            data.role = 'user'
+          }
+          if (req.user && !(isAdmin({ req }) || isSuperAdminAccess({ req }))) {
+            data.role = 'user'
+          }
         }
         if (operation === 'create') {
           // Only apply if tenants array is missing or empty

@@ -26,7 +26,22 @@ export default function OrganiserRegisterPage() {
     setLoading(true)
 
     try {
-      // 1. Register user & tenant
+      // 1. Sign up user account via Better Auth (creates auth record + session cookie)
+      const signUpRes = await authClient.signUp.email({
+        email,
+        password,
+        name,
+      })
+
+      if ((signUpRes as any)?.error) {
+        const msg = (signUpRes as any).error?.message || ''
+        if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('exist')) {
+          throw new Error('An account with this email already exists. Please sign in.')
+        }
+        throw new Error(msg || 'Failed to create account')
+      }
+
+      // 2. Provision tenant and assign admin role & Assigned Tenant
       const res = await fetch('/api/organiser/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -37,19 +52,12 @@ export default function OrganiserRegisterPage() {
           phone,
           password,
         }),
+        credentials: 'include',
       })
 
       const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || 'Registration failed')
-      }
-
-      // 2. Sign in to set the session cookie
-      const signInRes = await authClient.signIn.email({ email, password })
-      if ((signInRes as any)?.error) {
-        // Fallback redirect if signin response has minor issue but account was created
-        window.location.href = '/organiser/login'
-        return
+        throw new Error(data.error || 'Failed to initialize organisation profile')
       }
 
       // 3. Route straight to organiser dashboard
