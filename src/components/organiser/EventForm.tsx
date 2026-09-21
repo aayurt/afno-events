@@ -699,38 +699,59 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
 
       {/* Form Action Controls */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-        <Button
-          type="button"
-          onClick={(e) => handleSubmit(e, { enabled: true, isBookable })}
-          disabled={isSubmitting}
-          className="rounded-xl px-6 font-bold text-sm h-11 w-full sm:w-auto shadow-sm bg-primary text-primary-foreground"
-        >
-          {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
-          {!isTenantVerified
-            ? 'Submit for Review'
-            : submitLabel === 'Save Changes'
-              ? 'Save & Publish Live'
-              : 'Publish Show Live'}
-        </Button>
+        {submitLabel === 'Save Changes' ? (
+          <>
+            <Button
+              type="button"
+              onClick={(e) => handleSubmit(e)}
+              disabled={isSubmitting}
+              className="rounded-xl px-6 font-bold text-sm h-11 w-full sm:w-auto shadow-sm bg-primary text-primary-foreground"
+            >
+              {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+              Save Changes
+            </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={(e) => handleSubmit(e, { enabled: false, isBookable })}
-          disabled={isSubmitting}
-          className="rounded-xl px-6 font-semibold text-sm h-11 w-full sm:w-auto border-border bg-card"
-        >
-          Save as Draft
-        </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/organiser/dashboard')}
+              className="rounded-xl h-11 px-5 text-sm text-muted-foreground hover:text-foreground w-full sm:w-auto border-border"
+            >
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              type="button"
+              onClick={(e) => handleSubmit(e, { enabled: true, isBookable })}
+              disabled={isSubmitting}
+              className="rounded-xl px-6 font-bold text-sm h-11 w-full sm:w-auto shadow-sm bg-primary text-primary-foreground"
+            >
+              {isSubmitting ? <Loader2 size={16} className="animate-spin mr-2" /> : null}
+              {!isTenantVerified ? 'Submit for Review' : 'Publish Show Live'}
+            </Button>
 
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => router.push('/organiser/dashboard')}
-          className="rounded-xl h-11 px-5 text-sm text-muted-foreground hover:text-foreground w-full sm:w-auto"
-        >
-          Cancel
-        </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={(e) => handleSubmit(e, { enabled: false, isBookable })}
+              disabled={isSubmitting}
+              className="rounded-xl px-6 font-semibold text-sm h-11 w-full sm:w-auto border-border bg-card"
+            >
+              Save as Draft
+            </Button>
+
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push('/organiser/dashboard')}
+              className="rounded-xl h-11 px-5 text-sm text-muted-foreground hover:text-foreground w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+          </>
+        )}
       </div>
     </form>
   )
