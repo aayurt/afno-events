@@ -60,17 +60,12 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
       {/* Desktop Navigation */}
       <nav className="hidden md:flex gap-4 lg:gap-6 items-center">
         {navItems.map(({ link }, i) => {
-          const isOrganiser = link?.url === '/organiser' || link?.label?.toLowerCase().includes('organis')
           return (
             <CMSLink
               key={i}
               {...link}
               appearance="link"
-              className={
-                isOrganiser
-                  ? 'font-bold text-foreground hover:text-primary transition-colors text-sm'
-                  : 'text-sm font-medium hover:text-primary transition-colors'
-              }
+              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
             />
           )
         })}
