@@ -23,17 +23,28 @@ export const Tenants: CollectionConfig = {
   },
   hooks: {
     afterChange: [
-      async ({ doc, operation, req }) => {
-        if ((operation === 'create' || operation === 'update') && req?.payload) {
-          await sendFCMTopicNotification({
-            topic: 'afno-app-tenant',
-            notification: {
-              title: 'Keep an eye on ' + doc.name + ' events.',
-              body: doc.description || 'Check out the ' + doc.name + ' events.',
-              imageUrl: doc.coverImage?.url,
-              id: doc.id,
-            },
-          })
+      async ({ doc, previousDoc, operation, req }) => {
+        // Only send push notification if the tenant is explicitly enabled AND verified,
+        // and either newly created or newly verified
+        const isNewlyVerified =
+          doc.enabled === true &&
+          doc.verified === true &&
+          (!previousDoc || previousDoc.verified !== true)
+
+        if (isNewlyVerified && req?.payload) {
+          try {
+            await sendFCMTopicNotification({
+              topic: 'afno-app-tenant',
+              notification: {
+                title: 'Keep an eye on ' + doc.name + ' events.',
+                body: doc.description || 'Check out the ' + doc.name + ' events.',
+                imageUrl: doc.coverImage?.url,
+                id: doc.id,
+              },
+            })
+          } catch (err) {
+            console.error('FCM tenant notification error:', err)
+          }
         }
         return doc
       },
@@ -66,6 +77,29 @@ export const Tenants: CollectionConfig = {
       admin: {
         description:
           'If checked, the tenant will be shown on the website. If not checked, the tenant will not be shown on the website.',
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'status',
+      type: 'select',
+      defaultValue: 'pending',
+      options: [
+        { label: 'Pending Review', value: 'pending' },
+        { label: 'Verified / Approved', value: 'verified' },
+        { label: 'Rejected', value: 'rejected' },
+      ],
+      admin: {
+        description: 'Approval status for self-registered organisers',
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'verified',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'When checked, this organiser can publish events live without admin pre-approval.',
         position: 'sidebar',
       },
     },
