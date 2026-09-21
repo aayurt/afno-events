@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs'
+import { sendEventApprovalEmails } from '@/emails'
 
 async function resolveAuthAndEvent(req: NextRequest, idParam: string) {
   const payload = await getPayload({ config: configPromise })
@@ -91,8 +92,9 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   
   const tenantId = (event as any).tenant?.id || (event as any).tenant
   let isTenantVerified = user.role === 'super-admin'
+  let tenantDoc: any = null
   if (!isTenantVerified && tenantId) {
-    const tenantDoc = await payload.findByID({
+    tenantDoc = await payload.findByID({
       collection: 'tenants',
       id: Number(tenantId),
       overrideAccess: true,
@@ -100,11 +102,13 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     isTenantVerified = Boolean((tenantDoc as any)?.verified || (tenantDoc as any)?.status === 'verified')
   }
 
+  let justSubmittedForReview = false
   if (body.enabled !== undefined || body.publish !== undefined) {
     const wantPublish = body.enabled !== undefined ? !!body.enabled : !!body.publish
     if (wantPublish && !isTenantVerified) {
       updateData.enabled = false
       updateData.approvalStatus = 'pending_review'
+      justSubmittedForReview = true
     } else if (isTenantVerified) {
       updateData.enabled = wantPublish
       updateData.approvalStatus = 'approved'
@@ -128,6 +132,55 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
     data: updateData,
     overrideAccess: true,
   })
+
+  // If organiser submitted an unverified event for review via edit form, send approval emails
+  if (justSubmittedForReview) {
+    try {
+      const orgName = (tenantDoc as any)?.name || 'Organiser'
+      const venueStr =
+        body.location?.location ||
+        body.location?.mapLocation ||
+        (event as any).location?.location ||
+        'TBA'
+      const startIso = body.startDatetime || (event as any).startDatetime
+      const dateStr = startIso
+        ? new Date(startIso).toLocaleDateString('en-GB', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : 'TBA'
+
+      let coverUrl: string | undefined = undefined
+      const coverId = body.coverImage || (event as any).coverImage?.id || (event as any).coverImage
+      if (coverId) {
+        const mediaDoc = await payload.findByID({
+          collection: 'media',
+          id: Number(coverId),
+          overrideAccess: true,
+        }).catch(() => null)
+        coverUrl = (mediaDoc as any)?.url || undefined
+      }
+
+      await sendEventApprovalEmails(user.email, {
+        eventTitle: body.title || (event as any).title,
+        eventDateText: dateStr,
+        eventVenue: venueStr,
+        eventPriceRange: isPaid ? body.pricing?.priceRange || `£${ticketTypes[0]?.price || 0}` : 'Free',
+        eventId: updated.id,
+        organisationName: orgName,
+        contactName: user.name || orgName,
+        contactEmail: user.email,
+        contactPhone: user.phoneNumber || undefined,
+        coverImageUrl: coverUrl,
+      })
+    } catch (emailErr) {
+      console.error('Error dispatching event approval emails on update:', emailErr)
+    }
+  }
 
   return NextResponse.json({ id: updated.id })
 }

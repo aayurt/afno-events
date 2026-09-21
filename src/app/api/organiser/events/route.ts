@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs'
+import { sendEventApprovalEmails } from '@/emails'
 
 /**
  * Events owned by the signed-in organiser (across their tenants).
@@ -48,8 +49,9 @@ export async function POST(req: NextRequest) {
   }
 
   let isTenantVerified = user.role === 'super-admin'
+  let tenantDoc: any = null
   if (!isTenantVerified && assignedTenant) {
-    const tenantDoc = await payload.findByID({
+    tenantDoc = await payload.findByID({
       collection: 'tenants',
       id: assignedTenant,
       overrideAccess: true,
@@ -90,6 +92,49 @@ export async function POST(req: NextRequest) {
     },
     overrideAccess: true,
   })
+
+  // If submitted for review by an unverified organiser, send review email alerts to admins & confirmation to organiser
+  if (!isTenantVerified && requestedPublish) {
+    try {
+      const orgName = (tenantDoc as any)?.name || 'Organiser'
+      const venueStr = body.location?.location || body.location?.mapLocation || 'TBA'
+      const dateStr = body.startDatetime
+        ? new Date(body.startDatetime).toLocaleDateString('en-GB', {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          })
+        : 'TBA'
+
+      let coverUrl: string | undefined = undefined
+      if (body.coverImage) {
+        const mediaDoc = await payload.findByID({
+          collection: 'media',
+          id: Number(body.coverImage),
+          overrideAccess: true,
+        }).catch(() => null)
+        coverUrl = (mediaDoc as any)?.url || undefined
+      }
+
+      await sendEventApprovalEmails(user.email, {
+        eventTitle: body.title,
+        eventDateText: dateStr,
+        eventVenue: venueStr,
+        eventPriceRange: isPaid ? body.pricing?.priceRange || `£${ticketTypes[0]?.price || 0}` : 'Free',
+        eventId: newEvent.id,
+        organisationName: orgName,
+        contactName: user.name || orgName,
+        contactEmail: user.email,
+        contactPhone: user.phoneNumber || undefined,
+        coverImageUrl: coverUrl,
+      })
+    } catch (emailErr) {
+      console.error('Error dispatching event approval emails:', emailErr)
+    }
+  }
 
   return NextResponse.json({
     id: newEvent.id,

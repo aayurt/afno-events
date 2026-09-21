@@ -3,6 +3,7 @@ import { renderVerifyEmailHtml, VerifyEmailProps } from './templates/VerifyEmail
 import { renderPasswordResetHtml, PasswordResetProps } from './templates/PasswordReset'
 import { renderTicketPurchaseHtml, TicketPurchaseEmailProps } from './templates/TicketPurchase'
 import { renderNewEventNotificationHtml, NewEventNotificationProps } from './templates/NewEventNotification'
+import { renderEventApprovalEmailHtml, EventApprovalEmailProps } from './templates/EventApproval'
 import { generateUnsubscribeToken } from '@/app/api/newsletter/unsubscribe/route'
 
 let resendInstance: Resend | null = null
@@ -96,4 +97,68 @@ export async function sendNewEventNotification(to: string, props: Omit<NewEventN
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
   })
+}
+
+export const ADMIN_NOTIFICATION_EMAILS = [
+  'nepalesebros@gmail.com',
+  'mr.shusangrg@outlook.com',
+]
+
+export const PLATFORM_SELF_NOTIFICATION_EMAIL = 'afnoapplication@gmail.com'
+
+/**
+ * 5. Send Event Approval Emails:
+ *    - To Admin reviewers (nepalesebros@gmail.com, mr.shusangrg@outlook.com)
+ *    - To Platform self-inbox (afnoapplication@gmail.com) via info@afnoevents.co.uk
+ *    - To Organiser submitter (confirmation that review is pending)
+ */
+export async function sendEventApprovalEmails(
+  organiserEmail: string,
+  props: Omit<EventApprovalEmailProps, 'type'>,
+) {
+  const resend = getResend()
+
+  const adminHtml = renderEventApprovalEmailHtml({
+    ...props,
+    type: 'admin_alert',
+  })
+
+  const organiserHtml = renderEventApprovalEmailHtml({
+    ...props,
+    type: 'self_receipt',
+  })
+
+  const sendPromises: Promise<any>[] = []
+
+  // 1. Send alert to Admins + Platform self (afnoapplication@gmail.com)
+  const adminRecipients = Array.from(
+    new Set([...ADMIN_NOTIFICATION_EMAILS, PLATFORM_SELF_NOTIFICATION_EMAIL]),
+  )
+
+  sendPromises.push(
+    resend.emails
+      .send({
+        from: EMAIL_SENDERS.info, // sends from info@afnoevents.co.uk
+        to: adminRecipients,
+        subject: `🚨 Action Required: New Event Submitted for Review — "${props.eventTitle}" (${props.organisationName})`,
+        html: adminHtml,
+      })
+      .catch((err) => console.error('Failed sending admin approval email:', err)),
+  )
+
+  // 2. Send receipt to Organiser (if valid email provided)
+  if (organiserEmail && organiserEmail.includes('@')) {
+    sendPromises.push(
+      resend.emails
+        .send({
+          from: EMAIL_SENDERS.info,
+          to: [organiserEmail],
+          subject: `Submission Received: "${props.eventTitle}" is Pending Review — Afno Events`,
+          html: organiserHtml,
+        })
+        .catch((err) => console.error('Failed sending organiser submission receipt email:', err)),
+    )
+  }
+
+  await Promise.allSettled(sendPromises)
 }
