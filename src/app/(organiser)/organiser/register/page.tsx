@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, ArrowRight, Building2, CheckCircle2, Loader2, Sparkles } from 'lucide-react'
+import { PasswordInput } from '@/components/ui/password-input'
 
 export default function OrganiserRegisterPage() {
   const router = useRouter()
@@ -166,9 +167,8 @@ export default function OrganiserRegisterPage() {
                 <Label htmlFor="password" className="text-xs font-semibold">
                   Password *
                 </Label>
-                <Input
+                <PasswordInput
                   id="password"
-                  type="password"
                   autoComplete="new-password"
                   placeholder="••••••••"
                   value={password}

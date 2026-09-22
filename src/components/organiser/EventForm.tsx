@@ -40,6 +40,8 @@ export type EventFormData = {
   description?: string
   coverImage?: number | null
   coverImageUrl?: string | null
+  showcaseImages?: Array<{ image: number | { id: number; url?: string } }> | null
+  showcaseImageUrls?: string[]
   startDatetime?: string
   endDatetime?: string
   location?: {
@@ -57,6 +59,7 @@ export type EventFormData = {
   enabled?: boolean
   isBookable?: boolean
   publish?: boolean
+  timezone?: string
 }
 
 type Props = {
@@ -73,6 +76,10 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const [coverImageId, setCoverImageId] = useState<number | null>(initial?.coverImage || null)
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(initial?.coverImageUrl || null)
   const [isUploading, setIsUploading] = useState(false)
+
+  const [showcaseImageIds, setShowcaseImageIds] = useState<number[]>(initial?.showcaseImages?.map((s) => (typeof s.image === 'object' ? s.image.id : s.image)) || [])
+  const [showcaseImageUrls, setShowcaseImageUrls] = useState<string[]>(initial?.showcaseImageUrls || [])
+  const [isGalleryUploading, setIsGalleryUploading] = useState(false)
 
   const toLocalInput = (iso?: string) => {
     if (!iso) return ''
@@ -111,6 +118,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
 
   const [isEnabled, setIsEnabled] = useState(initial?.enabled ?? (initial?.publish ?? true))
   const [isBookable, setIsBookable] = useState(initial?.isBookable ?? true)
+  const [timezone, setTimezone] = useState(initial?.timezone || 'Europe/London')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -166,6 +174,53 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     }
   }
 
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    setIsGalleryUploading(true)
+    setError(null)
+
+    const uploadedIds: number[] = []
+    const uploadedUrls: string[] = []
+
+    try {
+      for (const file of Array.from(files)) {
+        const fd = new FormData()
+        fd.append('file', file)
+
+        const res = await fetch('/api/organiser/media', {
+          method: 'POST',
+          body: fd,
+          credentials: 'include',
+        })
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: 'Upload failed' }))
+          throw new Error(err.error || 'Failed to upload image')
+        }
+
+        const data = await res.json()
+        uploadedIds.push(data.id)
+        uploadedUrls.push(data.url)
+      }
+
+      setShowcaseImageIds((prev) => [...prev, ...uploadedIds])
+      setShowcaseImageUrls((prev) => [...prev, ...uploadedUrls])
+    } catch (err: any) {
+      setError(err.message || 'Image upload failed')
+    } finally {
+      setIsGalleryUploading(false)
+      // Reset file input
+      e.target.value = ''
+    }
+  }
+
+  const removeShowcaseImage = (index: number) => {
+    setShowcaseImageIds((prev) => prev.filter((_, i) => i !== index))
+    setShowcaseImageUrls((prev) => prev.filter((_, i) => i !== index))
+  }
+
   const handleSubmit = async (
     e?: React.FormEvent,
     forceStatus?: { enabled?: boolean; isBookable?: boolean }
@@ -196,6 +251,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
       title,
       description,
       coverImage: coverImageId,
+      showcaseImages: showcaseImageIds.map((id) => ({ image: id })),
       startDatetime: startDatetime ? new Date(startDatetime).toISOString() : new Date().toISOString(),
       endDatetime: endDatetime ? new Date(endDatetime).toISOString() : new Date().toISOString(),
       location: {
@@ -213,6 +269,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
       enabled: finalEnabled,
       isBookable: finalBookable,
       publish: finalEnabled,
+      timezone,
     }
 
     try {
@@ -333,12 +390,64 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         </CardContent>
       </Card>
 
-      {/* 3. Schedule */}
+      {/* 3. Event Gallery / Showcase Images */}
+      <Card className="rounded-2xl border-border/80 shadow-xs">
+        <CardContent className="p-4 sm:p-6 space-y-4">
+          <div className="flex items-center gap-2 text-foreground font-semibold">
+            <ImageIcon size={18} className="text-primary" />
+            <span>3. Event Gallery / Showcase Images</span>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Add additional images for the event detail page gallery. Recommended: 16:9 landscape or 4:3 ratio. JPG, PNG, WebP (up to 25MB each).
+          </p>
+
+          <div className="space-y-3">
+            <label className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-border hover:bg-muted/60 text-xs font-semibold cursor-pointer transition-colors shadow-xs">
+              <UploadCloud size={15} />
+              <span>Add Images</span>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleGalleryUpload}
+                disabled={isGalleryUploading}
+                className="hidden"
+              />
+            </label>
+
+            {isGalleryUploading && (
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-xs text-primary font-medium">
+                <Loader2 size={14} className="animate-spin" /> Uploading images…
+              </div>
+            )}
+
+            {showcaseImageUrls && showcaseImageUrls.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                {showcaseImageUrls.map((url, idx) => (
+                  <div key={idx} className="relative aspect-square rounded-xl overflow-hidden bg-muted border border-border">
+                    <img src={url} alt={`Showcase ${idx + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeShowcaseImage(idx)}
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+                      aria-label="Remove image"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 4. Schedule */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
         <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Calendar size={18} className="text-primary" />
-            <span>3. Date & Time</span>
+            <span>4. Date & Time</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1">
@@ -368,16 +477,41 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                 className="h-10 rounded-xl font-mono text-xs w-full min-w-0"
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="timezone" className="text-xs font-semibold">
+                Timezone
+              </Label>
+              <select
+                id="timezone"
+                value={timezone || 'Europe/London'}
+                onChange={(e) => setTimezone(e.target.value)}
+                className="h-10 rounded-xl border border-border bg-background px-3 py-2 text-sm w-full"
+              >
+                <option value="Europe/London">UK (GMT/BST)</option>
+                <option value="Europe/Berlin">Central Europe (CET/CEST)</option>
+                <option value="America/New_York">US Eastern (ET)</option>
+                <option value="America/Chicago">US Central (CT)</option>
+                <option value="America/Denver">US Mountain (MT)</option>
+                <option value="America/Los_Angeles">US Pacific (PT)</option>
+                <option value="Asia/Kolkata">India (UTC+5:30)</option>
+                <option value="Asia/Kathmandu">Nepal (UTC+5:45)</option>
+                <option value="Asia/Dhaka">Bangladesh (UTC+6)</option>
+                <option value="Australia/Sydney">Australia Eastern (AET)</option>
+                <option value="Asia/Tokyo">Japan (UTC+9)</option>
+                <option value="Asia/Dubai">Dubai (UTC+4)</option>
+              </select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* 4. Venue & Interactive Map */}
+      {/* 5. Venue & Interactive Map */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
         <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <MapPin size={18} className="text-primary" />
-            <span>4. Venue & Map Location</span>
+            <span>5. Venue & Map Location</span>
           </div>
 
           <VenueMapPicker
@@ -387,12 +521,12 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         </CardContent>
       </Card>
 
-      {/* 5. Categories & Tags */}
+      {/* 6. Categories & Tags */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
         <CardContent className="p-4 sm:p-6 space-y-3">
           <div className="flex items-center gap-2 text-foreground font-semibold">
             <Tag size={18} className="text-primary" />
-            <span>5. Categories & Discovery Tags</span>
+            <span>6. Categories & Discovery Tags</span>
           </div>
           <p className="text-xs text-muted-foreground">Select tags to help attendees find your show in category filters.</p>
 
@@ -545,13 +679,13 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         </CardContent>
       </Card>
 
-      {/* 7. Public Visibility & Listing Status (isEnabled) */}
+      {/* 8. Public Visibility & Listing Status (isEnabled) */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
         <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-foreground font-semibold min-w-0">
               <Globe size={18} className="text-primary shrink-0" />
-              <span className="truncate">7. Public Visibility & Listing Status</span>
+              <span className="truncate">8. Public Visibility & Listing Status</span>
             </div>
             <span
               className={`text-[10px] sm:text-[11px] font-mono uppercase px-2 sm:px-2.5 py-0.5 rounded-full font-bold shrink-0 ${
@@ -624,13 +758,13 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         </CardContent>
       </Card>
 
-      {/* 8. Ticket Sales & Online Booking (isBookable) */}
+      {/* 9. Ticket Sales & Online Booking (isBookable) */}
       <Card className="rounded-2xl border-border/80 shadow-xs">
         <CardContent className="p-4 sm:p-6 space-y-4">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-foreground font-semibold min-w-0">
               <Ticket size={18} className="text-primary shrink-0" />
-              <span className="truncate">8. Ticket Sales & Online Booking</span>
+              <span className="truncate">9. Ticket Sales & Online Booking</span>
             </div>
             <span
               className={`text-[10px] sm:text-[11px] font-mono uppercase px-2 sm:px-2.5 py-0.5 rounded-full font-bold shrink-0 ${

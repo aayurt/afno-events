@@ -274,6 +274,12 @@ export default function OrganiserDashboard() {
                 <span>New Event</span>
               </Link>
             </Button>
+            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex rounded-xl gap-1.5 h-9">
+              <Link href="/organiser/profile/edit">
+                <Building2 size={15} className="text-primary" />
+                <span>Profile</span>
+              </Link>
+            </Button>
             <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-9 px-2.5 text-xs text-muted-foreground gap-1.5">
               <LogOut size={15} />
               <span className="hidden md:inline">Sign out</span>
@@ -527,6 +533,16 @@ export default function OrganiserDashboard() {
           >
             <Link href="/organiser/events/new">
               <Plus size={16} /> New Event
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-xl text-xs font-semibold gap-1.5 h-10 border-border bg-card"
+          >
+            <Link href="/organiser/profile/edit">
+              <Building2 size={15} className="text-primary" /> Profile
             </Link>
           </Button>
         </div>
