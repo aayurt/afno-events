@@ -17,10 +17,34 @@ import {
   QrCode,
   ScanLine,
   ShieldAlert,
+  Sun,
+  Moon,
+  Monitor,
   Ticket,
   Users,
   X,
 } from 'lucide-react'
+import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+import { useScopedI18n } from '@/locales/client'
+
+function ThemeSwitcherTrigger() {
+  const t = useScopedI18n('profile')
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        className="hidden sm:inline-flex h-9 rounded-xl gap-1.5 px-3"
+        onClick={() => setOpen(true)}
+      >
+        <Monitor size={16} className="text-primary" />
+        <span className="text-xs">{t('theme')}</span>
+      </Button>
+      <ThemeSwitcher open={open} onOpenChange={setOpen} t={t} />
+    </>
+  )
+}
 
 type Me = {
   user: { id: number; email: string; name?: string; role: string }
@@ -280,6 +304,7 @@ export default function OrganiserDashboard() {
                 <span>Profile</span>
               </Link>
             </Button>
+            <ThemeSwitcherTrigger />
             <Button variant="ghost" size="sm" onClick={handleSignOut} className="h-9 px-2.5 text-xs text-muted-foreground gap-1.5">
               <LogOut size={15} />
               <span className="hidden md:inline">Sign out</span>

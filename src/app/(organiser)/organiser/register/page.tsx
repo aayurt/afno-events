@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, ArrowRight, Building2, CheckCircle2, Loader2, Sparkles } from 'lucide-react'
 import { PasswordInput } from '@/components/ui/password-input'
+import { cn } from '@/utilities/ui'
 
 export default function OrganiserRegisterPage() {
   const router = useRouter()
@@ -18,12 +19,21 @@ export default function OrganiserRegisterPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const passwordsMatch = password === confirmPassword && password.length > 0
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
+
+    if (!passwordsMatch) {
+      setError('Passwords do not match')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -179,6 +189,28 @@ export default function OrganiserRegisterPage() {
                 />
               </div>
 
+              <div className="space-y-1.5">
+                <Label htmlFor="confirmPassword" className="text-xs font-semibold">
+                  Confirm Password *
+                </Label>
+                <PasswordInput
+                  id="confirmPassword"
+                  autoComplete="new-password"
+                  placeholder="••••••••"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={cn(
+                    "h-10 rounded-xl text-sm",
+                    confirmPassword && !passwordsMatch && "border-destructive"
+                  )}
+                  required
+                  disabled={loading}
+                />
+                {confirmPassword && !passwordsMatch && (
+                  <p className="text-xs text-destructive">Passwords do not match</p>
+                )}
+              </div>
+
               {error && (
                 <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl p-3">
                   <AlertCircle size={15} className="shrink-0 mt-0.5" />
@@ -190,7 +222,7 @@ export default function OrganiserRegisterPage() {
                 type="submit"
                 size="lg"
                 className="w-full gap-2 rounded-xl font-bold text-sm h-11 bg-primary text-primary-foreground shadow-sm"
-                disabled={loading}
+                disabled={loading || !passwordsMatch}
               >
                 {loading ? (
                   <>
