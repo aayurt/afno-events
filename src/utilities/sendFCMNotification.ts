@@ -1,6 +1,17 @@
 import { getMessaging } from 'firebase-admin/messaging'
 import { cert, initializeApp, getApps, ServiceAccount } from 'firebase-admin/app'
-import serviceAccountKey from '../../serviceAccountKey.json'
+import * as fs from 'fs'
+import * as path from 'path'
+
+let serviceAccountKey: ServiceAccount | null = null
+try {
+  const keyPath = path.resolve(process.cwd(), 'serviceAccountKey.json')
+  if (fs.existsSync(keyPath)) {
+    serviceAccountKey = JSON.parse(fs.readFileSync(keyPath, 'utf-8')) as ServiceAccount
+  }
+} catch {
+  console.warn('serviceAccountKey.json not found or invalid — FCM notifications disabled')
+}
 
 type NotificationData = {
   id?: string
@@ -18,10 +29,12 @@ type SendFCMNotificationParams = {
 }
 
 // Initialize Firebase Admin if not already initialized
-if (!getApps().length) {
+if (!getApps().length && serviceAccountKey) {
   initializeApp({
-    credential: cert(serviceAccountKey as ServiceAccount),
+    credential: cert(serviceAccountKey),
   })
+} else if (!serviceAccountKey) {
+  console.warn('Firebase Admin not initialized — serviceAccountKey.json missing')
 }
 
 export const sendFCMNotification = async ({
