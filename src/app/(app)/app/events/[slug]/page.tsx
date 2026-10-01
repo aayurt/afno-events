@@ -87,19 +87,41 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative h-[380px] md:h-[440px] bg-muted overflow-hidden">
+      <div className="relative h-[380px] md:h-[480px] lg:h-[560px] bg-muted overflow-hidden">
         {getCardImageUrl(e.coverImage) ? (
-          <img
-            src={getCardImageUrl(e.coverImage)!}
-            alt={e.title}
-            className="w-full h-full object-cover"
-          />
+          <>
+            {/* Ambient backdrop: the artwork itself, blurred and overscaled, so the band is never empty
+                on wide screens without cropping the poster. */}
+            <img
+              src={getCardImageUrl(e.coverImage)!}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-125 blur-3xl saturate-150 opacity-80"
+            />
+            <div className="absolute inset-0 bg-background/30" />
+
+            {/* Phones: poster fills the band (its own aspect is close to a phone screen). */}
+            <img
+              src={getCardImageUrl(e.coverImage)!}
+              alt={e.title}
+              className="absolute inset-0 w-full h-full object-cover md:hidden"
+            />
+
+            {/* Tablet and up: show the whole poster, sized to the band, floating over the ambient wash. */}
+            <div className="hidden md:flex absolute inset-x-0 top-4 bottom-36 items-center justify-center px-6">
+              <img
+                src={getCardImageUrl(e.coverImage)!}
+                alt={e.title}
+                className="h-full w-auto max-w-[85%] object-contain rounded-2xl shadow-2xl ring-1 ring-border/40"
+              />
+            </div>
+          </>
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
             <Calendar size={80} className="opacity-20" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-transparent md:from-background/90 md:via-background/5" />
         {eventStatus && (
           <div className="absolute top-6 left-6 z-10">
             <span className={`text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm ${

@@ -85,6 +85,7 @@ export interface Config {
     'circle-locations': CircleLocation;
     'circle-alerts': CircleAlert;
     'alert-cooldowns': AlertCooldown;
+    subscribers: Subscriber;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -119,6 +120,7 @@ export interface Config {
     'circle-locations': CircleLocationsSelect<false> | CircleLocationsSelect<true>;
     'circle-alerts': CircleAlertsSelect<false> | CircleAlertsSelect<true>;
     'alert-cooldowns': AlertCooldownsSelect<false> | AlertCooldownsSelect<true>;
+    subscribers: SubscribersSelect<false> | SubscribersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -301,6 +303,14 @@ export interface Tenant {
    * If checked, the tenant will be shown on the website. If not checked, the tenant will not be shown on the website.
    */
   enabled?: boolean | null;
+  /**
+   * Approval status for self-registered organisers
+   */
+  status?: ('pending' | 'verified' | 'rejected') | null;
+  /**
+   * When checked, this organiser can publish events live without admin pre-approval.
+   */
+  verified?: boolean | null;
   contactInfo?: {
     phone?: string | null;
     email?: string | null;
@@ -322,8 +332,6 @@ export interface Tenant {
    * If checked, logging in is not required to read. Useful for building public pages.
    */
   allowPublicRead?: boolean | null;
-  status?: ('pending' | 'verified' | 'rejected') | null;
-  verified?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -950,6 +958,9 @@ export interface Event {
    * Open for booking (uncheck to disable booking/tickets)
    */
   isBookable?: boolean | null;
+  /**
+   * Review status for organiser-submitted events
+   */
   approvalStatus?: ('draft' | 'pending_review' | 'approved' | 'rejected') | null;
   updatedAt: string;
   createdAt: string;
@@ -1159,6 +1170,17 @@ export interface AlertCooldown {
    * When the alert last fired; used to enforce the cooldown window
    */
   firedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers".
+ */
+export interface Subscriber {
+  id: number;
+  email: string;
+  status: 'active' | 'unsubscribed';
   updatedAt: string;
   createdAt: string;
 }
@@ -1503,6 +1525,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'alert-cooldowns';
         value: number | AlertCooldown;
+      } | null)
+    | ({
+        relationTo: 'subscribers';
+        value: number | Subscriber;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1907,6 +1933,8 @@ export interface EventsSelect<T extends boolean = true> {
       };
   stripeProductID?: T;
   enabled?: T;
+  isBookable?: T;
+  approvalStatus?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1955,6 +1983,8 @@ export interface TicketsSelect<T extends boolean = true> {
 export interface TenantsSelect<T extends boolean = true> {
   name?: T;
   enabled?: T;
+  status?: T;
+  verified?: T;
   contactInfo?:
     | T
     | {
@@ -2089,6 +2119,16 @@ export interface CircleAlertsSelect<T extends boolean = true> {
 export interface AlertCooldownsSelect<T extends boolean = true> {
   key?: T;
   firedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subscribers_select".
+ */
+export interface SubscribersSelect<T extends boolean = true> {
+  email?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
