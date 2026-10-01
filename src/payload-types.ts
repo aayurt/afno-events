@@ -332,6 +332,8 @@ export interface Tenant {
    * If checked, logging in is not required to read. Useful for building public pages.
    */
   allowPublicRead?: boolean | null;
+  status?: ('pending' | 'verified' | 'rejected') | null;
+  verified?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
