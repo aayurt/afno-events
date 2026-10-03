@@ -41,12 +41,17 @@ fi
 
 echo ""
 echo "📡 Syncing build to server (protecting VPS sharp, media, and secrets)..."
+# NOTE: never sync standalone public/media — prod uploads live ONLY in
+# $REMOTE_PATH/public/media (pinned via PAYLOAD_MEDIA_DIR). Syncing or
+# deleting it here once wiped weeks of uploads. The server re-links it below.
+rm -rf .next/standalone/public/media
 rsync -az --delete \
   --exclude 'node_modules/sharp' \
   --exclude 'node_modules/@img' \
   --exclude '.env*' \
   --exclude '*.p8' \
   --exclude 'serviceAccountKey.json' \
+  --exclude 'public/media' \
   .next/standalone/ "$SERVER:$REMOTE_PATH/.next/standalone/"
 
 rsync -az .next/static/ "$SERVER:$REMOTE_PATH/.next/standalone/.next/static/"
@@ -66,9 +71,17 @@ ssh "$SERVER" bash -s <<'EOF'
   [ -f .env ] && cp .env .next/standalone/.env
   [ -f AuthKey.p8 ] && cp AuthKey.p8 .next/standalone/AuthKey.p8
   [ -f serviceAccountKey.json ] && cp serviceAccountKey.json .next/standalone/serviceAccountKey.json
+  # Uploads must resolve outside standalone regardless of process CWD.
+  grep -q "^PAYLOAD_MEDIA_DIR=" .next/standalone/.env || {
+    echo "❌ PAYLOAD_MEDIA_DIR missing in standalone .env — aborting (uploads would go nowhere)"
+    exit 1
+  }
 
   echo "🖼️  Ensuring media directories..."
   mkdir -p public/media
+  # rm first: ln -sfn against an existing REAL dir creates the link inside it
+  # instead of replacing it (this silently broke uploads before).
+  rm -rf .next/standalone/public/media
   ln -sfn /var/www/vhosts/afnoevents.co.uk/public/media .next/standalone/public/media
   mkdir -p /Users/aayurtshrestha/projects/self/AfnoEvent/server/public
   ln -sfn /var/www/vhosts/afnoevents.co.uk/public/media /Users/aayurtshrestha/projects/self/AfnoEvent/server/public/media
