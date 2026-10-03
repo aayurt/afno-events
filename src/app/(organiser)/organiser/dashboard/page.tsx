@@ -17,8 +17,6 @@ import {
   QrCode,
   ScanLine,
   ShieldAlert,
-  Sun,
-  Moon,
   Monitor,
   Ticket,
   Users,
@@ -35,11 +33,12 @@ function ThemeSwitcherTrigger() {
       <Button
         variant="outline"
         size="sm"
-        className="hidden sm:inline-flex h-9 rounded-xl gap-1.5 px-3"
+        className="inline-flex h-9 rounded-xl gap-1.5 px-3"
         onClick={() => setOpen(true)}
+        aria-label={t('theme')}
       >
         <Monitor size={16} className="text-primary" />
-        <span className="text-xs">{t('theme')}</span>
+        <span className="hidden sm:inline text-xs">{t('theme')}</span>
       </Button>
       <ThemeSwitcher open={open} onOpenChange={setOpen} t={t} />
     </>

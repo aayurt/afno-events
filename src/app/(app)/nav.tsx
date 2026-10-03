@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, Calendar, Ticket, User, Users, UsersRound, type LucideIcon } from 'lucide-react'
+import { Bell, Calendar, Monitor, Moon, Sun, Ticket, User, Users, UsersRound, type LucideIcon } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { authClient } from '@/lib/auth/client'
+import { useTheme } from '@/providers/Theme'
+import { themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
 import { fireDueReminders } from '@/lib/reminders'
 import { useScopedI18n } from '@/locales/client'
 import { OnboardingModal } from './onboarding'
@@ -53,9 +55,47 @@ const getTabs = (t: (key: any, params?: any) => any) => [
   { href: '/app/profile', label: t('profile'), icon: User },
 ]
 
+type ThemePref = 'auto' | 'light' | 'dark'
+
+const themeOrder: ThemePref[] = ['auto', 'light', 'dark']
+
+const themeIcons = { auto: Monitor, light: Sun, dark: Moon } satisfies Record<ThemePref, LucideIcon>
+
+function ThemeCycleButton({ label }: { label: string }) {
+  const { setTheme } = useTheme()
+  const [pref, setPref] = useState<ThemePref>('auto')
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(themeLocalStorageKey)
+    setPref(stored === 'light' || stored === 'dark' ? stored : 'auto')
+  }, [])
+
+  const cycle = () => {
+    const next = themeOrder[(themeOrder.indexOf(pref) + 1) % themeOrder.length]
+    if (next === 'auto') setTheme(null)
+    else setTheme(next)
+    setPref(next)
+  }
+
+  const Icon = themeIcons[pref]
+
+  return (
+    <button
+      type="button"
+      onClick={cycle}
+      title={label}
+      aria-label={label}
+      className="relative w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors shrink-0"
+    >
+      <Icon size={20} />
+    </button>
+  )
+}
+
 export function AppNav({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const t = useScopedI18n('nav')
+  const tp = useScopedI18n('profile')
 
   const isActive = (href: string) => {
     if (href === '/app/events') return pathname === '/app' || pathname.startsWith('/app/events')
@@ -173,6 +213,7 @@ export function AppNav({ children }: { children: React.ReactNode }) {
             <span className="font-semibold text-base absolute left-1/2 -translate-x-1/2 capitalize">{pageTitle}</span>
             {authChecked && signedIn ? (
               <div className="flex items-center gap-1 shrink-0">
+                <ThemeCycleButton label={tp('theme')} />
                 <HeaderBell
                   href="/app/circles/alerts"
                   title={t('squadAlerts')}
@@ -187,7 +228,9 @@ export function AppNav({ children }: { children: React.ReactNode }) {
                 />
               </div>
             ) : (
-              <div className="w-20" />
+              <div className="w-20 flex justify-end shrink-0">
+                <ThemeCycleButton label={tp('theme')} />
+              </div>
             )}
           </div>
         </header>

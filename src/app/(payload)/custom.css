@@ -1,0 +1,123 @@
+/**
+ * better-auth login view (`/admin/login` renders
+ * `src/components/auth/login-form.tsx` inside the Payload admin bundle).
+ *
+ * That form is styled with shadcn/Tailwind classes + `index.scss` tokens
+ * (`--border`, `--background`, `--primary`, …) which only exist in the
+ * frontend `globals.css` — they are undefined in admin context, so the
+ * card/input/social-button borders compute to nothing and the password
+ * eye-toggle (Tailwind `absolute` positioning) drops below the input.
+ * Define the site tokens here (scoped, no clash with Payload's own
+ * `--theme-*`/`--color-*` vars) and add explicit non-Tailwind rules.
+ */
+@layer payload-default {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 15%;
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 15%;
+    --primary: 347.7 83.33% 47.06%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 50%;
+    --destructive: 0 75% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 89%;
+    --input: 0 0% 92%;
+    --ring: 350 78% 42%;
+  }
+
+  [data-theme='dark'] {
+    --background: 222 47% 8%;
+    --foreground: 0 0% 98%;
+    --card: 222 47% 12%;
+    --card-foreground: 0 0% 98%;
+    --primary: 350 78% 52%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 222 30% 18%;
+    --muted-foreground: 0 0% 60%;
+    --destructive: 0 65% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 18%;
+    --ring: 350 78% 52%;
+  }
+
+  /* Card shell (shadcn `Card` classes are inert without Tailwind) */
+  .login-container .login-card {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    box-shadow:
+      0 1px 2px 0 rgba(0, 0, 0, 0.05),
+      0 4px 16px -4px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+  }
+
+  /* Password eye-toggle: pin inside the input (no Tailwind in admin) */
+  .login-container .login-form > .form-group > div[class*='relative'],
+  .login-container .login-form div.relative {
+    position: relative;
+  }
+
+  .login-container .login-form div.relative > button[type='button'] {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .login-container .login-form div.relative > button[type='button']:hover {
+    color: hsl(var(--foreground));
+  }
+
+  .login-container .login-form div.relative > input {
+    padding-right: 2.5rem;
+  }
+}
+@layer payload-default {
+  :root {
+    --color-success-50: rgb(253, 242, 245);
+    --color-success-100: rgb(251, 228, 234);
+    --color-success-150: rgb(246, 201, 212);
+    --color-success-200: rgb(239, 166, 184);
+    --color-success-250: rgb(230, 126, 151);
+    --color-success-300: rgb(221, 84, 121);
+    --color-success-350: rgb(212, 47, 93);
+    --color-success-400: rgb(207, 31, 76);
+    --color-success-450: rgb(197, 20, 68);
+    --color-success-500: rgb(220, 20, 60);
+    --color-success-550: rgb(198, 18, 54);
+    --color-success-600: rgb(176, 16, 48);
+    --color-success-650: rgb(154, 14, 42);
+    --color-success-700: rgb(132, 12, 36);
+    --color-success-750: rgb(110, 10, 30);
+    --color-success-800: rgb(88, 8, 24);
+    --color-success-850: rgb(66, 6, 18);
+    --color-success-900: rgb(44, 5, 12);
+    --color-success-950: rgb(30, 3, 8);
+  }
+}
+
+/* Login / form inputs: crisp theme borders + crimson focus ring */
+@layer payload-default {
+  .field-type input,
+  .field-type textarea,
+  .field-type select {
+    border-color: var(--theme-elevation-150);
+  }
+
+  .field-type input:focus,
+  .field-type textarea:focus,
+  .field-type select:focus {
+    border-color: var(--theme-success-500);
+  }
+}

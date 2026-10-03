@@ -5,7 +5,7 @@ import {
   createPayloadAuthClient,
   type PayloadAuthClient,
 } from '@delmaredigital/payload-better-auth/client'
-import { Apple, ArrowRight, Loader2, Zap } from 'lucide-react'
+import { Apple, ArrowRight, Loader2, Monitor, Moon, Sun, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -71,6 +71,74 @@ export type LoginViewProps = {
    * The reset token will be appended as ?token=xxx
    */
   resetPasswordUrl?: string
+}
+
+/**
+ * Self-contained theme toggle for the login card.
+ * Inline styles on purpose: this form renders inside the Payload admin
+ * bundle (`/admin/login`) where Tailwind utilities don't exist, so it
+ * can't rely on Tailwind classes or a ThemeProvider. Reads/writes the
+ * same `payload-theme` key + `data-theme` attribute both Payload admin
+ * and the site ThemeProvider use, so all three stay in sync.
+ */
+const loginThemeOrder = ['auto', 'light', 'dark'] as const
+type LoginThemePref = (typeof loginThemeOrder)[number]
+
+function applyLoginTheme(pref: LoginThemePref) {
+  if (typeof window === 'undefined') return
+  if (pref === 'auto') {
+    window.localStorage.removeItem('payload-theme')
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+  } else {
+    window.localStorage.setItem('payload-theme', pref)
+    document.documentElement.setAttribute('data-theme', pref)
+  }
+}
+
+function LoginThemeToggle() {
+  const [pref, setPref] = useState<LoginThemePref>('auto')
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem('payload-theme')
+      setPref(stored === 'light' || stored === 'dark' ? stored : 'auto')
+    } catch {}
+  }, [])
+
+  const cycle = () => {
+    const next = loginThemeOrder[(loginThemeOrder.indexOf(pref) + 1) % loginThemeOrder.length]
+    applyLoginTheme(next)
+    setPref(next)
+  }
+
+  const Icon = pref === 'light' ? Sun : pref === 'dark' ? Moon : Monitor
+
+  return (
+    <button
+      type="button"
+      onClick={cycle}
+      title="Theme"
+      aria-label="Toggle theme"
+      style={{
+        position: 'absolute',
+        top: '0.75rem',
+        right: '0.75rem',
+        width: '2.25rem',
+        height: '2.25rem',
+        borderRadius: '9999px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '1px solid hsl(var(--border))',
+        background: 'transparent',
+        cursor: 'pointer',
+        zIndex: 1,
+      }}
+    >
+      <Icon size={18} />
+    </button>
+  )
 }
 
 export default function LoginForm({
@@ -197,7 +265,8 @@ export default function LoginForm({
   }
   return (
     <div className="login-container">
-      <Card className="login-card">
+      <Card className="login-card" style={{ position: 'relative' }}>
+        <LoginThemeToggle />
         <CardHeader className="login-header">
           <CardTitle className="login-title">{title}</CardTitle>
           <CardDescription className="login-description">
