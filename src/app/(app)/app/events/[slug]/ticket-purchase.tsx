@@ -60,11 +60,16 @@ export function TicketPurchase({ event }: { event: any }) {
         return
       }
 
+      const buyerID = Number((user as { id?: unknown }).id)
+      if (!Number.isInteger(buyerID)) {
+        throw new Error('Could not determine your account. Please sign out and sign in again.')
+      }
+
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          buyer: user.id,
+          buyer: buyerID,
           event: event.id,
           totalAmount: total,
           status: 'pending',

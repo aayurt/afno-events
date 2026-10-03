@@ -19,6 +19,23 @@ export const Orders: CollectionConfig = {
     update: isAdmin,
   },
   hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        // Better Auth sessions hand back serial IDs as strings ("1"), but the
+        // postgres adapter validates relationships as numbers — a string buyer
+        // fails with "invalid relationships". Coerce numeric strings up front
+        // so ticket purchase (and any API client) can't trip on ID types.
+        if (data) {
+          for (const field of ['buyer', 'event'] as const) {
+            const value = (data as any)[field]
+            if (typeof value === 'string' && /^\d+$/.test(value)) {
+              ;(data as any)[field] = parseInt(value, 10)
+            }
+          }
+        }
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, operation, req }) => {
         // Only generate tickets when an order is created or updated to 'paid'
