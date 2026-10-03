@@ -27,7 +27,13 @@ type Args = {
 
 export default async function EventDetailPage({ params: paramsPromise }: Args) {
   const t = await getScopedI18n('eventDetail')
-  const { slug } = await paramsPromise
+  const { slug: rawSlug } = await paramsPromise
+  let slug = rawSlug
+  try {
+    slug = decodeURIComponent(rawSlug)
+  } catch {
+    slug = rawSlug
+  }
   const payload = await getPayload({ config: configPromise })
 
   const isNumeric = /^\d+$/.test(slug)
@@ -519,7 +525,13 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug } = await paramsPromise
+  const { slug: rawSlug } = await paramsPromise
+  let slug = rawSlug
+  try {
+    slug = decodeURIComponent(rawSlug)
+  } catch {
+    slug = rawSlug
+  }
   const payload = await getPayload({ config: configPromise })
 
   const isNumeric = /^\d+$/.test(slug)

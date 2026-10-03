@@ -21,7 +21,15 @@ type Args = {
 export default async function OrganiserPage({ params: paramsPromise, searchParams }: Args) {
   const t = await getScopedI18n('events')
   const et = await getScopedI18n('eventDetail')
-  const { slug } = await paramsPromise
+  const { slug: rawSlug } = await paramsPromise
+  // Route params can arrive still-encoded (%20 for spaces) — legacy tenant
+  // slugs contain raw names, so decode before the DB lookup.
+  let slug = rawSlug
+  try {
+    slug = decodeURIComponent(rawSlug)
+  } catch {
+    slug = rawSlug
+  }
   const { page: pageStr } = await searchParams
   const currentPage = parseInt(pageStr || '1', 10) || 1
   const limit = 12
@@ -214,7 +222,13 @@ export default async function OrganiserPage({ params: paramsPromise, searchParam
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const { slug } = await paramsPromise
+  const { slug: rawSlug } = await paramsPromise
+  let slug = rawSlug
+  try {
+    slug = decodeURIComponent(rawSlug)
+  } catch {
+    slug = rawSlug
+  }
   const payload = await getPayload({ config: configPromise })
   const result = await payload.find({
     collection: 'tenants',
