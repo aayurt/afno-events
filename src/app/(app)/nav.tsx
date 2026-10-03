@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Bell, Calendar, Monitor, Moon, Sun, Ticket, User, Users, UsersRound, type LucideIcon } from 'lucide-react'
+import { Bell, Calendar, Moon, Sun, Ticket, User, Users, UsersRound, type LucideIcon } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { authClient } from '@/lib/auth/client'
 import { useTheme } from '@/providers/Theme'
@@ -55,25 +55,24 @@ const getTabs = (t: (key: any, params?: any) => any) => [
   { href: '/app/profile', label: t('profile'), icon: User },
 ]
 
-type ThemePref = 'auto' | 'light' | 'dark'
+type ThemePref = 'light' | 'dark'
 
-const themeOrder: ThemePref[] = ['auto', 'light', 'dark']
+const themeOrder: ThemePref[] = ['light', 'dark']
 
-const themeIcons = { auto: Monitor, light: Sun, dark: Moon } satisfies Record<ThemePref, LucideIcon>
+const themeIcons = { light: Sun, dark: Moon } satisfies Record<ThemePref, LucideIcon>
 
 function ThemeCycleButton({ label }: { label: string }) {
   const { setTheme } = useTheme()
-  const [pref, setPref] = useState<ThemePref>('auto')
+  const [pref, setPref] = useState<ThemePref>('light')
 
   useEffect(() => {
     const stored = window.localStorage.getItem(themeLocalStorageKey)
-    setPref(stored === 'light' || stored === 'dark' ? stored : 'auto')
+    setPref(stored === 'dark' ? 'dark' : 'light')
   }, [])
 
   const cycle = () => {
-    const next = themeOrder[(themeOrder.indexOf(pref) + 1) % themeOrder.length]
-    if (next === 'auto') setTheme(null)
-    else setTheme(next)
+    const next = themeOrder[(themeOrder.indexOf(pref) + 1) % themeOrder.length] ?? 'light'
+    setTheme(next)
     setPref(next)
   }
 

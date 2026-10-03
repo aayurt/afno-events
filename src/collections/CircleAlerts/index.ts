@@ -21,11 +21,14 @@ export const CircleAlerts: CollectionConfig = {
         if (!req.user) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
+        // Coerce string serial IDs ("28") to numbers for the postgres comparison.
+        const rawId = (req.user as any).id
+        const userId = typeof rawId === 'string' && /^\d+$/.test(rawId) ? parseInt(rawId, 10) : rawId
         try {
           await req.payload.update({
             collection: 'circle-alerts' as any,
             where: {
-              user: { equals: req.user.id },
+              user: { equals: userId },
               read: { equals: false },
             },
             data: { read: true },

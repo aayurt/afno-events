@@ -19,8 +19,8 @@ export const Notifications: CollectionConfig = {
             path: '/mark-all-read',
             method: 'post',
             handler: async (req) => {
-                // Next route handlers don't auto-run Payload auth strategies —
-                // resolve the (Better Auth) session from cookies if needed.
+                // Prefer Payload's own auth (same as circle-alerts endpoint);
+                // fall back to resolving the Better Auth session from cookies.
                 let user: any = (req as any).user
                 if (!user) {
                     try {
@@ -29,7 +29,8 @@ export const Notifications: CollectionConfig = {
                             canSetHeaders: false,
                         })
                         user = authResult?.user ?? null
-                    } catch {
+                    } catch (err) {
+                        req.payload.logger.error(`mark-all-read session resolve failed: ${err}`)
                         user = null
                     }
                 }
@@ -38,14 +39,20 @@ export const Notifications: CollectionConfig = {
                     return Response.json({ error: 'Unauthorized' }, { status: 401 })
                 }
 
+                // Better Auth hands serial IDs back as strings ("28") but the
+                // postgres adapter compares relationship columns as numbers —
+                // coerce so the where clause actually matches the user's rows.
+                const rawId = (user as any).id
+                const userId = typeof rawId === 'string' && /^\d+$/.test(rawId) ? parseInt(rawId, 10) : rawId
+
                 try {
-                    await req.payload.update({
+                    const result = await req.payload.update({
                         collection: 'notifications',
                         where: {
                             and: [
                                 {
                                     user: {
-                                        equals: user.id,
+                                        equals: userId,
                                     },
                                 },
                                 {
@@ -61,7 +68,7 @@ export const Notifications: CollectionConfig = {
                         overrideAccess: true,
                     })
 
-                    return Response.json({ success: true })
+                    return Response.json({ success: true, updated: (result as any)?.docs?.length ?? 0 })
                 } catch (error) {
                     req.payload.logger.error(`Error marking all notifications as read: ${error}`)
                     return Response.json({ error: 'Internal Server Error' }, { status: 500 })

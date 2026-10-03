@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs'
+import { displayPriceRange } from '@/utilities/pricing'
 import { sendEventApprovalEmails } from '@/emails'
 
 async function resolveAuthAndEvent(req: NextRequest, idParam: string) {
@@ -122,7 +123,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
 
   updateData.pricing = {
     type: isPaid ? 'paid' : 'free',
-    priceRange: isPaid ? body.pricing?.priceRange || '' : 'Free',
+    priceRange: isPaid ? displayPriceRange(ticketTypes, body.pricing?.priceRange) : 'Free',
     ticketTypes,
   }
 
@@ -169,7 +170,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
         eventTitle: body.title || (event as any).title,
         eventDateText: dateStr,
         eventVenue: venueStr,
-        eventPriceRange: isPaid ? body.pricing?.priceRange || `£${ticketTypes[0]?.price || 0}` : 'Free',
+        eventPriceRange: isPaid ? displayPriceRange(ticketTypes, body.pricing?.priceRange) : 'Free',
         eventId: updated.id,
         organisationName: orgName,
         contactName: user.name || orgName,

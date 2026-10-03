@@ -24,6 +24,10 @@ export default function OrganiserLoginPage() {
   const [loading, setLoading] = useState(false)
   const [checking, setChecking] = useState(true)
   const [notOrganiser, setNotOrganiser] = useState(false)
+  const [orgName, setOrgName] = useState('')
+  const [requesting, setRequesting] = useState(false)
+  const [requestError, setRequestError] = useState<string | null>(null)
+  const [requestSent, setRequestSent] = useState(false)
 
   // Already signed in? Route them straight in (or show the not-organiser note).
   useEffect(() => {
@@ -51,6 +55,40 @@ export default function OrganiserLoginPage() {
     }
   }, [router])
 
+  // Fan account signed in on the organiser portal: let them request an
+  // upgrade in place. Reuses /api/organiser/register, which provisions a
+  // pending tenant and promotes the existing user to admin — new orgs can
+  // draft immediately, events go live after admin verification.
+  async function handleRequestAccess(e: React.FormEvent) {
+    e.preventDefault()
+    if (!orgName.trim() || requesting) return
+    setRequesting(true)
+    setRequestError(null)
+    try {
+      const session = await authClient.getSession().catch(() => null)
+      const sessionUser = session?.data?.user as { name?: string; email?: string } | undefined
+      const res = await fetch('/api/organiser/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          organisationName: orgName.trim(),
+          name: sessionUser?.name || '',
+          email: sessionUser?.email || email,
+        }),
+      })
+      const data = await res.json().catch(() => null)
+      if (!res.ok) throw new Error(data?.error || 'Could not submit your request')
+      setRequestSent(true)
+      setTimeout(() => {
+        window.location.href = '/organiser/dashboard'
+      }, 1500)
+    } catch (err: any) {
+      setRequestError(err?.message || 'Could not submit your request. Please try again.')
+    } finally {
+      setRequesting(false)
+    }
+  }
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -167,10 +205,52 @@ export default function OrganiserLoginPage() {
                 )}
 
                 {notOrganiser && (
-                  <div className="text-sm text-amber-700 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 rounded-lg p-3">
-                    This account is a fan account, not an organiser account. Please use the{' '}
-                    <Link href="/app" className="underline font-medium">fan app</Link> instead, or
-                    contact us to upgrade your account.
+                  <div className="text-sm rounded-lg p-3 space-y-3 text-amber-700 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900">
+                    {requestSent ? (
+                      <p className="font-medium">
+                        Request received — your organiser workspace is being set up. Taking you
+                        to the dashboard…
+                      </p>
+                    ) : (
+                      <>
+                        <p>
+                          This account is a fan account, not an organiser account. Enter your
+                          organisation name and we&apos;ll upgrade it — you can draft events
+                          right away, and our team verifies organisations before events go live.
+                        </p>
+                        <form onSubmit={handleRequestAccess} className="space-y-2">
+                          <Input
+                            type="text"
+                            placeholder="Organisation name"
+                            value={orgName}
+                            onChange={(e) => setOrgName(e.target.value)}
+                            disabled={requesting}
+                            required
+                          />
+                          {requestError && <p className="text-red-600">{requestError}</p>}
+                          <Button
+                            type="submit"
+                            size="sm"
+                            className="w-full gap-2"
+                            disabled={requesting || !orgName.trim()}
+                          >
+                            {requesting ? (
+                              <>
+                                <Loader2 className="animate-spin" size={14} /> Submitting…
+                              </>
+                            ) : (
+                              'Request organiser access'
+                            )}
+                          </Button>
+                        </form>
+                        <p>
+                          Prefer to talk first?{' '}
+                          <Link href="/contact" className="underline font-medium">
+                            Contact us
+                          </Link>
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -199,7 +279,7 @@ export default function OrganiserLoginPage() {
           </p>
           <p>
             Want to speak with our team first?{' '}
-            <Link href="/contact-us" className="underline hover:text-foreground">
+            <Link href="/contact" className="underline hover:text-foreground">
               Contact us
             </Link>
           </p>

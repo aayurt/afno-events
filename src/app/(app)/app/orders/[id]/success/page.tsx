@@ -7,6 +7,7 @@ import { CheckCircle, Loader2, Calendar, MapPin, Ticket } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { getScopedI18n } from '@/locales/server'
+import { formatEventDateLong, formatEventTime } from '@/utilities/formatEventDate'
 import { OrderStatusPoller } from './order-status-poller'
 
 type Args = {
@@ -80,14 +81,8 @@ export default async function OrderSuccessPage({ params: paramsPromise }: Args) 
                 {event.startDatetime && (
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <Calendar size={14} />
-                    {new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {formatEventDateLong(event.startDatetime, event.timezone)}{' '}
+                    {formatEventTime(event.startDatetime, event.timezone, { withAbbr: true })}
                   </p>
                 )}
                 {event.location?.location && (

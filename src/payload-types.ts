@@ -332,8 +332,6 @@ export interface Tenant {
    * If checked, logging in is not required to read. Useful for building public pages.
    */
   allowPublicRead?: boolean | null;
-  status?: ('pending' | 'verified' | 'rejected') | null;
-  verified?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -420,6 +418,8 @@ export interface Category {
   createdAt: string;
 }
 /**
+ * Deleting a user moves them to Trash — use the Trash filter to restore or permanently delete. Trashed emails stay reserved: re-registering the same email fails until the trashed account is permanently deleted.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -946,6 +946,10 @@ export interface Event {
           name: string;
           price: number;
           description?: string | null;
+          /**
+           * Max tickets of this type per order. Leave blank for no limit.
+           */
+          maxPerOrder?: number | null;
           stripePriceID?: string | null;
           id?: string | null;
         }[]
@@ -1929,6 +1933,7 @@ export interface EventsSelect<T extends boolean = true> {
               name?: T;
               price?: T;
               description?: T;
+              maxPerOrder?: T;
               stripePriceID?: T;
               id?: T;
             };

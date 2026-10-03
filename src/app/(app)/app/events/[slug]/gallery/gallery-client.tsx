@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Loader2, Lock, Camera, Upload, X, ImageIcon, Clock } from 'lucide-react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { ImageLightbox } from '@/components/ui/image-lightbox'
 
 function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: any[] }) {
   const t = useScopedI18n('gallery') as (key: string, params?: Record<string, string | number>) => string
@@ -22,6 +23,7 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [lightbox, setLightbox] = useState<number | null>(null)
 
   const refetchPhotos = useCallback(async (userId?: string) => {
     try {
@@ -149,6 +151,16 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
 
   const allPhotos = [...myPendingPhotos, ...photos]
 
+  // Photos the viewer is allowed to inspect full-size: unlocked gallery or
+  // the user's own pending uploads (locked/blurred ones stay unclickable).
+  const viewablePhotos = allPhotos.filter(
+    (p: any) =>
+      (isUnlocked || p.status === 'pending') &&
+      typeof p.image === 'object' &&
+      p.image?.url,
+  )
+  const viewableUrls = viewablePhotos.map((p: any) => p.image.url as string)
+
   return (
     <div>
       {uploadSuccess && (
@@ -161,8 +173,27 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
           {allPhotos.map((photo: any) => {
             const isPending = photo.status === 'pending'
+            const canView =
+              (isUnlocked || isPending) &&
+              typeof photo.image === 'object' &&
+              photo.image?.url
+            const Wrapper = canView ? 'button' : 'div'
             return (
-              <div key={photo.id} className="aspect-square rounded-xl overflow-hidden bg-muted relative group">
+              <Wrapper
+                key={photo.id}
+                {...(canView
+                  ? {
+                      type: 'button',
+                      onClick: () =>
+                        setLightbox(viewablePhotos.findIndex((p: any) => p.id === photo.id)),
+                      'aria-label': 'View photo',
+                      className:
+                        'aspect-square rounded-xl overflow-hidden bg-muted relative group cursor-zoom-in text-left',
+                    }
+                  : {
+                      className: 'aspect-square rounded-xl overflow-hidden bg-muted relative group',
+                    })}
+              >
                 {isUnlocked || isPending ? (
                   typeof photo.image === 'object' && photo.image.url ? (
                     <img
@@ -206,7 +237,7 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
                     </p>
                   </div>
                 )}
-              </div>
+              </Wrapper>
             )
           })}
         </div>
@@ -220,6 +251,15 @@ function GalleryClient({ event, photos: initialPhotos }: { event: any; photos: a
             {isUnlocked ? '' : t('lockedDescription')}
           </p>
         </div>
+      )}
+
+      {lightbox !== null && lightbox >= 0 && (
+        <ImageLightbox
+          images={viewableUrls}
+          index={lightbox}
+          onClose={() => setLightbox(null)}
+          onNavigate={setLightbox}
+        />
       )}
 
       {!isUnlocked && (

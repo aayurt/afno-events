@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 import { getUserTenantIDs } from '@/utilities/getUserTenantIDs'
+import { displayPriceRange } from '@/utilities/pricing'
 import { sendEventApprovalEmails } from '@/emails'
 
 /**
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
       tags: Array.isArray(body.tags) ? body.tags : [],
       pricing: {
         type: isPaid ? 'paid' : 'free',
-        priceRange: isPaid ? body.pricing?.priceRange || '' : 'Free',
+        priceRange: isPaid ? displayPriceRange(ticketTypes, body.pricing?.priceRange) : 'Free',
         ticketTypes,
       },
       enabled: finalEnabled,
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
         eventTitle: body.title,
         eventDateText: dateStr,
         eventVenue: venueStr,
-        eventPriceRange: isPaid ? body.pricing?.priceRange || `£${ticketTypes[0]?.price || 0}` : 'Free',
+        eventPriceRange: isPaid ? displayPriceRange(ticketTypes, body.pricing?.priceRange) : 'Free',
         eventId: newEvent.id,
         organisationName: orgName,
         contactName: user.name || orgName,

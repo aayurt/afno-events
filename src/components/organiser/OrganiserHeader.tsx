@@ -2,32 +2,31 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { LayoutDashboard, Monitor, Moon, Sun, type LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Moon, Sun, type LucideIcon } from 'lucide-react'
 import { useTheme } from '@/providers/Theme'
 import { themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
 import { useScopedI18n } from '@/locales/client'
 
-type ThemePref = 'auto' | 'light' | 'dark'
+type ThemePref = 'light' | 'dark'
 
-const themeOrder: ThemePref[] = ['auto', 'light', 'dark']
+const themeOrder: ThemePref[] = ['light', 'dark']
 
-const themeIcons = { auto: Monitor, light: Sun, dark: Moon } satisfies Record<ThemePref, LucideIcon>
+const themeIcons = { light: Sun, dark: Moon } satisfies Record<ThemePref, LucideIcon>
 
 function OrganiserThemeButton({ label }: { label: string }) {
   const { setTheme } = useTheme()
-  const [pref, setPref] = useState<ThemePref>('auto')
+  const [pref, setPref] = useState<ThemePref>('light')
 
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(themeLocalStorageKey)
-      setPref(stored === 'light' || stored === 'dark' ? stored : 'auto')
+      setPref(stored === 'dark' ? 'dark' : 'light')
     } catch {}
   }, [])
 
   const cycle = () => {
-    const next = themeOrder[(themeOrder.indexOf(pref) + 1) % themeOrder.length]
-    if (next === 'auto') setTheme(null)
-    else setTheme(next)
+    const next = themeOrder[(themeOrder.indexOf(pref) + 1) % themeOrder.length] ?? 'light'
+    setTheme(next)
     setPref(next)
   }
 

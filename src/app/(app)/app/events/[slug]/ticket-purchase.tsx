@@ -12,19 +12,23 @@ type TicketType = {
   price: number
   description?: string | null
   stripePriceID?: string | null
+  maxPerOrder?: number | null
   id?: string | null
 }
 
 export function TicketPurchase({ event }: { event: any }) {
   const t = useScopedI18n('eventDetail')
   const router = useRouter()
-  const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const ticketTypes: TicketType[] = event.pricing?.ticketTypes || []
+  // Default to 1 of the first tier so fans can buy in one tap.
+  const [quantities, setQuantities] = useState<Record<string, number>>(() =>
+    ticketTypes.length > 0 && ticketTypes[0]?.name ? { [ticketTypes[0].name]: 1 } : {},
+  )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const isFree = event.pricing?.type === 'free'
   const hasExternalLink = !!event.pricing?.paymentExternalLink
-  const ticketTypes: TicketType[] = event.pricing?.ticketTypes || []
 
   const total = ticketTypes.reduce((sum, tt) => {
     return sum + (quantities[tt.name] || 0) * tt.price
@@ -33,9 +37,12 @@ export function TicketPurchase({ event }: { event: any }) {
   const totalTickets = Object.values(quantities).reduce((a, b) => a + b, 0)
 
   const updateQuantity = (name: string, delta: number) => {
+    const tier = ticketTypes.find((tt) => tt.name === name)
+    const max = tier?.maxPerOrder && tier.maxPerOrder > 0 ? tier.maxPerOrder : null
     setQuantities((prev) => {
       const current = prev[name] || 0
-      const next = Math.max(0, current + delta)
+      let next = Math.max(0, current + delta)
+      if (max !== null) next = Math.min(next, max)
       return { ...prev, [name]: next }
     })
   }
@@ -132,6 +139,8 @@ export function TicketPurchase({ event }: { event: any }) {
           <div className="border border-border rounded-2xl divide-y divide-border bg-card overflow-hidden">
             {ticketTypes.map((tt) => {
               const q = quantities[tt.name] || 0
+              const max = tt.maxPerOrder && tt.maxPerOrder > 0 ? tt.maxPerOrder : null
+              const atMax = max !== null && q >= max
               return (
               <div key={tt.name} className="flex items-center justify-between gap-3 p-3.5">
                 <div className="flex-1 min-w-0">
@@ -140,6 +149,9 @@ export function TicketPurchase({ event }: { event: any }) {
                     <p className="text-xs text-muted-foreground mt-0.5">{tt.description}</p>
                   )}
                   <p className="text-sm font-bold text-primary mt-1">£{tt.price}</p>
+                  {max !== null && (
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Max {max} per order</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-1 rounded-full border border-border bg-background p-1 shrink-0">
                   <button
@@ -153,8 +165,8 @@ export function TicketPurchase({ event }: { event: any }) {
                   <span className="w-6 text-center font-bold text-sm">{q}</span>
                   <button
                     onClick={() => updateQuantity(tt.name, 1)}
-                    className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
-                    disabled={loading}
+                    className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    disabled={loading || atMax}
                     aria-label={`Add one ${tt.name}`}
                   >
                     <Plus size={14} />

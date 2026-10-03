@@ -9,10 +9,15 @@ import { Button } from '@/components/ui/button'
 import { TicketPurchase } from './ticket-purchase'
 import { ShareButtons } from './share-buttons'
 import { FavoriteButton } from './favorite-button'
+import { ShowcaseGallery } from './showcase-gallery'
+import { PhotoThumbs } from './photo-thumbs'
+import { getEventStatus } from '@/components/events/event-status'
+import { EventStatusBadge } from '@/components/events/event-status-badge'
 import { AddToCalendarButton, CountdownChip } from './event-niceties'
 import { RemindMeButton } from './remind-me'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { formatEventDateLong, formatEventTime } from '@/utilities/formatEventDate'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -203,7 +208,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                   </div>
                   {start && (
                     <div className="text-xs text-muted-foreground font-mono mt-0.5">
-                      {new Date(start).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                      {formatEventTime(e.startDatetime, e.timezone, { withAbbr: true })}
                     </div>
                   )}
                 </div>
@@ -274,23 +279,12 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                   </div>
                   <div>
                     <p className="font-semibold text-lg">
-                      {new Date(e.startDatetime).toLocaleDateString('en-GB', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
+                      {formatEventDateLong(e.startDatetime, e.timezone)}
                     </p>
                     <p className="text-muted-foreground">
-                      {new Date(e.startDatetime).toLocaleTimeString('en-GB', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
+                      {formatEventTime(e.startDatetime, e.timezone, { withAbbr: true })}
                       {e.endDatetime && (
-                        <> — {new Date(e.endDatetime).toLocaleTimeString('en-GB', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
+                        <> — {formatEventTime(e.endDatetime, e.timezone, { withAbbr: true })}
                         </>
                       )}
                     </p>
@@ -388,19 +382,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             {e.showcaseImages && e.showcaseImages.length > 0 && (
               <div className="border-t border-border pt-8">
                 <h2 className="text-xl font-bold tracking-tight mb-4">{t('gallery')}</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {e.showcaseImages.map((item: any, i: number) => (
-                    <div key={item.id || i} className="aspect-square rounded-xl overflow-hidden bg-muted">
-                      {getCardImageUrl(item.image) ? (
-                        <img
-                          src={getCardImageUrl(item.image) as string}
-                          alt=""
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : null}
-                    </div>
-                  ))}
-                </div>
+                <ShowcaseGallery
+                  images={e.showcaseImages
+                    .map((item: any) => getCardImageUrl(item.image))
+                    .filter((src: any): src is string => !!src)}
+                />
                 {e.galleryEnabled && (
                   <div className="mt-4">
                     <Link href={`/app/events/${e.slug || e.id}/gallery`}>
@@ -424,27 +410,14 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                     {t('viewFullGallery')} <ArrowRight size={14} />
                   </Link>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-                  {approvedPhotos.map((photo: any) => {
-                    const img = typeof photo.image === 'object' ? photo.image : null
-                    const src = img?.sizes?.thumbnail?.url || img?.url
-                    if (!src) return null
-                    return (
-                      <Link
-                        key={photo.id}
-                        href={`/app/events/${e.slug || e.id}/gallery`}
-                        className="block aspect-square rounded-xl overflow-hidden bg-muted"
-                      >
-                        <img
-                          src={src}
-                          alt=""
-                          loading="lazy"
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                        />
-                      </Link>
-                    )
-                  })}
-                </div>
+                <PhotoThumbs
+                  images={approvedPhotos
+                    .map((photo: any) => {
+                      const img = typeof photo.image === 'object' ? photo.image : null
+                      return img?.sizes?.thumbnail?.url || img?.url
+                    })
+                    .filter((src: any): src is string => !!src)}
+                />
               </div>
             )}
 
@@ -511,6 +484,12 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                      <div className="absolute top-2 left-2">
+                        <EventStatusBadge
+                          status={getEventStatus(ev.startDatetime, ev.endDatetime)}
+                          labels={{ live: t('live'), upcoming: t('upcoming'), past: t('past') }}
+                        />
+                      </div>
                       {rStart && (
                         <div className="absolute bottom-2 left-2 bg-white rounded-lg px-2 py-1 text-center leading-tight">
                           <div className="text-[9px] font-extrabold uppercase tracking-wide text-primary">{rMonth}</div>

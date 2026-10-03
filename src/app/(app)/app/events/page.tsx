@@ -18,7 +18,10 @@ type Args = {
 import { TAG_OPTIONS } from '@/config/tags'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { formatEventDate } from '@/utilities/formatEventDate'
 import { FavoriteButton } from './[slug]/favorite-button'
+import { getEventStatus } from '@/components/events/event-status'
+import { EventStatusBadge } from '@/components/events/event-status-badge'
 
 function formatMonthDay(startDatetime: string | null) {
   if (!startDatetime) return ''
@@ -30,6 +33,7 @@ function formatMonthDay(startDatetime: string | null) {
 
 export default async function EventsPage({ searchParams: searchParamsPromise }: Args) {
   const t = await getScopedI18n('events')
+  const et = await getScopedI18n('eventDetail')
   const { q, tag, page: pageStr } = await searchParamsPromise
   const currentPage = parseInt(pageStr || '1', 10)
   const limit = 12
@@ -131,7 +135,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
             const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
             const isFree = event.pricing?.type === 'free'
             const priceText = isFree ? t('free') : event.pricing?.priceRange || t('paid')
-            const stockClass = isFree ? 'text-muted-foreground' : 'text-primary text-[11px] font-bold'
+            const stockClass = isFree ? 'text-muted-foreground' : 'text-primary text-base font-extrabold'
             const stockText = isFree ? 'Free entry' : 'Available'
 
             return (
@@ -160,12 +164,16 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                       </div>
                     )}
 
-                    <div className="absolute top-2 left-2">
+                    <div className="absolute top-2 left-2 flex flex-col items-start gap-1.5">
                       <span
                         className="bg-background/85 text-foreground border border-border text-xs font-semibold rounded-full px-2.5 py-1 backdrop-blur-sm"
                       >
                         {event.tags?.[0] || t('allEvents')}
                       </span>
+                      <EventStatusBadge
+                        status={getEventStatus(event.startDatetime, event.endDatetime)}
+                        labels={{ live: et('live'), upcoming: et('upcoming'), past: et('past') }}
+                      />
                     </div>
 
                     <div className="absolute bottom-2 left-2 bg-white rounded-xl px-2.5 py-1.5 text-xs font-semibold">
@@ -182,11 +190,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                         <Calendar size={14} />
                         {event.startDatetime
-                          ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                              day: 'numeric',
-                              month: 'short',
-                              year: 'numeric',
-                            })
+                          ? formatEventDate(event.startDatetime, event.timezone)
                           : t('tbd')}
                       </div>
                       <CardTitle className={`font-bold tracking-tight line-clamp-2 ${isFeatured ? 'text-2xl' : 'text-base'}`}>

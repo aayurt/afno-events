@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
+import configPromise from '@payload-config'
+import { getPayload } from 'payload'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { XCircle } from 'lucide-react'
+import { XCircle, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { getScopedI18n } from '@/locales/server'
+import { RetryPaymentButton } from './retry-payment-button'
 
 type Args = {
   params: Promise<{ id: string }>
@@ -12,6 +16,100 @@ type Args = {
 export default async function OrderCancelPage({ params: paramsPromise }: Args) {
   const t = await getScopedI18n('orders')
   const { id } = await paramsPromise
+  const numericId = parseInt(id, 10)
+
+  if (!Number.isInteger(numericId)) notFound()
+
+  // Resilient order lookup: if Payload/DB is unreachable (or the order is
+  // gone), fall back to the generic cancelled UI instead of 500ing. A user
+  // landing here just had their checkout cancelled — that message must render.
+  let order: any = null
+  try {
+    const payload = await getPayload({ config: configPromise })
+    order = await payload.findByID({
+      collection: 'orders',
+      id: numericId,
+      depth: 2,
+    })
+  } catch (err) {
+    console.error(`OrderCancelPage: could not load order ${numericId}`, err)
+    order = null
+  }
+
+  // Order couldn't be loaded (DB down, deleted, or never existed):
+  // render the generic cancelled UI with no order-specific details.
+  if (!order) {
+    return (
+      <div className="container py-20 flex justify-center">
+        <div className="w-full max-w-lg">
+          <Card className="rounded-2xl">
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center">
+                  <XCircle size={40} className="text-red-600" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold">{t('paymentCancelled')}</h1>
+                <p className="text-muted-foreground">{t('paymentCancelledDesc')}</p>
+              </div>
+
+              <div className="flex gap-4 justify-center pt-4">
+                <Link href="/app/events">
+                  <Button variant="outline">{t('browseEvents')}</Button>
+                </Link>
+                <Link href="/app/profile">
+                  <Button>{t('myProfile')}</Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
+
+  const o = order as any
+  const event = typeof o.event === 'object' ? o.event : null
+  const isPaid = o.status === 'paid'
+
+  // Edge case: user paid but landed back on the cancel URL (back button,
+  // Stripe redirect race). Point them to the confirmed order instead of
+  // showing a stale "cancelled" screen.
+  if (isPaid) {
+    return (
+      <div className="container py-20 flex justify-center">
+        <div className="w-full max-w-lg">
+          <Card className="rounded-2xl">
+            <CardContent className="p-8 text-center space-y-6">
+              <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center">
+                  <CheckCircle size={40} className="text-green-600" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold">{t('alreadyPaid')}</h1>
+                <p className="text-muted-foreground">
+                  {t('alreadyPaidDesc', { orderId: o.id })}
+                </p>
+              </div>
+
+              <div className="flex gap-4 justify-center pt-4">
+                <Link href={`/app/orders/${o.id}/success`}>
+                  <Button>{t('viewMyOrders')}</Button>
+                </Link>
+                <Link href="/app/events">
+                  <Button variant="outline">{t('browseEvents')}</Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container py-20 flex justify-center">
@@ -26,17 +124,31 @@ export default async function OrderCancelPage({ params: paramsPromise }: Args) {
 
             <div className="space-y-2">
               <h1 className="text-3xl font-bold">{t('paymentCancelled')}</h1>
-              <p className="text-muted-foreground">
-                {t('paymentCancelledDesc')}
+              <p className="text-muted-foreground">{t('paymentCancelledDesc')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('orderId')}: #{o.id}
               </p>
+              <p className="text-sm text-muted-foreground">{t('retryPaymentDesc')}</p>
             </div>
 
-            <div className="flex gap-4 justify-center pt-4">
+            {event && (
+              <div className="bg-muted/50 rounded-xl p-4 text-left">
+                <p className="font-semibold">{event.title}</p>
+                {o.totalAmount != null && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {t('total')}: £{Number(o.totalAmount).toFixed(2)}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+              <RetryPaymentButton orderId={o.id} />
               <Link href="/app/events">
                 <Button variant="outline">{t('browseEvents')}</Button>
               </Link>
               <Link href="/app/profile">
-                <Button>{t('myProfile')}</Button>
+                <Button variant="ghost">{t('myProfile')}</Button>
               </Link>
             </div>
           </CardContent>

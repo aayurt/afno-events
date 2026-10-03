@@ -1,14 +1,13 @@
 'use client'
 
 import { Dialog, DialogHeader, DialogContent } from '@/components/ui/dialog'
-import { Sun, Moon, Monitor, Check } from 'lucide-react'
+import { Sun, Moon, Check } from 'lucide-react'
 import { cn } from '@/utilities/ui'
 import { useTheme } from '@/providers/Theme'
 import { themeLocalStorageKey } from '@/providers/Theme/ThemeSelector/types'
 import { useEffect, useState } from 'react'
 
 const THEMES = [
-  { value: 'auto' as const, label: 'themeSystem', icon: Monitor },
   { value: 'light' as const, label: 'themeLight', icon: Sun },
   { value: 'dark' as const, label: 'themeDark', icon: Moon },
 ]
@@ -23,19 +22,15 @@ export function ThemeSwitcher({
   t: (key: any, params?: any) => any
 }) {
   const { setTheme } = useTheme()
-  const [current, setCurrent] = useState('auto')
+  const [current, setCurrent] = useState('light')
 
   useEffect(() => {
     const stored = window.localStorage.getItem(themeLocalStorageKey)
-    setCurrent(stored ?? 'auto')
+    setCurrent(stored === 'dark' ? 'dark' : 'light')
   }, [])
 
   const switchTheme = (value: string) => {
-    if (value === 'auto') {
-      setTheme(null)
-    } else {
-      setTheme(value as 'light' | 'dark')
-    }
+    setTheme(value as 'light' | 'dark')
     setCurrent(value)
     onOpenChange(false)
   }

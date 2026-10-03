@@ -100,15 +100,24 @@ export default function NotificationsPage() {
   const markAllRead = async () => {
     if (unreadCount === 0 || busy) return
     setBusy(true)
+    setError(null)
+    const previous = notifs
     setNotifs((prev) => prev.map((n) => ({ ...n, read: true })))
     try {
       const res = await fetch('/api/notifications/mark-all-read', {
         method: 'POST',
         credentials: 'include',
       })
-      if (!res.ok) throw new Error('bad status')
-    } catch {
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || `Request failed (${res.status})`)
+      }
+    } catch (err: any) {
+      // Roll back the optimistic update and tell the user — previously this
+      // failed silently and unread items just reappeared.
+      setNotifs(previous)
       await load()
+      setError(`${t('markAllReadFailed')}${err?.message ? `: ${err.message}` : ''}`)
     } finally {
       setBusy(false)
     }

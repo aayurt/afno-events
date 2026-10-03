@@ -426,6 +426,15 @@ export const Events: CollectionConfig = {
               type: 'textarea',
             },
             {
+              name: 'maxPerOrder',
+              type: 'number',
+              min: 1,
+              admin: {
+                placeholder: 'e.g. 4 (blank = no limit)',
+                description: 'Max tickets of this type per order. Leave blank for no limit.',
+              },
+            },
+            {
               name: 'stripePriceID',
               type: 'text',
               admin: {

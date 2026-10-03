@@ -43,7 +43,7 @@ export default function ProfilePage() {
   const [catOpen, setCatOpen] = useState(false)
   const [userDoc, setUserDoc] = useState<any>(null)
   const { theme } = useTheme()
-  const themeLabel = theme === null ? t('themeSystem') : theme === 'light' ? t('themeLight') : t('themeDark')
+  const themeLabel = theme === 'dark' ? t('themeDark') : t('themeLight')
 
   useEffect(() => {
     document.title = `${t('profileTab')} | Afno Events`

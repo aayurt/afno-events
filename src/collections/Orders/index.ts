@@ -36,8 +36,32 @@ export const Orders: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [
-      async ({ doc, operation, req }) => {
+    beforeChange: [
+      async ({ data, req }) => {
+        // Enforce organiser quantity limits: no line item may exceed its
+        // tier's maxPerOrder (client clamps too — this stops direct API abuse).
+        const items = (data as any)?.items
+        const eventRef = (data as any)?.event
+        if (Array.isArray(items) && items.length > 0 && eventRef != null) {
+          const eventId = typeof eventRef === 'object' ? eventRef.id : eventRef
+          const event = await req.payload
+            .findByID({ collection: 'events', id: eventId, depth: 0, overrideAccess: true })
+            .catch(() => null)
+          const tiers = ((event as any)?.pricing?.ticketTypes || []) as any[]
+          for (const item of items) {
+            const tier = tiers.find((t) => t.name === item.ticketType)
+            const max = tier?.maxPerOrder
+            if (max != null && Number(max) > 0 && Number(item.quantity) > Number(max)) {
+              throw new Error(
+                `Only ${max} × "${item.ticketType}" allowed per order.`,
+              )
+            }
+          }
+        }
+        return data
+      },
+    ],
+    afterChange: [      async ({ doc, operation, req }) => {
         // Only generate tickets when an order is created or updated to 'paid'
         // and doesn't already have tickets generated
         if (

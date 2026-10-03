@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { formatEventDate } from '@/utilities/formatEventDate'
+import { getEventStatus } from '@/components/events/event-status'
+import { EventStatusBadge } from '@/components/events/event-status-badge'
 
 type Args = {
   params: Promise<{ slug: string }>
@@ -147,25 +150,27 @@ export default async function OrganiserPage({ params: paramsPromise, searchParam
                       </div>
                     )}
                     {event.pricing?.type === 'paid' && (
-                      <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-semibold">
+                      <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-bold">
                         {event.pricing.priceRange || t('paid')}
                       </div>
                     )}
                     {event.pricing?.type === 'free' && (
-                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                         {t('free')}
                       </div>
                     )}
+                    <div className="absolute top-4 left-4">
+                      <EventStatusBadge
+                        status={getEventStatus(event.startDatetime, event.endDatetime)}
+                        labels={{ live: et('live'), upcoming: et('upcoming'), past: et('past') }}
+                      />
+                    </div>
                   </div>
                   <CardHeader className="flex-1">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
                       <Calendar size={14} />
                       {event.startDatetime
-                        ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })
+                        ? formatEventDate(event.startDatetime, event.timezone)
                         : t('tbd')}
                     </div>
                     <CardTitle className="text-lg group-hover:text-primary transition-colors">

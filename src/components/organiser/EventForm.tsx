@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { VenueMapPicker, VenueLocation } from './VenueMapPicker'
+import { displayPriceRange } from '@/utilities/pricing'
 import {
   Calendar,
   Clock,
@@ -32,6 +33,7 @@ type TicketTier = {
   price: number
   description?: string | null
   stripePriceID?: string | null
+  maxPerOrder?: number | null
 }
 
 export type EventFormData = {
@@ -81,18 +83,67 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const [showcaseImageUrls, setShowcaseImageUrls] = useState<string[]>(initial?.showcaseImageUrls || [])
   const [isGalleryUploading, setIsGalleryUploading] = useState(false)
 
-  const toLocalInput = (iso?: string) => {
+  const toLocalInput = (iso?: string, timeZone?: string) => {
     if (!iso) return ''
     try {
-      const d = new Date(iso)
-      return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+      // Show the stored UTC instant as wall-clock time in the event's timezone
+      // (not the browser's), so what the organiser sees matches the tz dropdown.
+      const tz = timeZone || 'Europe/London'
+      const dtf = new Intl.DateTimeFormat('en-CA', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+      const parts = Object.fromEntries(
+        dtf.formatToParts(new Date(iso)).map((p) => [p.type, p.value]),
+      )
+      return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}`
     } catch {
       return ''
     }
   }
 
-  const [startDatetime, setStartDatetime] = useState(toLocalInput(initial?.startDatetime))
-  const [endDatetime, setEndDatetime] = useState(toLocalInput(initial?.endDatetime))
+  // Interpret a `datetime-local` wall-clock string as being in `timeZone`,
+  // returning the correct UTC instant (DST-aware via Intl offset lookup).
+  const zonedTimeToUtc = (localInput: string, timeZone: string): string => {
+    const [datePart = '', timePart = ''] = localInput.split('T')
+    const [y = 0, m = 1, d = 1] = datePart.split('-').map(Number)
+    const [hh = 0, mm = 0] = timePart.split(':').map(Number)
+    const guess = Date.UTC(y, m - 1, d, hh, mm)
+    const dtf = new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+    const parts = Object.fromEntries(
+      dtf.formatToParts(new Date(guess)).map((p) => [p.type, p.value]),
+    )
+    const asUtc = Date.UTC(
+      Number(parts.year),
+      Number(parts.month) - 1,
+      Number(parts.day),
+      Number(parts.hour) % 24,
+      Number(parts.minute),
+      Number(parts.second),
+    )
+    return new Date(guess - (asUtc - guess)).toISOString()
+  }
+
+  const [startDatetime, setStartDatetime] = useState(
+    toLocalInput(initial?.startDatetime, initial?.timezone),
+  )
+  const [endDatetime, setEndDatetime] = useState(
+    toLocalInput(initial?.endDatetime, initial?.timezone),
+  )
   
   const [locationData, setLocationData] = useState<VenueLocation>({
     location: initial?.location?.location || '',
@@ -112,6 +163,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           price: t.price ?? 15,
           description: t.description || '',
           stripePriceID: t.stripePriceID || null,
+          maxPerOrder: (t as any).maxPerOrder ?? null,
         }))
       : [{ name: 'General Admission', price: 15, description: 'Standard event entry' }]
   )
@@ -244,16 +296,27 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
             price: Number(r.price) || 0,
             description: r.description || '',
             stripePriceID: r.stripePriceID || null,
+            maxPerOrder: r.maxPerOrder ? Number(r.maxPerOrder) || null : null,
           }))
         : [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
+
+    const tz = timezone || 'Europe/London'
+    const startIso = startDatetime ? zonedTimeToUtc(startDatetime, tz) : new Date().toISOString()
+    const endIso = endDatetime ? zonedTimeToUtc(endDatetime, tz) : startIso
+
+    if (endDatetime && new Date(endIso).getTime() < new Date(startIso).getTime()) {
+      setError('Event end time must be after the start time.')
+      setIsSubmitting(false)
+      return
+    }
 
     const payloadData: any = {
       title,
       description,
       coverImage: coverImageId,
       showcaseImages: showcaseImageIds.map((id) => ({ image: id })),
-      startDatetime: startDatetime ? new Date(startDatetime).toISOString() : new Date().toISOString(),
-      endDatetime: endDatetime ? new Date(endDatetime).toISOString() : new Date().toISOString(),
+      startDatetime: startIso,
+      endDatetime: endIso,
       location: {
         location: locationData.location || '',
         mapLocation: locationData.mapLocation || locationData.location || '',
@@ -263,7 +326,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
       tags: selectedTags,
       pricing: {
         type: pricingType,
-        priceRange: pricingType === 'paid' ? priceRange || `£${ticketRows[0]?.price || 0}` : 'Free',
+        priceRange: pricingType === 'paid' ? displayPriceRange(ticketRows, priceRange) : 'Free',
         ticketTypes,
       },
       enabled: finalEnabled,
@@ -665,6 +728,24 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                         placeholder="Perks, entrance window, or inclusions (optional)"
                         className="h-9 sm:h-8 rounded-xl text-xs bg-background w-full"
                       />
+
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs text-muted-foreground whitespace-nowrap">
+                          Max per order
+                        </Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          step="1"
+                          value={row.maxPerOrder ?? ''}
+                          onChange={(e) => {
+                            const v = parseInt(e.target.value, 10)
+                            updateTicketRow(idx, 'maxPerOrder', Number.isInteger(v) && v > 0 ? v : null)
+                          }}
+                          placeholder="No limit"
+                          className="h-9 sm:h-8 rounded-xl text-xs bg-background w-28"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>

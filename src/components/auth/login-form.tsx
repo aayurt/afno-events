@@ -5,7 +5,7 @@ import {
   createPayloadAuthClient,
   type PayloadAuthClient,
 } from '@delmaredigital/payload-better-auth/client'
-import { Apple, ArrowRight, Loader2, Monitor, Moon, Sun, Zap } from 'lucide-react'
+import { Apple, ArrowRight, Loader2, Moon, Sun, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -81,38 +81,32 @@ export type LoginViewProps = {
  * same `payload-theme` key + `data-theme` attribute both Payload admin
  * and the site ThemeProvider use, so all three stay in sync.
  */
-const loginThemeOrder = ['auto', 'light', 'dark'] as const
+const loginThemeOrder = ['light', 'dark'] as const
 type LoginThemePref = (typeof loginThemeOrder)[number]
 
 function applyLoginTheme(pref: LoginThemePref) {
   if (typeof window === 'undefined') return
-  if (pref === 'auto') {
-    window.localStorage.removeItem('payload-theme')
-    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
-  } else {
-    window.localStorage.setItem('payload-theme', pref)
-    document.documentElement.setAttribute('data-theme', pref)
-  }
+  window.localStorage.setItem('payload-theme', pref)
+  document.documentElement.setAttribute('data-theme', pref)
 }
 
 function LoginThemeToggle() {
-  const [pref, setPref] = useState<LoginThemePref>('auto')
+  const [pref, setPref] = useState<LoginThemePref>('light')
 
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem('payload-theme')
-      setPref(stored === 'light' || stored === 'dark' ? stored : 'auto')
+      setPref(stored === 'dark' ? 'dark' : 'light')
     } catch {}
   }, [])
 
   const cycle = () => {
-    const next = loginThemeOrder[(loginThemeOrder.indexOf(pref) + 1) % loginThemeOrder.length]
+    const next = loginThemeOrder[(loginThemeOrder.indexOf(pref) + 1) % loginThemeOrder.length] ?? 'light'
     applyLoginTheme(next)
     setPref(next)
   }
 
-  const Icon = pref === 'light' ? Sun : pref === 'dark' ? Moon : Monitor
+  const Icon = pref === 'light' ? Sun : Moon
 
   return (
     <button

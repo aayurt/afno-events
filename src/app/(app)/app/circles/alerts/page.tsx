@@ -101,15 +101,24 @@ export default function CircleAlertsPage() {
   const markAllRead = async () => {
     if (unreadCount === 0 || busy) return
     setBusy(true)
+    setError(null)
+    const previous = alerts
     setAlerts((prev) => prev.map((a) => ({ ...a, read: true })))
     try {
-      await fetch('/api/circle-alerts/mark-all-read', {
+      const res = await fetch('/api/circle-alerts/mark-all-read', {
         method: 'POST',
         credentials: 'include',
       })
-    } catch {
-      // Refresh on failure so the UI doesn't stay optimistically wrong.
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || `Request failed (${res.status})`)
+      }
+    } catch (err: any) {
+      // Roll back the optimistic update and surface the failure instead of
+      // silently showing stale read state.
+      setAlerts(previous)
       await load()
+      setError(`${t('loadFailedGeneric')}${err?.message ? `: ${err.message}` : ''}`)
     } finally {
       setBusy(false)
     }
