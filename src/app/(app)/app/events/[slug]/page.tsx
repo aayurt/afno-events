@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
-import { Calendar, MapPin, User, ArrowRight } from 'lucide-react'
+import { Calendar, MapPin, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Card, CardContent } from '@/components/ui/card'
@@ -11,6 +11,7 @@ import { ShareButtons } from './share-buttons'
 import { FavoriteButton } from './favorite-button'
 import { ShowcaseGallery } from './showcase-gallery'
 import { PhotoThumbs } from './photo-thumbs'
+import { OrganiserAvatar } from '@/components/ui/organiser-avatar'
 import { getEventStatus } from '@/components/events/event-status'
 import { EventStatusBadge } from '@/components/events/event-status-badge'
 import { AddToCalendarButton, CountdownChip } from './event-niceties'
@@ -92,7 +93,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="relative h-[380px] md:h-[480px] lg:h-[560px] bg-muted overflow-hidden">
+      <div className="relative h-[420px] md:h-[560px] lg:h-[640px] bg-muted overflow-hidden">
         {getCardImageUrl(e.coverImage) ? (
           <>
             {/* Ambient backdrop: the artwork itself, blurred and overscaled, so the band is never empty
@@ -113,11 +114,11 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             />
 
             {/* Tablet and up: show the whole poster, sized to the band, floating over the ambient wash. */}
-            <div className="hidden md:flex absolute inset-x-0 top-4 bottom-36 items-center justify-center px-6">
+            <div className="hidden md:flex absolute inset-x-0 top-4 bottom-36 items-center justify-center px-4">
               <img
                 src={getCardImageUrl(e.coverImage)!}
                 alt={e.title}
-                className="h-full w-auto max-w-[85%] object-contain rounded-2xl shadow-2xl ring-1 ring-border/40"
+                className="h-full w-auto max-w-[94%] object-contain rounded-2xl shadow-2xl ring-1 ring-border/40"
               />
             </div>
           </>
@@ -350,17 +351,12 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 {e.tenant.slug ? (
                   <Link href={`/app/organisers/${e.tenant.slug}`} className="group block">
                     <div className="flex items-center gap-4">
-                      {getCardImageUrl(e.tenant.organisationImage) ? (
-                        <img
-                          src={getCardImageUrl(e.tenant.organisationImage) as string}
-                          alt={e.tenant.name}
-                          className="w-16 h-16 rounded-xl object-cover"
-                        />
-                      ) : (
-                        <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
-                          <User size={24} className="text-muted-foreground" />
-                        </div>
-                      )}
+                      <OrganiserAvatar
+                        name={e.tenant.name}
+                        imageUrl={getCardImageUrl(e.tenant.organisationImage)}
+                        className="w-16 h-16 rounded-xl"
+                        textClassName="text-2xl"
+                      />
                       <div className="min-w-0">
                         <p className="font-semibold text-lg group-hover:text-primary transition-colors">
                           {e.tenant.name}

@@ -3,11 +3,12 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Calendar, Mail, MapPin, Phone, User } from 'lucide-react'
+import { ArrowLeft, Calendar, Mail, MapPin, Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { OrganiserAvatar } from '@/components/ui/organiser-avatar'
 import { formatEventDate } from '@/utilities/formatEventDate'
 import { getEventStatus } from '@/components/events/event-status'
 import { EventStatusBadge } from '@/components/events/event-status-badge'
@@ -67,16 +68,12 @@ export default async function OrganiserPage({ params: paramsPromise, searchParam
         <div className="relative h-32 sm:h-40 bg-gradient-to-br from-secondary/25 to-primary/10" />
         <CardContent className="p-6 sm:p-8 -mt-14 sm:-mt-16 relative">
           <div className="flex flex-col sm:flex-row sm:items-end gap-5">
-            {orgImage ? (
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden ring-4 ring-background bg-muted shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={orgImage} alt={tenant.name} className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-secondary/10 ring-4 ring-background flex items-center justify-center shrink-0">
-                <User size={44} className="text-secondary" />
-              </div>
-            )}
+            <OrganiserAvatar
+              name={tenant.name}
+              imageUrl={orgImage}
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden ring-4 ring-background"
+              textClassName="text-4xl sm:text-5xl"
+            />
             <div className="min-w-0 space-y-2">
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{tenant.name}</h1>
               <div className="flex items-center gap-4 flex-wrap text-sm text-muted-foreground">
