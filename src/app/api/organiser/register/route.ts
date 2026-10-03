@@ -133,6 +133,18 @@ export async function POST(req: NextRequest) {
     })
   } catch (err: any) {
     console.error('Organiser registration error:', err)
-    return NextResponse.json({ error: err.message || 'Registration failed' }, { status: 500 })
+    const msg = err.message || 'Registration failed'
+    // Trashed users keep their email reserved (unique constraint), so creating
+    // an account for a deleted email surfaces here instead of "already exists".
+    if (/duplicate|unique|constraint/i.test(msg)) {
+      return NextResponse.json(
+        {
+          error:
+            'An account with this email already exists (it may be a deleted account). Try signing in, or contact support to restore it.',
+        },
+        { status: 409 },
+      )
+    }
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

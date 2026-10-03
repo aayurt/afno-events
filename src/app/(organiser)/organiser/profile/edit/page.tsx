@@ -20,6 +20,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Trash2,
 } from 'lucide-react'
 import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
@@ -47,6 +48,9 @@ export default function OrganiserProfileEditPage() {
   const [description, setDescription] = useState('')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -137,6 +141,28 @@ export default function OrganiserProfileEditPage() {
       setError(err.message || 'Failed to update profile')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const removeTenant = async () => {
+    if (!tenant || deleting) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      const res = await fetch(`/api/organiser/tenant/${tenant.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to delete organisation')
+      }
+      router.push('/organiser/dashboard')
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to delete organisation')
+      setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -302,6 +328,60 @@ export default function OrganiserProfileEditPage() {
               </Button>
             </div>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Danger Zone */}
+      <Card className="border-destructive/40">
+        <CardContent className="p-6 space-y-3">
+          <div>
+            <h2 className="font-bold text-sm text-destructive">Delete organisation</h2>
+            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              Permanently removes “{tenant?.name}” and unlinks its members. Only possible when it
+              has no events left — delete or move them first.
+            </p>
+          </div>
+          {deleteError && (
+            <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl p-3">
+              <AlertCircle size={15} className="shrink-0 mt-0.5" />
+              <span>{deleteError}</span>
+            </div>
+          )}
+          {!confirmDelete ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
+              onClick={() => {
+                setDeleteError(null)
+                setConfirmDelete(true)
+              }}
+            >
+              <Trash2 size={15} /> Delete organisation…
+            </Button>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+              >
+                Keep it
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                className="flex-1 gap-2"
+                onClick={removeTenant}
+                disabled={deleting}
+              >
+                {deleting && <Loader2 size={15} className="animate-spin" />}
+                Yes, delete “{tenant?.name}”
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
       </div>

@@ -28,12 +28,22 @@ export default function OrganiserForgotPasswordPage() {
       })
 
       if (error) {
-        setError(error.message || 'Failed to send reset email')
+        const status = (error as { status?: number }).status
+        if (status === 429) {
+          setError('Too many attempts. Wait a few minutes and try again.')
+        } else if (status !== undefined && status >= 500) {
+          console.error('[organiser/forgot-password] reset request failed:', error)
+          setError('Something went wrong sending the email. Please try again in a moment.')
+        } else {
+          setError(error.message || 'Failed to send reset email')
+        }
       } else {
         setSuccess(true)
       }
     } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred')
+      // Network-level failure (server unreachable, offline, CORS, …)
+      console.error('[organiser/forgot-password] reset request threw:', err)
+      setError('Couldn’t reach the server. Check your connection and try again.')
     } finally {
       setLoading(false)
     }

@@ -46,7 +46,15 @@ function ResetPasswordFormContent() {
       })
 
       if (error) {
-        setError(error.message || 'Failed to reset password')
+        const status = (error as { status?: number }).status
+        if (status === 429) {
+          setError('Too many attempts. Wait a few minutes and try again.')
+        } else if (status !== undefined && status >= 500) {
+          console.error('[organiser/reset-password] reset failed:', error)
+          setError('Something went wrong. Please request a new link and try again.')
+        } else {
+          setError(error.message || 'Failed to reset password')
+        }
       } else {
         setSuccess(true)
         setTimeout(() => {
@@ -54,7 +62,8 @@ function ResetPasswordFormContent() {
         }, 3000)
       }
     } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred')
+      console.error('[organiser/reset-password] reset threw:', err)
+      setError('Couldn’t reach the server. Check your connection and try again.')
     } finally {
       setLoading(false)
     }

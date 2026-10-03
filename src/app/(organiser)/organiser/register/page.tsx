@@ -47,8 +47,17 @@ export default function OrganiserRegisterPage() {
 
       if ((signUpRes as any)?.error) {
         const msg = (signUpRes as any).error?.message || ''
-        if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('exist')) {
+        const lower = msg.toLowerCase()
+        if (lower.includes('already') || lower.includes('exist')) {
           throw new Error('An account with this email already exists. Please sign in.')
+        }
+        // Trashed accounts keep their email reserved at the database level, so
+        // re-registering a deleted email fails here with a unique-constraint
+        // error instead of "already exists".
+        if (lower.includes('duplicate') || lower.includes('unique') || lower.includes('constraint')) {
+          throw new Error(
+            'An account with this email already exists (it may be a deleted account). Try signing in, or contact support to restore it.',
+          )
         }
         throw new Error(msg || 'Failed to create account')
       }

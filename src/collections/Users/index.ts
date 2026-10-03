@@ -53,6 +53,8 @@ export const Users: CollectionConfig = {
   },
   admin: {
     group: 'Users',
+    description:
+      'Deleting a user moves them to Trash — use the Trash filter to restore or permanently delete. Trashed emails stay reserved: re-registering the same email fails until the trashed account is permanently deleted.',
     hidden: ({ user }) => {
       if (!user) return true
       if (user.role === 'super-admin') return false
