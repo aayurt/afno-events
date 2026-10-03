@@ -175,18 +175,44 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const [error, setError] = useState<string | null>(null)
 
   // Keep in sync with /api/organiser/media (server enforces the same caps).
-  const MAX_IMAGE_BYTES = 25 * 1024 * 1024
   const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
-  const validateImageFile = (file: File): string | null => {
-    if (file.size > MAX_IMAGE_BYTES) {
-      const mb = (file.size / (1024 * 1024)).toFixed(1)
-      return `"${file.name}" is ${mb}MB — images must be under 25MB.`
+  // Downscale huge phone photos in-browser so uploads stay fast and never
+  // hit the 25MB server cap (413). Skips GIFs (would lose animation) and
+  // already-small files; falls back to the original on any failure.
+  const COMPRESS_MAX_DIM = 2048
+  const COMPRESS_MIN_BYTES = 4 * 1024 * 1024
+
+  const compressImageIfNeeded = async (file: File): Promise<File> => {
+    try {
+      if (file.type === 'image/gif') return file
+      if (file.size < COMPRESS_MIN_BYTES) return file
+      const bitmap = await createImageBitmap(file)
+      const longest = Math.max(bitmap.width, bitmap.height)
+      if (longest <= COMPRESS_MAX_DIM) {
+        bitmap.close()
+        return file
+      }
+      const scale = COMPRESS_MAX_DIM / longest
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(bitmap.width * scale)
+      canvas.height = Math.round(bitmap.height * scale)
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        bitmap.close()
+        return file
+      }
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+      bitmap.close()
+      const blob: Blob | null = await new Promise((resolve) =>
+        canvas.toBlob(resolve, 'image/jpeg', 0.85),
+      )
+      if (!blob) return file
+      const name = file.name.replace(/\.[^.]+$/, '') + '.jpg'
+      return new File([blob], name, { type: 'image/jpeg' })
+    } catch {
+      return file
     }
-    if (file.type && !ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-      return `"${file.name}" is not a supported image (use JPG, PNG, WebP or GIF).`
-    }
-    return null
   }
 
   const handleTagToggle = (tagValue: string) => {
@@ -216,9 +242,10 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     const file = e.target.files?.[0]
     if (!file) return
 
-    const validationError = validateImageFile(file)
-    if (validationError) {
-      setError(validationError)
+    // Type-check the original (HEIC etc. rejected even though the picker
+    // filters), then compress oversized photos before uploading.
+    if (file.type && !ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setError(`"${file.name}" is not a supported image (use JPG, PNG, WebP or GIF).`)
       e.target.value = ''
       return
     }
@@ -226,7 +253,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     setIsUploading(true)
     setError(null)
     const fd = new FormData()
-    fd.append('file', file)
+    fd.append('file', await compressImageIfNeeded(file))
 
     try {
       const res = await fetch('/api/organiser/media', {
@@ -252,12 +279,12 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     const files = e.target.files
     if (!files || files.length === 0) return
 
-    // Validate everything up front: reject oversized/unsupported files with a
-    // clear message instead of failing mid-batch after some already uploaded.
+    // Type-check everything up front (clear message instead of failing
+    // mid-batch), then compress oversized photos before uploading.
     const picked = Array.from(files)
-    const problems = picked.map(validateImageFile).filter((m): m is string => !!m)
-    if (problems.length > 0) {
-      setError(problems.join(' '))
+    const badType = picked.find((f) => f.type && !ACCEPTED_IMAGE_TYPES.includes(f.type))
+    if (badType) {
+      setError(`"${badType.name}" is not a supported image (use JPG, PNG, WebP or GIF).`)
       e.target.value = ''
       return
     }
@@ -269,7 +296,8 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     const uploadedUrls: string[] = []
 
     try {
-      for (const file of picked) {
+      for (const original of picked) {
+        const file = await compressImageIfNeeded(original)
         const fd = new FormData()
         fd.append('file', file)
 
