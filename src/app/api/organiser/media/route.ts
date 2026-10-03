@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ id: doc.id, url: doc.url })
   } catch (err: any) {
+    // Temporary debug: tenant validation failures need the full picture.
+    console.error(
+      `[organiser/media] upload failed for user ${user?.id} (${user?.email}) tenantIds=${JSON.stringify(tenantIds)} file=${file.name} ${file.size}B:`,
+      err,
+    )
     return NextResponse.json({ error: err.message || 'Upload failed' }, { status: 500 })
   }
 }

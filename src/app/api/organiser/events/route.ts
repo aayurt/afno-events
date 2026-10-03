@@ -89,9 +89,16 @@ export async function POST(req: NextRequest) {
       enabled: finalEnabled,
       isBookable: body.isBookable !== undefined ? !!body.isBookable : true,
       approvalStatus: finalApprovalStatus,
-      tenant: assignedTenant,
+      tenant: typeof assignedTenant === 'string' && /^\d+$/.test(assignedTenant) ? parseInt(assignedTenant, 10) : assignedTenant,
     },
     overrideAccess: true,
+  }).catch((err: any) => {
+    // Temporary debug for tenant validation failures.
+    console.error(
+      `[organiser/events] create failed for user ${user?.id} (${user?.email}) tenantIds=${JSON.stringify(tenantIds)} assignedTenant=${JSON.stringify(assignedTenant)}:`,
+      err,
+    )
+    throw err
   })
 
   // If submitted for review by an unverified organiser, send review email alerts to admins & confirmation to organiser
