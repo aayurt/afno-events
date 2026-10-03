@@ -45,6 +45,15 @@ export async function POST(req: NextRequest) {
   const tenantIds = getUserTenantIDs(user)
   const tenantId = tenantIds.length > 0 ? tenantIds[0] : null
 
+  // Media requires a tenant (multi-tenant plugin validation) — fail with a
+  // clear message instead of a cryptic "invalid: Assigned Tenant" 500.
+  if (!tenantId) {
+    return NextResponse.json(
+      { error: 'No organisation is linked to this account. Ask an administrator to assign you to an organisation, then try again.' },
+      { status: 403 },
+    )
+  }
+
   try {
     const buffer = Buffer.from(await file.arrayBuffer())
     const doc = await payload.create({
