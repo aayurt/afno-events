@@ -174,6 +174,21 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Keep in sync with /api/organiser/media (server enforces the same caps).
+  const MAX_IMAGE_BYTES = 25 * 1024 * 1024
+  const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+
+  const validateImageFile = (file: File): string | null => {
+    if (file.size > MAX_IMAGE_BYTES) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1)
+      return `"${file.name}" is ${mb}MB — images must be under 25MB.`
+    }
+    if (file.type && !ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      return `"${file.name}" is not a supported image (use JPG, PNG, WebP or GIF).`
+    }
+    return null
+  }
+
   const handleTagToggle = (tagValue: string) => {
     setSelectedTags((prev) =>
       prev.includes(tagValue) ? prev.filter((t) => t !== tagValue) : [...prev, tagValue]
@@ -200,6 +215,13 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+
+    const validationError = validateImageFile(file)
+    if (validationError) {
+      setError(validationError)
+      e.target.value = ''
+      return
+    }
 
     setIsUploading(true)
     setError(null)
@@ -230,6 +252,16 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     const files = e.target.files
     if (!files || files.length === 0) return
 
+    // Validate everything up front: reject oversized/unsupported files with a
+    // clear message instead of failing mid-batch after some already uploaded.
+    const picked = Array.from(files)
+    const problems = picked.map(validateImageFile).filter((m): m is string => !!m)
+    if (problems.length > 0) {
+      setError(problems.join(' '))
+      e.target.value = ''
+      return
+    }
+
     setIsGalleryUploading(true)
     setError(null)
 
@@ -237,7 +269,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     const uploadedUrls: string[] = []
 
     try {
-      for (const file of Array.from(files)) {
+      for (const file of picked) {
         const fd = new FormData()
         fd.append('file', file)
 
@@ -420,7 +452,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   <span>{coverImageUrl ? 'Change Poster' : 'Choose File'}</span>
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
                     onChange={handleImageUpload}
                     disabled={isUploading}
                     className="hidden"
@@ -470,7 +502,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
               <span>Add Images</span>
               <input
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp,image/gif"
                 multiple
                 onChange={handleGalleryUpload}
                 disabled={isGalleryUploading}

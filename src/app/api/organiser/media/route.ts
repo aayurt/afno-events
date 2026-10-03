@@ -28,7 +28,18 @@ export async function POST(req: NextRequest) {
 
   const MAX_SIZE = 25 * 1024 * 1024
   if (file.size > MAX_SIZE) {
-    return NextResponse.json({ error: 'File too large (max 25MB)' }, { status: 413 })
+    return NextResponse.json(
+      { error: `Image is ${(file.size / (1024 * 1024)).toFixed(1)}MB — maximum is 25MB.` },
+      { status: 413 },
+    )
+  }
+
+  const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+  if (file.type && !ACCEPTED_TYPES.includes(file.type)) {
+    return NextResponse.json(
+      { error: 'Unsupported image type. Please upload JPG, PNG, WebP or GIF.' },
+      { status: 415 },
+    )
   }
 
   const tenantIds = getUserTenantIDs(user)
