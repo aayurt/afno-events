@@ -177,8 +177,9 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
 
   // Organisation context: regular organisers file under their own tenant
   // (server default); super-admins pick any organisation explicitly.
+  const initialTenant = initial?.tenant ?? null
   const initialTenantId =
-    typeof initial?.tenant === 'object' ? initial.tenant.id : (initial?.tenant ?? null)
+    initialTenant && typeof initialTenant === 'object' ? initialTenant.id : initialTenant
   const [myTenants, setMyTenants] = useState<{ id: number; name: string }[]>([])
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [selectedTenantId, setSelectedTenantId] = useState<number | null>(initialTenantId)
