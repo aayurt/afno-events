@@ -11,6 +11,7 @@ import { ShareButtons } from './share-buttons'
 import { FavoriteButton } from './favorite-button'
 import { ShowcaseGallery } from './showcase-gallery'
 import { PhotoThumbs } from './photo-thumbs'
+import { EventCoverImage } from './event-cover'
 import { OrganiserAvatar } from '@/components/ui/organiser-avatar'
 import { getEventStatus } from '@/components/events/event-status'
 import { EventStatusBadge } from '@/components/events/event-status-badge'
@@ -107,18 +108,20 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             <div className="absolute inset-0 bg-background/30" />
 
             {/* Phones: poster fills the band (its own aspect is close to a phone screen). */}
-            <img
+            <EventCoverImage
               src={getCardImageUrl(e.coverImage)!}
               alt={e.title}
-              className="absolute inset-0 w-full h-full object-cover md:hidden"
+              className="absolute inset-0 w-full h-full md:hidden block"
+              imgClassName="w-full h-full object-cover"
             />
 
             {/* Tablet and up: show the whole poster, sized to the band, floating over the ambient wash. */}
             <div className="hidden md:flex absolute inset-x-0 top-4 bottom-36 items-center justify-center px-4">
-              <img
+              <EventCoverImage
                 src={getCardImageUrl(e.coverImage)!}
                 alt={e.title}
-                className="h-full w-auto max-w-[94%] object-contain rounded-2xl shadow-2xl ring-1 ring-border/40"
+                className="h-full block"
+                imgClassName="h-full w-auto max-w-[94%] object-contain rounded-2xl shadow-2xl ring-1 ring-border/40"
               />
             </div>
           </>
