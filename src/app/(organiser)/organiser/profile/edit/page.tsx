@@ -21,6 +21,7 @@ import {
   Phone,
   MapPin,
 } from 'lucide-react'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 export default function OrganiserProfileEditPage() {
   const router = useRouter()
@@ -168,7 +169,9 @@ export default function OrganiserProfileEditPage() {
   const isVerified = tenant.verified === true || tenant.status === 'verified'
 
   return (
-    <div className="container py-8 max-w-2xl space-y-6">
+    <>
+      <OrganiserHeader title="Profile" />
+      <div className="container py-8 max-w-2xl space-y-6">
       <Link href="/organiser/dashboard">
         <Button variant="ghost" size="sm" className="gap-1.5">
           <ArrowLeft size={16} /> Back to Dashboard
@@ -301,6 +304,7 @@ export default function OrganiserProfileEditPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </>
   )
 }

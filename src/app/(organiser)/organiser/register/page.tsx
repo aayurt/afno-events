@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AlertCircle, ArrowRight, Building2, CheckCircle2, Loader2, Sparkles } from 'lucide-react'
 import { PasswordInput } from '@/components/ui/password-input'
 import { cn } from '@/utilities/ui'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 export default function OrganiserRegisterPage() {
   const router = useRouter()
@@ -80,7 +81,9 @@ export default function OrganiserRegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-10 sm:py-16">
+    <>
+      <OrganiserHeader title="Register" />
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-10 sm:py-16">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2.5">
           <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -245,6 +248,7 @@ export default function OrganiserRegisterPage() {
           </Link>
         </p>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

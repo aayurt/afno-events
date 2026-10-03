@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 import { useScopedI18n } from '@/locales/client'
 
 function ThemeSwitcherTrigger() {
@@ -154,6 +155,7 @@ export default function OrganiserDashboard() {
   if (boot === 'loading') {
     return (
       <div className="min-h-screen bg-background text-foreground flex flex-col items-center pb-24 sm:pb-12 select-none">
+        <OrganiserHeader />
         <div className="w-full max-w-md sm:max-w-4xl lg:max-w-5xl px-4 sm:px-6 py-4 sm:py-8 flex flex-col flex-1 relative">
           {/* Header Skeleton */}
           <header className="mb-6 flex items-center justify-between gap-4">
@@ -257,6 +259,7 @@ export default function OrganiserDashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center pb-24 sm:pb-12 select-none">
+      <OrganiserHeader />
       <div className="w-full max-w-md sm:max-w-4xl lg:max-w-5xl px-4 sm:px-6 py-4 sm:py-8 flex flex-col flex-1 relative">
 
         {/* Responsive Top Header */}

@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, ArrowRight, Building2, Loader2 } from 'lucide-react'
 import { PasswordInput } from '@/components/ui/password-input'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 /**
  * Dedicated organiser login. Fans use /app/auth/login; organisers land here.
@@ -98,7 +99,9 @@ export default function OrganiserLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12">
+    <>
+      <OrganiserHeader title="Sign in" />
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-3">
           <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -136,7 +139,15 @@ export default function OrganiserLoginPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="/organiser/forgot-password"
+                      className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
                   <PasswordInput
                     id="password"
                     autoComplete="current-password"
@@ -194,6 +205,7 @@ export default function OrganiserLoginPage() {
           </p>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

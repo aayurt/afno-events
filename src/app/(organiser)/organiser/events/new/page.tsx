@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { EventForm } from '@/components/organiser/EventForm'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 export default function NewEventPage() {
   const router = useRouter()
@@ -39,7 +40,9 @@ export default function NewEventPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
+    <>
+      <OrganiserHeader title="New Event" />
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
       <div>
         <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors">
           <ArrowLeft size={14} /> Back to Dashboard
@@ -49,6 +52,7 @@ export default function NewEventPage() {
       </div>
 
       <EventForm onSubmit={handleCreate} submitLabel="Create Event" isTenantVerified={isTenantVerified} />
-    </div>
+      </div>
+    </>
   )
 }

@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 type Attendee = {
   id: number
@@ -157,7 +158,9 @@ export default function AttendeesPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 space-y-8">
+    <>
+      <OrganiserHeader title="Attendees" />
+      <div className="mx-auto max-w-5xl px-4 py-10 space-y-8">
       <div>
         <Link
           href="/organiser/dashboard"
@@ -270,6 +273,7 @@ export default function AttendeesPage() {
           </table>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

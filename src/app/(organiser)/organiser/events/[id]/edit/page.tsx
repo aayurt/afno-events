@@ -7,6 +7,7 @@ import { ArrowLeft, ExternalLink, Loader2, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EventForm, EventFormData } from '@/components/organiser/EventForm'
+import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 export default function EditEventPage() {
   const params = useParams()
@@ -143,7 +144,9 @@ export default function EditEventPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
+    <>
+      <OrganiserHeader title="Edit Event" />
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors">
@@ -172,6 +175,7 @@ export default function EditEventPage() {
         submitLabel="Save Changes"
         isTenantVerified={isTenantVerified}
       />
-    </div>
+      </div>
+    </>
   )
 }
