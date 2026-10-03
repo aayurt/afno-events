@@ -74,23 +74,26 @@ ssh "$SERVER" bash -s <<'EOF'
   ln -sfn /var/www/vhosts/afnoevents.co.uk/public/media /Users/aayurtshrestha/projects/self/AfnoEvent/server/public/media
 
   echo "📦 Ensuring VPS Linux sharp in standalone..."
+  # NOTE: server node_modules is pnpm symlinks — plain `cp -r` produces a
+  # dangling link and `cp -rL` orphans sharp from its .pnpm-store deps
+  # (semver, ...). Symlink instead so resolution flows through the real tree.
   mkdir -p .next/standalone/node_modules
   rm -rf .next/standalone/node_modules/sharp .next/standalone/node_modules/@img
   if [ -d node_modules/sharp ]; then
-    cp -r node_modules/sharp .next/standalone/node_modules/
+    ln -sfn /var/www/vhosts/afnoevents.co.uk/node_modules/sharp .next/standalone/node_modules/sharp
   fi
   if [ -d node_modules/@img ]; then
-    cp -r node_modules/@img .next/standalone/node_modules/
+    ln -sfn /var/www/vhosts/afnoevents.co.uk/node_modules/@img .next/standalone/node_modules/@img
   fi
 
   echo "🧪 Verifying sharp loads in standalone..."
   node -e "
     try {
-      const s = require('./.next/standalone/node_modules/sharp');
+      const s = require('/var/www/vhosts/afnoevents.co.uk/.next/standalone/node_modules/sharp');
       console.log('✅ Sharp verified in standalone:', s.versions.sharp);
     } catch(e) {
       console.warn('Fallback test with root sharp:', e.message);
-      const s = require('sharp');
+      const s = require('/var/www/vhosts/afnoevents.co.uk/node_modules/sharp');
       console.log('✅ Sharp verified from root:', s.versions.sharp);
     }
   "
