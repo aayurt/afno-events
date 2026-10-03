@@ -43,7 +43,22 @@ export async function POST(req: NextRequest) {
   }
 
   const tenantIds = getUserTenantIDs(user)
-  const tenantId = tenantIds.length > 0 ? tenantIds[0] : null
+  let tenantId = tenantIds.length > 0 ? tenantIds[0] : null
+
+  // Super-admins may file media under any organisation via an explicit
+  // tenantId (organiser portal picker). Members are confined to their own.
+  const requestedTenant = formData.get('tenantId')
+  if (requestedTenant !== null && requestedTenant !== '') {
+    const tid = Number(requestedTenant)
+    if (!Number.isInteger(tid)) {
+      return NextResponse.json({ error: 'Invalid organisation selected' }, { status: 400 })
+    }
+    const isSuperAdmin = user.role === 'super-admin'
+    if (!isSuperAdmin && !tenantIds.includes(tid)) {
+      return NextResponse.json({ error: 'Unauthorized tenant selection' }, { status: 403 })
+    }
+    tenantId = tid
+  }
 
   // Media requires a tenant (multi-tenant plugin validation) — fail with a
   // clear message instead of a cryptic "invalid: Assigned Tenant" 500.

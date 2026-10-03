@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { TAG_OPTIONS } from '@/config/tags'
 import { Button } from '@/components/ui/button'
@@ -62,6 +62,7 @@ export type EventFormData = {
   isBookable?: boolean
   publish?: boolean
   timezone?: string
+  tenant?: number | { id: number; name?: string | null } | null
 }
 
 type Props = {
@@ -174,6 +175,40 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Organisation context: regular organisers file under their own tenant
+  // (server default); super-admins pick any organisation explicitly.
+  const initialTenantId =
+    typeof initial?.tenant === 'object' ? initial.tenant.id : (initial?.tenant ?? null)
+  const [myTenants, setMyTenants] = useState<{ id: number; name: string }[]>([])
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false)
+  const [selectedTenantId, setSelectedTenantId] = useState<number | null>(initialTenantId)
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/organiser/me', { credentials: 'include' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active || !data) return
+        setIsSuperAdmin(data.user?.role === 'super-admin')
+        const list = Array.isArray(data.tenants) ? data.tenants : []
+        setMyTenants(list)
+        // Default the picker when creating (edit keeps the event's tenant).
+        if (!initial?.id && selectedTenantId == null && list.length > 0) {
+          setSelectedTenantId(list[0].id)
+        }
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const showTenantPicker = isSuperAdmin && !initial?.id && myTenants.length > 0
+  // Uploads ride on the explicitly chosen tenant (create) or the event's own
+  // tenant (edit) so files never land tenant-less.
+  const uploadTenantId = !initial?.id ? selectedTenantId : initialTenantId
+
   // Keep in sync with /api/organiser/media (server enforces the same caps).
   const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
@@ -253,7 +288,9 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     setIsUploading(true)
     setError(null)
     const fd = new FormData()
-    fd.append('file', await compressImageIfNeeded(file))
+    const coverFile = await compressImageIfNeeded(file)
+    fd.append('file', coverFile)
+    if (uploadTenantId) fd.append('tenantId', String(uploadTenantId))
 
     try {
       const res = await fetch('/api/organiser/media', {
@@ -300,6 +337,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         const file = await compressImageIfNeeded(original)
         const fd = new FormData()
         fd.append('file', file)
+        if (uploadTenantId) fd.append('tenantId', String(uploadTenantId))
 
         const res = await fetch('/api/organiser/media', {
           method: 'POST',
@@ -340,6 +378,10 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
     if (e) e.preventDefault()
     if (!title.trim()) {
       setError('Please enter an event title.')
+      return
+    }
+    if (showTenantPicker && !selectedTenantId) {
+      setError('Please select an organisation for this event.')
       return
     }
 
@@ -393,6 +435,8 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
       isBookable: finalBookable,
       publish: finalEnabled,
       timezone,
+      // Super-admin filing under a chosen organisation (create only).
+      ...(!initial?.id && selectedTenantId ? { tenantId: selectedTenantId } : {}),
     }
 
     try {
@@ -409,6 +453,36 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         <div className="p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-semibold">
           {error}
         </div>
+      )}
+
+      {/* Organisation (super-admin filing anywhere) */}
+      {showTenantPicker && (
+        <Card className="rounded-2xl border-primary/30 bg-primary/[0.03]">
+          <CardContent className="p-4 sm:p-6 space-y-2">
+            <Label htmlFor="eventTenant" className="text-xs font-semibold">
+              Organisation <span className="text-destructive">*</span>
+            </Label>
+            <select
+              id="eventTenant"
+              value={selectedTenantId ?? ''}
+              onChange={(e) => setSelectedTenantId(e.target.value ? Number(e.target.value) : null)}
+              className="h-11 rounded-xl border border-border bg-background px-3 text-sm w-full"
+              required
+            >
+              <option value="" disabled>
+                Select organisation…
+              </option>
+              {myTenants.map((tn) => (
+                <option key={tn.id} value={tn.id}>
+                  {tn.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">
+              As a super-admin you can file this event and its images under any organisation.
+            </p>
+          </CardContent>
+        </Card>
       )}
 
       {/* 1. Basic Info */}

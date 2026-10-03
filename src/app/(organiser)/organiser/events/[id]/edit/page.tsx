@@ -60,6 +60,7 @@ export default function EditEventPage() {
           enabled: data.enabled ?? true,
           isBookable: data.isBookable ?? true,
           publish: data.enabled ?? true,
+          tenant: data.tenant ?? null,
         })
       } catch (err: any) {
         if (active) setError(err.message || 'Failed to load event')

@@ -37,12 +37,16 @@ export async function GET(req: NextRequest) {
   const tenantIds = getUserTenantIDs(user)
   let tenants: { id: number; name: string; slug: string }[] = []
 
-  if (tenantIds.length > 0) {
+  // Super-admins act across every organisation: no memberships means the
+  // full tenant list (powers the organisation picker in the portal).
+  const listAll = role === 'super-admin' && tenantIds.length === 0
+  if (listAll || tenantIds.length > 0) {
     const result = await payload.find({
       collection: 'tenants',
-      where: { id: { in: tenantIds } },
+      where: listAll ? {} : { id: { in: tenantIds } },
       depth: 0,
-      limit: 20,
+      limit: listAll ? 100 : 20,
+      sort: 'name',
       overrideAccess: true,
     })
     tenants = result.docs.map((t: any) => ({
