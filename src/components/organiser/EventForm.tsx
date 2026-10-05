@@ -34,6 +34,7 @@ type TicketTier = {
   description?: string | null
   stripePriceID?: string | null
   maxPerOrder?: number | null
+  totalStock?: number | null
 }
 
 export type EventFormData = {
@@ -165,6 +166,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           description: t.description || '',
           stripePriceID: t.stripePriceID || null,
           maxPerOrder: (t as any).maxPerOrder ?? null,
+          totalStock: (t as any).totalStock ?? null,
         }))
       : [{ name: 'General Admission', price: 15, description: 'Standard event entry' }]
   )
@@ -400,6 +402,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
             description: r.description || '',
             stripePriceID: r.stripePriceID || null,
             maxPerOrder: r.maxPerOrder ? Number(r.maxPerOrder) || null : null,
+            totalStock: r.totalStock ? Number(r.totalStock) || null : null,
           }))
         : [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
 
@@ -864,7 +867,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                         className="h-9 sm:h-8 rounded-xl text-xs bg-background w-full"
                       />
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <Label className="text-xs text-muted-foreground whitespace-nowrap">
                           Max per order
                         </Label>
@@ -878,6 +881,21 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                             updateTicketRow(idx, 'maxPerOrder', Number.isInteger(v) && v > 0 ? v : null)
                           }}
                           placeholder="No limit"
+                          className="h-9 sm:h-8 rounded-xl text-xs bg-background w-28"
+                        />
+                        <Label className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+                          Total stock
+                        </Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          step="1"
+                          value={row.totalStock ?? ''}
+                          onChange={(e) => {
+                            const v = parseInt(e.target.value, 10)
+                            updateTicketRow(idx, 'totalStock', Number.isInteger(v) && v > 0 ? v : null)
+                          }}
+                          placeholder="Unlimited"
                           className="h-9 sm:h-8 rounded-xl text-xs bg-background w-28"
                         />
                       </div>

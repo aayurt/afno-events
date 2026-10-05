@@ -950,6 +950,10 @@ export interface Event {
            * Max tickets of this type per order. Leave blank for no limit.
            */
           maxPerOrder?: number | null;
+          /**
+           * Total tickets of this type that can ever be sold. Sales stop at 0 remaining. Leave blank for unlimited.
+           */
+          totalStock?: number | null;
           stripePriceID?: string | null;
           id?: string | null;
         }[]
@@ -1934,6 +1938,7 @@ export interface EventsSelect<T extends boolean = true> {
               price?: T;
               description?: T;
               maxPerOrder?: T;
+              totalStock?: T;
               stripePriceID?: T;
               id?: T;
             };

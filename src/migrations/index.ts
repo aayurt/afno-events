@@ -4,6 +4,7 @@ import * as migration_20260725_123516 from './20260725_123516';
 import * as migration_20260915_add_subscribers from './20260915_add_subscribers';
 import * as migration_20260921_model3_organiser_approval from './20260921_model3_organiser_approval';
 import * as migration_20261003_ticket_max_per_order from './20261003_ticket_max_per_order';
+import * as migration_20261003_ticket_total_stock from './20261003_ticket_total_stock';
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261003_ticket_max_per_order.up,
     down: migration_20261003_ticket_max_per_order.down,
     name: '20261003_ticket_max_per_order'
+  },
+  {
+    up: migration_20261003_ticket_total_stock.up,
+    down: migration_20261003_ticket_total_stock.down,
+    name: '20261003_ticket_total_stock'
   },
 ];

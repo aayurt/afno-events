@@ -19,6 +19,7 @@ import { AddToCalendarButton, CountdownChip } from './event-niceties'
 import { RemindMeButton } from './remind-me'
 import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { getEventTierAvailability } from '@/utilities/ticketAvailability'
 import { formatEventDateLong, formatEventTime } from '@/utilities/formatEventDate'
 
 type Args = {
@@ -443,7 +444,10 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                     </p>
                   </div>
 
-                  <TicketPurchase event={e} />
+                  <TicketPurchase
+                    event={e}
+                    availability={await getEventTierAvailability(payload, e.id).catch(() => [])}
+                  />
                 </CardContent>
               </Card>
             </div>

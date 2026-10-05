@@ -5,6 +5,10 @@ import crypto from 'crypto'
 import { getStripe } from '@/utilities/stripe'
 import { getServerSideURL } from '@/utilities/getURL'
 import { markOrderRefunded } from '@/utilities/stripeWebhooks'
+import {
+  getEventTierAvailability,
+  validateOrderStock,
+} from '@/utilities/ticketAvailability'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -37,26 +41,43 @@ export const Orders: CollectionConfig = {
       },
     ],
     beforeChange: [
-      async ({ data, req }) => {
-        // Enforce organiser quantity limits: no line item may exceed its
-        // tier's maxPerOrder (client clamps too — this stops direct API abuse).
+      async ({ data, req, originalDoc, operation }) => {
+        // Enforce organiser limits: per-order caps AND total tier stock
+        // (client clamps too — this stops direct API abuse and oversells).
         const items = (data as any)?.items
         const eventRef = (data as any)?.event
         if (Array.isArray(items) && items.length > 0 && eventRef != null) {
           const eventId = typeof eventRef === 'object' ? eventRef.id : eventRef
-          const event = await req.payload
-            .findByID({ collection: 'events', id: eventId, depth: 0, overrideAccess: true })
-            .catch(() => null)
-          const tiers = ((event as any)?.pricing?.ticketTypes || []) as any[]
-          for (const item of items) {
-            const tier = tiers.find((t) => t.name === item.ticketType)
-            const max = tier?.maxPerOrder
-            if (max != null && Number(max) > 0 && Number(item.quantity) > Number(max)) {
-              throw new Error(
-                `Only ${max} × "${item.ticketType}" allowed per order.`,
-              )
+          const availability = await getEventTierAvailability(req.payload, eventId).catch(
+            () => [],
+          )
+          const tiers = availability.map((a) => ({
+            name: a.name,
+            maxPerOrder: a.maxPerOrder,
+            totalStock: a.totalStock,
+          }))
+          const soldByTier: Record<string, number> = {}
+          for (const a of availability) soldByTier[a.name] = a.sold
+          // On update the hook sees the merged doc (items always present, id
+          // is not) — use originalDoc for identity. Exclude this order's own
+          // previous quantities so edits don't count stock twice, and skip
+          // entirely when items are untouched (status-only updates like
+          // pending → paid must never strand a paying customer — this also
+          // covers the afterChange ticket-attach update).
+          if (operation === 'update') {
+            const prevItems = ((originalDoc as any)?.items || []) as any[]
+            if (JSON.stringify(prevItems) === JSON.stringify(items)) return data
+            for (const prev of prevItems) {
+              if (typeof prev?.ticketType === 'string') {
+                soldByTier[prev.ticketType] = Math.max(
+                  0,
+                  (soldByTier[prev.ticketType] ?? 0) - Math.max(0, Number(prev.quantity) || 0),
+                )
+              }
             }
           }
+          const violation = validateOrderStock(tiers, items, soldByTier)
+          if (violation) throw new Error(violation)
         }
         return data
       },

@@ -435,6 +435,16 @@ export const Events: CollectionConfig = {
               },
             },
             {
+              name: 'totalStock',
+              type: 'number',
+              min: 1,
+              admin: {
+                placeholder: 'e.g. 50 (blank = unlimited)',
+                description:
+                  'Total tickets of this type that can ever be sold. Sales stop at 0 remaining. Leave blank for unlimited.',
+              },
+            },
+            {
               name: 'stripePriceID',
               type: 'text',
               admin: {

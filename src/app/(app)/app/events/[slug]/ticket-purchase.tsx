@@ -13,17 +13,48 @@ type TicketType = {
   description?: string | null
   stripePriceID?: string | null
   maxPerOrder?: number | null
+  totalStock?: number | null
   id?: string | null
 }
 
-export function TicketPurchase({ event }: { event: any }) {
+export type TierAvailabilityInfo = {
+  name: string
+  /** null = unlimited */
+  remaining: number | null
+}
+
+export function TicketPurchase({
+  event,
+  availability,
+}: {
+  event: any
+  availability?: TierAvailabilityInfo[]
+}) {
   const t = useScopedI18n('eventDetail')
   const router = useRouter()
   const ticketTypes: TicketType[] = event.pricing?.ticketTypes || []
-  // Default to 1 of the first tier so fans can buy in one tap.
-  const [quantities, setQuantities] = useState<Record<string, number>>(() =>
-    ticketTypes.length > 0 && ticketTypes[0]?.name ? { [ticketTypes[0].name]: 1 } : {},
-  )
+
+  const remainingFor = (name: string): number | null => {
+    const found = (availability || []).find((a) => a.name === name)
+    // No availability info (older callers): fall back to the tier's own
+    // stock as unlimited — enforcement still happens server-side.
+    return found ? found.remaining : null
+  }
+  const effectiveMax = (tt: TicketType): number | null => {
+    const perOrder = tt.maxPerOrder && tt.maxPerOrder > 0 ? tt.maxPerOrder : null
+    const remaining = remainingFor(tt.name)
+    if (perOrder !== null && remaining !== null) return Math.min(perOrder, remaining)
+    return perOrder ?? remaining
+  }
+
+  // Default to 1 of the first tier that still has stock.
+  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
+    const first = ticketTypes.find((tt) => {
+      const r = remainingFor(tt.name)
+      return r === null || r > 0
+    })
+    return first?.name ? { [first.name]: 1 } : {}
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -38,7 +69,7 @@ export function TicketPurchase({ event }: { event: any }) {
 
   const updateQuantity = (name: string, delta: number) => {
     const tier = ticketTypes.find((tt) => tt.name === name)
-    const max = tier?.maxPerOrder && tier.maxPerOrder > 0 ? tier.maxPerOrder : null
+    const max = tier ? effectiveMax(tier) : null
     setQuantities((prev) => {
       const current = prev[name] || 0
       let next = Math.max(0, current + delta)
@@ -46,6 +77,10 @@ export function TicketPurchase({ event }: { event: any }) {
       return { ...prev, [name]: next }
     })
   }
+
+  const allSoldOut =
+    ticketTypes.length > 0 &&
+    ticketTypes.every((tt) => remainingFor(tt.name) === 0)
 
   const handlePurchase = async () => {
     setLoading(true)
@@ -136,21 +171,40 @@ export function TicketPurchase({ event }: { event: any }) {
         </Button>
       ) : ticketTypes.length > 0 ? (
         <>
+          {allSoldOut && (
+            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-center">
+              <p className="font-bold">Sold out</p>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                All tickets for this event have been sold.
+              </p>
+            </div>
+          )}
           <div className="border border-border rounded-2xl divide-y divide-border bg-card overflow-hidden">
             {ticketTypes.map((tt) => {
               const q = quantities[tt.name] || 0
-              const max = tt.maxPerOrder && tt.maxPerOrder > 0 ? tt.maxPerOrder : null
+              const max = effectiveMax(tt)
               const atMax = max !== null && q >= max
+              const remaining = remainingFor(tt.name)
+              const soldOut = remaining === 0
               return (
-              <div key={tt.name} className="flex items-center justify-between gap-3 p-3.5">
+              <div key={tt.name} className={`flex items-center justify-between gap-3 p-3.5 ${soldOut ? 'opacity-60' : ''}`}>
                 <div className="flex-1 min-w-0">
                   <p className="font-bold text-sm tracking-tight">{tt.name}</p>
                   {tt.description && (
                     <p className="text-xs text-muted-foreground mt-0.5">{tt.description}</p>
                   )}
                   <p className="text-sm font-bold text-primary mt-1">£{tt.price}</p>
-                  {max !== null && (
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Max {max} per order</p>
+                  {soldOut ? (
+                    <p className="text-[11px] font-bold text-destructive mt-0.5">Sold out</p>
+                  ) : (
+                    <>
+                      {tt.maxPerOrder && tt.maxPerOrder > 0 && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5">Max {tt.maxPerOrder} per order</p>
+                      )}
+                      {remaining !== null && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5">Only {remaining} left</p>
+                      )}
+                    </>
                   )}
                 </div>
                 <div className="flex items-center gap-1 rounded-full border border-border bg-background p-1 shrink-0">
@@ -166,7 +220,7 @@ export function TicketPurchase({ event }: { event: any }) {
                   <button
                     onClick={() => updateQuantity(tt.name, 1)}
                     className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                    disabled={loading || atMax}
+                    disabled={loading || atMax || soldOut}
                     aria-label={`Add one ${tt.name}`}
                   >
                     <Plus size={14} />
