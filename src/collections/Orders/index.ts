@@ -10,6 +10,7 @@ import {
   hasActiveOrder,
   validateOrderStock,
 } from '@/utilities/ticketAvailability'
+import { formatPurchaseTime, publishNtfy } from '@/utilities/ntfy'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -118,7 +119,7 @@ export const Orders: CollectionConfig = {
         return data
       },
     ],
-    afterChange: [      async ({ doc, operation, req }) => {
+    afterChange: [      async ({ doc, operation, req, previousDoc }) => {
         // Only generate tickets when an order is created or updated to 'paid'
         // and doesn't already have tickets generated
         if (
@@ -158,6 +159,48 @@ export const Orders: CollectionConfig = {
               },
               req,
             })
+          }
+        }
+
+        // Purchase alert (ntfy): fire once when the order becomes paid —
+        // not on the later ticket-attach update (status already paid there).
+        if (doc.status === 'paid' && (previousDoc as any)?.status !== 'paid') {
+          try {
+            const buyerId = (doc as any).buyer
+            const buyer =
+              buyerId !== null && typeof buyerId === 'object'
+                ? buyerId
+                : await req.payload
+                    .findByID({ collection: 'users', id: buyerId, depth: 0, overrideAccess: true })
+                    .catch(() => null)
+            const eventRef = (doc as any).event
+            const event =
+              eventRef !== null && typeof eventRef === 'object'
+                ? eventRef
+                : await req.payload
+                    .findByID({ collection: 'events', id: eventRef, depth: 0, overrideAccess: true })
+                    .catch(() => null)
+            const items = (((doc as any).items || []) as any[])
+              .map((i: any) => `${i.quantity} × ${i.ticketType}`)
+              .join(', ')
+            const total =
+              (doc as any).totalAmount != null ? `£${Number((doc as any).totalAmount).toFixed(2)}` : 'Free'
+            const lines = [
+              `Name: ${(buyer as any)?.name || 'Guest'}`,
+              `Email: ${(buyer as any)?.email || '-'}`,
+              `Time: ${formatPurchaseTime((doc as any).updatedAt || (doc as any).createdAt)}`,
+              `Event: ${(event as any)?.title || `#${(event as any)?.id ?? '?'}`}`,
+              `Tickets: ${items || '-'}`,
+              `Total: ${total} (Order #${doc.id})`,
+            ]
+            await publishNtfy({
+              title: `New ticket purchase — ${(event as any)?.title || `Order #${doc.id}`}`,
+              message: lines.join('\n'),
+              tags: ['ticket'],
+              click: `${getServerSideURL()}/admin/collections/orders/${doc.id}`,
+            })
+          } catch {
+            // Alerts must never break order processing.
           }
         }
       },
