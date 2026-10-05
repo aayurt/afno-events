@@ -64,6 +64,7 @@ export type EventFormData = {
   publish?: boolean
   timezone?: string
   tenant?: number | { id: number; name?: string | null } | null
+  limitOneOrderPerAccount?: boolean | null
 }
 
 type Props = {
@@ -157,6 +158,18 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
   const [selectedTags, setSelectedTags] = useState<string[]>(initial?.tags || [])
   const [pricingType, setPricingType] = useState<'free' | 'paid'>(initial?.pricing?.type || 'free')
   const [priceRange, setPriceRange] = useState(initial?.pricing?.priceRange || '')
+
+  // Free-tier limits (paid tiers carry their own per-row limits below).
+  const initialFreeTier = initial?.pricing?.ticketTypes?.[0] as any
+  const [freeMaxPerOrder, setFreeMaxPerOrder] = useState<number | null>(
+    initialFreeTier?.maxPerOrder ?? null,
+  )
+  const [freeTotalStock, setFreeTotalStock] = useState<number | null>(
+    initialFreeTier?.totalStock ?? null,
+  )
+  const [limitOneOrder, setLimitOneOrder] = useState<boolean>(
+    initial?.limitOneOrderPerAccount ?? false,
+  )
   
   const [ticketRows, setTicketRows] = useState<TicketTier[]>(
     initial?.pricing?.ticketTypes && initial.pricing.ticketTypes.length > 0
@@ -404,7 +417,15 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
             maxPerOrder: r.maxPerOrder ? Number(r.maxPerOrder) || null : null,
             totalStock: r.totalStock ? Number(r.totalStock) || null : null,
           }))
-        : [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
+        : [
+            {
+              name: 'Free Admission',
+              price: 0,
+              description: 'General free admission',
+              maxPerOrder: freeMaxPerOrder || null,
+              totalStock: freeTotalStock || null,
+            },
+          ]
 
     const tz = timezone || 'Europe/London'
     const startIso = startDatetime ? zonedTimeToUtc(startDatetime, tz) : new Date().toISOString()
@@ -439,6 +460,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
       isBookable: finalBookable,
       publish: finalEnabled,
       timezone,
+      limitOneOrderPerAccount: limitOneOrder,
       // Super-admin filing under a chosen organisation (create only).
       ...(!initial?.id && selectedTenantId ? { tenantId: selectedTenantId } : {}),
     }
@@ -903,11 +925,64 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   ))}
                 </div>
               </div>
+
+              <label className="flex items-center gap-2 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={limitOneOrder}
+                  onChange={(e) => setLimitOneOrder(e.target.checked)}
+                  className="w-4 h-4 rounded accent-primary"
+                />
+                <span className="text-xs font-medium">One order per account <span className="text-muted-foreground font-normal">— each account can book this event only once</span></span>
+              </label>
             </div>
           ) : (
-            <div className="p-4 rounded-2xl border border-border bg-muted/30 text-xs text-muted-foreground space-y-1">
-              <p className="font-semibold text-foreground">Free Registration Tier</p>
-              <p>Attendees will receive a free admission QR ticket upon registration.</p>
+            <div className="p-4 rounded-2xl border border-border bg-muted/30 text-xs text-muted-foreground space-y-3">
+              <div>
+                <p className="font-semibold text-foreground">Free Registration Tier</p>
+                <p>Attendees will receive a free admission QR ticket upon registration.</p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Label className="text-xs text-muted-foreground whitespace-nowrap">
+                  Max per order
+                </Label>
+                <Input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={freeMaxPerOrder ?? ''}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10)
+                    setFreeMaxPerOrder(Number.isInteger(v) && v > 0 ? v : null)
+                  }}
+                  placeholder="No limit"
+                  className="h-9 sm:h-8 rounded-xl text-xs bg-background w-28"
+                />
+                <Label className="text-xs text-muted-foreground whitespace-nowrap ml-2">
+                  Total stock
+                </Label>
+                <Input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={freeTotalStock ?? ''}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10)
+                    setFreeTotalStock(Number.isInteger(v) && v > 0 ? v : null)
+                  }}
+                  placeholder="Unlimited"
+                  className="h-9 sm:h-8 rounded-xl text-xs bg-background w-28"
+                />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer pt-1">
+                <input
+                  type="checkbox"
+                  checked={limitOneOrder}
+                  onChange={(e) => setLimitOneOrder(e.target.checked)}
+                  className="w-4 h-4 rounded accent-primary"
+                />
+                <span className="font-medium text-foreground">One order per account</span>
+              </label>
             </div>
           )}
         </CardContent>

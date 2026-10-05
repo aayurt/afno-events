@@ -969,6 +969,10 @@ export interface Event {
    */
   isBookable?: boolean | null;
   /**
+   * Each account can place only one order for this event
+   */
+  limitOneOrderPerAccount?: boolean | null;
+  /**
    * Review status for organiser-submitted events
    */
   approvalStatus?: ('draft' | 'pending_review' | 'approved' | 'rejected') | null;
@@ -1946,6 +1950,7 @@ export interface EventsSelect<T extends boolean = true> {
   stripeProductID?: T;
   enabled?: T;
   isBookable?: T;
+  limitOneOrderPerAccount?: T;
   approvalStatus?: T;
   updatedAt?: T;
   createdAt?: T;

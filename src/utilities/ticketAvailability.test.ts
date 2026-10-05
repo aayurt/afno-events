@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   PENDING_HOLD_MS,
   computeTierSold,
+  hasActiveOrder,
   tierRemaining,
   validateOrderStock,
 } from './ticketAvailability'
@@ -89,6 +90,31 @@ describe('computeTierSold', () => {
         NOW,
       ),
     ).toBe(0)
+  })
+})
+
+describe('hasActiveOrder', () => {
+  const orders = [
+    { buyer: 7, status: 'paid' },
+    { buyer: 8, status: 'pending' },
+    { buyer: 9, status: 'cancelled' },
+    { buyer: 10, status: 'refunded' },
+  ]
+
+  it('finds paid and pending orders by the same buyer', () => {
+    expect(hasActiveOrder(orders, 7)).toBe(true)
+    expect(hasActiveOrder(orders, 8)).toBe(true)
+  })
+
+  it('ignores cancelled, refunded and other buyers', () => {
+    expect(hasActiveOrder(orders, 9)).toBe(false)
+    expect(hasActiveOrder(orders, 10)).toBe(false)
+    expect(hasActiveOrder(orders, 999)).toBe(false)
+  })
+
+  it('matches numeric-string buyer ids (Better Auth serials)', () => {
+    expect(hasActiveOrder([{ buyer: '7', status: 'paid' }], 7)).toBe(true)
+    expect(hasActiveOrder(orders, '8' as any)).toBe(true)
   })
 })
 

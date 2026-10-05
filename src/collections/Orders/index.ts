@@ -7,6 +7,7 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { markOrderRefunded } from '@/utilities/stripeWebhooks'
 import {
   getEventTierAvailability,
+  hasActiveOrder,
   validateOrderStock,
 } from '@/utilities/ticketAvailability'
 
@@ -51,6 +52,41 @@ export const Orders: CollectionConfig = {
           const availability = await getEventTierAvailability(req.payload, eventId).catch(
             () => [],
           )
+          // One order per account: reject before stock checks (more specific).
+          const buyerRef = (data as any)?.buyer
+          const buyerId = buyerRef !== null && typeof buyerRef === 'object' ? buyerRef.id : buyerRef
+          if (buyerId != null) {
+            const eventDoc = await req.payload
+              .findByID({
+                collection: 'events',
+                id: eventId,
+                depth: 0,
+                overrideAccess: true,
+              })
+              .catch(() => null)
+            if ((eventDoc as any)?.limitOneOrderPerAccount) {
+              const where: any = {
+                and: [
+                  { buyer: { equals: buyerId } },
+                  { event: { equals: eventId } },
+                  { status: { in: ['pending', 'paid'] } },
+                ],
+              }
+              if (operation === 'update' && (originalDoc as any)?.id != null) {
+                where.and.push({ id: { not_equals: (originalDoc as any).id } })
+              }
+              const existing = await req.payload.find({
+                collection: 'orders',
+                where,
+                depth: 0,
+                limit: 1,
+                overrideAccess: true,
+              })
+              if (hasActiveOrder(existing.docs, buyerId)) {
+                throw new Error('You already have an order for this event — one order per account.')
+              }
+            }
+          }
           const tiers = availability.map((a) => ({
             name: a.name,
             maxPerOrder: a.maxPerOrder,

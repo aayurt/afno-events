@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Loader2, Minus, Plus, ExternalLink } from 'lucide-react'
+import { Loader2, Minus, Plus, ExternalLink, TicketCheck } from 'lucide-react'
 import { authClient } from '@/lib/auth/client'
 import { useScopedI18n } from '@/locales/client'
 
@@ -57,6 +57,41 @@ export function TicketPurchase({
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [alreadyOrdered, setAlreadyOrdered] = useState(false)
+
+  // One order per account: if this account already holds a live order,
+  // replace the buy box (server still enforces as backstop).
+  useEffect(() => {
+    if (!event.limitOneOrderPerAccount) return
+    let active = true
+    ;(async () => {
+      try {
+        const session = await authClient.getSession()
+        const user = session.data?.user
+        const buyerID = Number((user as { id?: unknown } | undefined)?.id)
+        if (!user || !Number.isInteger(buyerID)) return
+        const params = new URLSearchParams({
+          'where[event][equals]': String(event.id),
+          'where[buyer][equals]': String(buyerID),
+          limit: '5',
+          depth: '0',
+        })
+        const res = await fetch(`/api/orders?${params}`, { credentials: 'include' })
+        if (!res.ok) return
+        const data = await res.json().catch(() => null)
+        const hasLive = (data?.docs || []).some(
+          (o: any) => o?.status === 'paid' || o?.status === 'pending',
+        )
+        if (active && hasLive) {
+          setAlreadyOrdered(true)
+          setQuantities({})
+        }
+      } catch {}
+    })()
+    return () => {
+      active = false
+    }
+  }, [event.id, event.limitOneOrderPerAccount])
 
   const isFree = event.pricing?.type === 'free'
   const hasExternalLink = !!event.pricing?.paymentExternalLink
@@ -156,7 +191,26 @@ export function TicketPurchase({
 
   return (
     <div className="space-y-4">
-      {hasExternalLink ? (
+      {alreadyOrdered ? (
+        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-center space-y-3">
+          <div className="mx-auto w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <TicketCheck size={20} className="text-primary" />
+          </div>
+          <div>
+            <p className="font-bold">You&apos;re already booked</p>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              One order per account for this event.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            className="rounded-full"
+            onClick={() => router.push('/app/tickets')}
+          >
+            View my tickets
+          </Button>
+        </div>
+      ) : hasExternalLink ? (
         <Button
           size="lg"
           className="w-full rounded-full"

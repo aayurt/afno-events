@@ -68,6 +68,21 @@ export function tierRemaining(
   return Math.max(0, Math.floor(s) - Math.max(0, sold))
 }
 
+/** True when the buyer already holds a live (paid or pending) order. */
+export function hasActiveOrder(
+  orders: { buyer?: unknown; status?: string | null }[],
+  buyerId: unknown,
+): boolean {
+  const wanted = String(buyerId ?? '')
+  if (!wanted) return false
+  return (orders || []).some((o) => {
+    const b = o?.buyer
+    const id = b !== null && typeof b === 'object' ? (b as any).id : b
+    if (String(id ?? '') !== wanted) return false
+    return o?.status === 'paid' || o?.status === 'pending'
+  })
+}
+
 /**
  * Returns the first stock violation for an order, or null when it can proceed.
  * Stock is checked before per-order caps (remaining seats is the urgent info).

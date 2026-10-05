@@ -489,6 +489,16 @@ export const Events: CollectionConfig = {
       },
     },
     {
+      name: 'limitOneOrderPerAccount',
+      type: 'checkbox',
+      required: false,
+      defaultValue: false,
+      admin: {
+        description: 'Each account can place only one order for this event',
+        position: 'sidebar',
+      },
+    },
+    {
       name: 'approvalStatus',
       type: 'select',
       defaultValue: 'approved',

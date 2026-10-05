@@ -26,6 +26,7 @@ const testConfig = buildConfig({
       slug: 'events',
       fields: [
         { name: 'title', type: 'text' },
+        { name: 'limitOneOrderPerAccount', type: 'checkbox', defaultValue: false },
         {
           name: 'pricing',
           type: 'group',
@@ -114,5 +115,81 @@ describe('50-ticket tier end to end', () => {
 
   it('is sold out afterwards', async () => {
     await expect(createOrder(1, 'paid')).rejects.toThrow(/sold out|0 left/i)
+  })
+})
+
+describe('free tier stock + one order per account', () => {
+  let freeEventId: number
+  let otherBuyerId: number
+
+  beforeAll(async () => {
+    const other = await payload.create({
+      collection: 'users',
+      data: { email: 'stock-buyer-2@example.com', password: 'password123' } as any,
+      overrideAccess: true,
+    })
+    otherBuyerId = other.id
+
+    const event = await payload.create({
+      collection: 'events',
+      data: {
+        title: 'Free Stock Gig',
+        limitOneOrderPerAccount: true,
+        pricing: {
+          ticketTypes: [{ name: 'Free Admission', price: 0, maxPerOrder: 2, totalStock: 2 }],
+        },
+      } as any,
+      overrideAccess: true,
+    })
+    freeEventId = event.id
+  })
+
+  async function createFreeOrder(qty: number, buyer: number, status = 'pending') {
+    return payload.create({
+      collection: 'orders',
+      data: {
+        buyer,
+        event: freeEventId,
+        totalAmount: 0,
+        status,
+        items: [{ ticketType: 'Free Admission', quantity: qty, price: 0 }],
+      } as any,
+      overrideAccess: true,
+    })
+  }
+
+  it('enforces stock on the free tier (2 available)', async () => {
+    await expect(createFreeOrder(3, otherBuyerId)).rejects.toThrow(/2 left/i)
+    const order = await createFreeOrder(2, otherBuyerId)
+    expect(order.id).toBeDefined()
+  })
+
+  it('rejects a second order from the same account', async () => {
+    await expect(createFreeOrder(1, otherBuyerId)).rejects.toThrow(/already.*order/i)
+  })
+
+  it('lets a different account order', async () => {
+    // Fresh event so stock is untouched; one-order rule is per account.
+    const event = await payload.create({
+      collection: 'events',
+      data: {
+        title: 'Free Stock Gig 2',
+        limitOneOrderPerAccount: true,
+        pricing: { ticketTypes: [{ name: 'Free Admission', price: 0 }] },
+      } as any,
+      overrideAccess: true,
+    })
+    const order = await payload.create({
+      collection: 'orders',
+      data: {
+        buyer: buyerId,
+        event: event.id,
+        totalAmount: 0,
+        status: 'pending',
+        items: [{ ticketType: 'Free Admission', quantity: 1, price: 0 }],
+      } as any,
+      overrideAccess: true,
+    })
+    expect(order.id).toBeDefined()
   })
 })

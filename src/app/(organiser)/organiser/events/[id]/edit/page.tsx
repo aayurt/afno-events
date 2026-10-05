@@ -61,6 +61,7 @@ export default function EditEventPage() {
           isBookable: data.isBookable ?? true,
           publish: data.enabled ?? true,
           tenant: data.tenant ?? null,
+          limitOneOrderPerAccount: data.limitOneOrderPerAccount ?? false,
         })
       } catch (err: any) {
         if (active) setError(err.message || 'Failed to load event')

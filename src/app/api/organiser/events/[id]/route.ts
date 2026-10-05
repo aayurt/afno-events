@@ -120,6 +120,9 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   }
 
   if (body.isBookable !== undefined) updateData.isBookable = !!body.isBookable
+  if (body.limitOneOrderPerAccount !== undefined) {
+    updateData.limitOneOrderPerAccount = !!body.limitOneOrderPerAccount
+  }
 
   updateData.pricing = {
     type: isPaid ? 'paid' : 'free',
