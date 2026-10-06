@@ -160,9 +160,9 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                   <td className="p-4">
                     <Link href={`/app/orders/${order.id}/success`} className="block">
                       <p className="font-semibold truncate max-w-[200px]">
-                        {typeof order.event === 'object' ? order.event.title : `Order #${order.id}`}
+                        {order.event && typeof order.event === 'object' ? order.event.title : `Order #${order.id}`}
                       </p>
-                      {typeof order.event === 'object' && order.event.location?.location && (
+                      {order.event && typeof order.event === 'object' && order.event.location?.location && (
                         <p className="text-xs text-muted-foreground truncate max-w-[200px]">
                           {order.event.location.location}
                         </p>
@@ -493,7 +493,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                         <tr key={order.id} className="border-b border-border last:border-0">
                           <td className="p-4">
                             <p className="font-medium truncate max-w-[200px]">
-                              {typeof order.event === 'object' ? order.event.title : `Order #${order.id}`}
+                              {order.event && typeof order.event === 'object' ? order.event.title : `Order #${order.id}`}
                             </p>
                           </td>
                           <td className="p-4 text-muted-foreground hidden sm:table-cell">
