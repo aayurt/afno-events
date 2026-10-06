@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { formatPurchaseTime, publishNtfy } from './ntfy'
+import { formatPurchaseTime, publishNtfy, sanitizeNtfyHeader } from './ntfy'
 
 describe('formatPurchaseTime', () => {
   it('formats in UK time with a label', () => {
@@ -13,6 +13,20 @@ describe('formatPurchaseTime', () => {
   })
 })
 
+describe('sanitizeNtfyHeader', () => {
+  it('converts em dashes and other non-Latin1 to safe ASCII', () => {
+    expect(sanitizeNtfyHeader('New ticket purchase — Maan Ko Raja')).toBe(
+      'New ticket purchase - Maan Ko Raja',
+    )
+    expect(sanitizeNtfyHeader('2 × GA')).toBe('2 x GA')
+  })
+
+  it('output is always header-safe (regression: ByteString throw)', () => {
+    const out = sanitizeNtfyHeader('— š ž —')
+    expect(() => new Headers({ Title: out })).not.toThrow()
+    expect(/^[\x20-\x7E]*$/.test(out)).toBe(true)
+  })
+})
 describe('publishNtfy', () => {
   it('skips silently without env and never throws', async () => {
     const prev = { ...process.env }

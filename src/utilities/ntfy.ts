@@ -20,8 +20,8 @@ export async function publishNtfy(options: {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
-        Title: options.title,
-        ...(options.tags?.length ? { Tags: options.tags.join(',') } : {}),
+        Title: sanitizeNtfyHeader(options.title),
+        ...(options.tags?.length ? { Tags: sanitizeNtfyHeader(options.tags.join(',')) } : {}),
         ...(options.priority ? { Priority: options.priority } : {}),
         ...(options.click ? { Click: options.click } : {}),
       },
@@ -36,6 +36,20 @@ export async function publishNtfy(options: {
     console.error('[ntfy] publish failed:', (err as Error)?.message || err)
     return false
   }
+}
+
+/**
+ * HTTP header values must be Latin-1 (undici throws on e.g. em dashes).
+ * The message BODY stays full UTF-8 — only headers get sanitised.
+ */
+export function sanitizeNtfyHeader(value: string): string {
+  return (value || '')
+    .replace(/[—–]/g, '-')
+    .replace(/×/g, 'x')
+    .replace(/[''«»]/g, "'")
+    .replace(/[""„]/g, '"')
+    .replace(/…/g, '...')
+    .replace(/[^\x20-\x7E]/g, '?')
 }
 
 /** "3 Oct 2026, 14:22 UK time" style stamp for purchase alerts. */
