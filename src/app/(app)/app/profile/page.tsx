@@ -15,6 +15,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { useTheme } from '@/providers/Theme'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { orderEventTitle } from '@/utilities/orderDisplay'
 
 export default function ProfilePage() {
   const t = useScopedI18n('profile') as (
@@ -160,7 +161,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                   <td className="p-4">
                     <Link href={`/app/orders/${order.id}/success`} className="block">
                       <p className="font-semibold truncate max-w-[200px]">
-                        {order.event && typeof order.event === 'object' ? order.event.title : `Order #${order.id}`}
+                        {orderEventTitle(order)}
                       </p>
                       {order.event && typeof order.event === 'object' && order.event.location?.location && (
                         <p className="text-xs text-muted-foreground truncate max-w-[200px]">
@@ -493,7 +494,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                         <tr key={order.id} className="border-b border-border last:border-0">
                           <td className="p-4">
                             <p className="font-medium truncate max-w-[200px]">
-                              {order.event && typeof order.event === 'object' ? order.event.title : `Order #${order.id}`}
+                              {orderEventTitle(order)}
                             </p>
                           </td>
                           <td className="p-4 text-muted-foreground hidden sm:table-cell">
