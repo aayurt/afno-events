@@ -53,19 +53,20 @@ export const Orders: CollectionConfig = {
           const availability = await getEventTierAvailability(req.payload, eventId).catch(
             () => [],
           )
+          const eventDoc = await req.payload
+            .findByID({
+              collection: 'events',
+              id: eventId,
+              depth: 0,
+              overrideAccess: true,
+            })
+            .catch(() => null)
+          const singleTicket = Boolean((eventDoc as any)?.limitOneOrderPerAccount)
           // One order per account: reject before stock checks (more specific).
           const buyerRef = (data as any)?.buyer
           const buyerId = buyerRef !== null && typeof buyerRef === 'object' ? buyerRef.id : buyerRef
           if (buyerId != null) {
-            const eventDoc = await req.payload
-              .findByID({
-                collection: 'events',
-                id: eventId,
-                depth: 0,
-                overrideAccess: true,
-              })
-              .catch(() => null)
-            if ((eventDoc as any)?.limitOneOrderPerAccount) {
+            if (singleTicket) {
               const where: any = {
                 and: [
                   { buyer: { equals: buyerId } },
@@ -113,7 +114,7 @@ export const Orders: CollectionConfig = {
               }
             }
           }
-          const violation = validateOrderStock(tiers, items, soldByTier)
+          const violation = validateOrderStock(tiers, items, soldByTier, singleTicket)
           if (violation) throw new Error(violation)
         }
         return data

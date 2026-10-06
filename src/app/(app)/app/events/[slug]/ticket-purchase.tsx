@@ -105,10 +105,19 @@ export function TicketPurchase({
   const updateQuantity = (name: string, delta: number) => {
     const tier = ticketTypes.find((tt) => tt.name === name)
     const max = tier ? effectiveMax(tier) : null
+    // One order per account events are single-ticket: cap the ORDER total at 1.
+    const singleTicket = Boolean(event.limitOneOrderPerAccount)
     setQuantities((prev) => {
       const current = prev[name] || 0
       let next = Math.max(0, current + delta)
       if (max !== null) next = Math.min(next, max)
+      if (singleTicket && delta > 0) {
+        const others = Object.entries(prev).reduce(
+          (sum, [k, v]) => sum + (k === name ? 0 : v || 0),
+          0,
+        )
+        next = Math.min(next, Math.max(0, 1 - others))
+      }
       return { ...prev, [name]: next }
     })
   }
@@ -225,6 +234,11 @@ export function TicketPurchase({
         </Button>
       ) : ticketTypes.length > 0 ? (
         <>
+          {event.limitOneOrderPerAccount && !allSoldOut && (
+            <p className="text-xs text-muted-foreground text-center">
+              Limit: 1 ticket per account for this event.
+            </p>
+          )}
           {allSoldOut && (
             <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-center">
               <p className="font-bold">Sold out</p>

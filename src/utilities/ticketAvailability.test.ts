@@ -131,6 +131,45 @@ describe('tierRemaining', () => {
   })
 })
 
+describe('validateOrderStock single-ticket mode (one order per account)', () => {
+  const tiers = [
+    { name: 'GA', maxPerOrder: 4, totalStock: 50 },
+    { name: 'VIP', totalStock: 10 },
+  ]
+
+  it('accepts a single ticket across tiers', () => {
+    expect(
+      validateOrderStock(tiers, [{ ticketType: 'GA', quantity: 1 }], { GA: 0 }, true),
+    ).toBeNull()
+  })
+
+  it('rejects multiple tickets in one tier', () => {
+    expect(
+      validateOrderStock(tiers, [{ ticketType: 'GA', quantity: 2 }], { GA: 0 }, true),
+    ).toMatch(/one ticket/i)
+  })
+
+  it('rejects one ticket in each of two tiers (total still 2)', () => {
+    expect(
+      validateOrderStock(
+        tiers,
+        [
+          { ticketType: 'GA', quantity: 1 },
+          { ticketType: 'VIP', quantity: 1 },
+        ],
+        { GA: 0, VIP: 0 },
+        true,
+      ),
+    ).toMatch(/one ticket/i)
+  })
+
+  it('leaves normal multi-ticket orders alone when the flag is off', () => {
+    expect(
+      validateOrderStock(tiers, [{ ticketType: 'GA', quantity: 4 }], { GA: 0 }, false),
+    ).toBeNull()
+  })
+})
+
 describe('validateOrderStock', () => {
   const tiers = [{ name: 'GA', maxPerOrder: 4, totalStock: 50 }]
 

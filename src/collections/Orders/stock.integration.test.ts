@@ -158,14 +158,86 @@ describe('free tier stock + one order per account', () => {
     })
   }
 
-  it('enforces stock on the free tier (2 available)', async () => {
-    await expect(createFreeOrder(3, otherBuyerId)).rejects.toThrow(/2 left/i)
-    const order = await createFreeOrder(2, otherBuyerId)
+  it('enforces the single-ticket cap before stock on a flagged free tier', async () => {
+    // 3 tickets: single-ticket rule fires (not the "2 left" stock message).
+    await expect(createFreeOrder(3, otherBuyerId)).rejects.toThrow(/one ticket/i)
+    const order = await createFreeOrder(1, otherBuyerId)
     expect(order.id).toBeDefined()
+  })
+
+  it('enforces stock on an unflagged free tier (2 available)', async () => {
+    const event = await payload.create({
+      collection: 'events',
+      data: {
+        title: 'Free Stock No Flag',
+        pricing: { ticketTypes: [{ name: 'Free Admission', price: 0, totalStock: 2 }] },
+      } as any,
+      overrideAccess: true,
+    })
+    const create = (qty: number) =>
+      payload.create({
+        collection: 'orders',
+        data: {
+          buyer: otherBuyerId,
+          event: event.id,
+          totalAmount: 0,
+          status: 'pending',
+          items: [{ ticketType: 'Free Admission', quantity: qty, price: 0 }],
+        } as any,
+        overrideAccess: true,
+      })
+    await expect(create(3)).rejects.toThrow(/2 left/i)
+    const order = await create(2)
+    expect(order.id).toBeDefined()
+    await expect(create(1)).rejects.toThrow(/sold out/i)
   })
 
   it('rejects a second order from the same account', async () => {
     await expect(createFreeOrder(1, otherBuyerId)).rejects.toThrow(/already.*order/i)
+  })
+
+  it('rejects more than one ticket in a single order when flagged', async () => {
+    // Fresh event with plenty of stock: 2 tickets at once still violates one-ticket.
+    const event = await payload.create({
+      collection: 'events',
+      data: {
+        title: 'Single Ticket Gig',
+        limitOneOrderPerAccount: true,
+        pricing: { ticketTypes: [{ name: 'GA', price: 5, totalStock: 10 }] },
+      } as any,
+      overrideAccess: true,
+    })
+    const fresh = await payload.create({
+      collection: 'users',
+      data: { email: 'stock-buyer-3@example.com', password: 'password123' } as any,
+      overrideAccess: true,
+    })
+    await expect(
+      payload.create({
+        collection: 'orders',
+        data: {
+          buyer: fresh.id,
+          event: event.id,
+          totalAmount: 10,
+          status: 'pending',
+          items: [{ ticketType: 'GA', quantity: 2, price: 5 }],
+        } as any,
+        overrideAccess: true,
+      }),
+    ).rejects.toThrow(/one ticket/i)
+    // ...but a single ticket goes through.
+    const order = await payload.create({
+      collection: 'orders',
+      data: {
+        buyer: fresh.id,
+        event: event.id,
+        totalAmount: 5,
+        status: 'pending',
+        items: [{ ticketType: 'GA', quantity: 1, price: 5 }],
+      } as any,
+      overrideAccess: true,
+    })
+    expect(order.id).toBeDefined()
   })
 
   it('lets a different account order', async () => {

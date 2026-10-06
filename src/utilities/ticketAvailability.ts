@@ -86,13 +86,21 @@ export function hasActiveOrder(
 /**
  * Returns the first stock violation for an order, or null when it can proceed.
  * Stock is checked before per-order caps (remaining seats is the urgent info).
+ * With singleTicket (one order per account events), the whole order is
+ * capped at one ticket total — across all tiers.
  */
 export function validateOrderStock(
   tiers: StockTier[],
   items: StockOrderLine[],
   soldByTier: Record<string, number>,
+  singleTicket: boolean = false,
 ): string | null {
-  for (const item of items || []) {
+  const lines = items || []
+  if (singleTicket) {
+    const total = lines.reduce((sum, item) => sum + asQty(item?.quantity), 0)
+    if (total > 1) return 'Only one ticket per account for this event.'
+  }
+  for (const item of lines) {
     const qty = asQty(item?.quantity)
     if (qty === 0) continue
     const tier = (tiers || []).find((t) => t?.name === item?.ticketType)

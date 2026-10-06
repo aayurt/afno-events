@@ -306,15 +306,15 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
   }
 
   return (
-    <div className="container py-12 space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="container py-6 sm:py-12 space-y-6 sm:space-y-8 overflow-x-clip">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <div className="relative shrink-0">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User size={36} className="text-primary" />
+                <User size={30} className="text-primary" />
               )}
             </div>
             <label className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors shadow-md">
@@ -332,12 +332,12 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
               />
             </label>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">{session.name || 'User'}</h1>
-            <p className="text-muted-foreground">{session.email}</p>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold truncate">{session.name || 'User'}</h1>
+            <p className="text-sm text-muted-foreground truncate">{session.email}</p>
           </div>
         </div>
-        <Button variant="outline" onClick={handleLogout} className="gap-2">
+        <Button variant="outline" onClick={handleLogout} className="gap-2 w-full sm:w-auto shrink-0">
           <LogOut size={16} /> {t('signOut')}
         </Button>
       </div>
@@ -352,7 +352,7 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
           <button
             key={key}
             onClick={() => setTab(key as any)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap shrink-0 ${
               tab === key
                 ? 'border-primary text-primary'
                 : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -465,9 +465,9 @@ function OrdersTab({ orders, ordersPage, ordersTotalPages, onPageChange, t }: { 
                   { label: t('email'), value: session.email },
                   { label: t('memberSince'), value: session.createdAt ? new Date(session.createdAt).toLocaleDateString() : '-' },
                 ].map(({ label, value }) => (
-                  <div key={label}>
+                  <div key={label} className="min-w-0">
                     <p className="text-sm text-muted-foreground">{label}</p>
-                    <p className="font-medium">{value || '-'}</p>
+                    <p className="font-medium break-all">{value || '-'}</p>
                   </div>
                 ))}
               </div>
