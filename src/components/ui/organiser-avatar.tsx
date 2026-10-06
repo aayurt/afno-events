@@ -1,8 +1,12 @@
+'use client'
+
+import { useState } from 'react'
 import { cn } from '@/utilities/ui'
 
 /**
  * Organiser avatar: logo image when available, otherwise a coloured
- * initial-letter tile (no more generic silhouette).
+ * initial-letter tile (no more generic silhouette). If the image URL is
+ * dead (missing file), falls back to the letter tile automatically.
  */
 export function OrganiserAvatar({
   name,
@@ -15,9 +19,18 @@ export function OrganiserAvatar({
   className?: string
   textClassName?: string
 }) {
-  if (imageUrl) {
+  const [imgFailed, setImgFailed] = useState(false)
+
+  if (imageUrl && !imgFailed) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={imageUrl} alt={name || ''} className={cn('object-cover', className)} />
+    return (
+      <img
+        src={imageUrl}
+        alt={name || ''}
+        onError={() => setImgFailed(true)}
+        className={cn('object-cover', className)}
+      />
+    )
   }
 
   const letter = (name?.trim()?.charAt(0) || '?').toUpperCase()
