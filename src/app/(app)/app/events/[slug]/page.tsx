@@ -53,10 +53,8 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
   const e = event as any
 
-  const now = new Date()
   const start = e.startDatetime ? new Date(e.startDatetime) : null
-  const end = e.endDatetime ? new Date(e.endDatetime) : null
-  const eventStatus = start && start > now ? 'upcoming' : end && end < now ? 'past' : start && start <= now && (!end || end >= now) ? 'live' : null
+  const eventStatus = getEventStatus(e.startDatetime, e.endDatetime)
 
   // Same-organiser rail ("More from this organiser"), mirroring mobile — shown
   // only when the event belongs to a tenant and that tenant has other events.

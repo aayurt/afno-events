@@ -129,7 +129,8 @@ export default function OrganiserDashboard() {
     return events.filter((e) => {
       if (!e.startDatetime) return false
       const s = new Date(e.startDatetime).getTime()
-      const end = e.endDatetime ? new Date(e.endDatetime).getTime() : s + 8 * 3600000
+      // No end time → single-day event (same 24h rule as getEventStatus).
+      const end = e.endDatetime ? new Date(e.endDatetime).getTime() : s + 24 * 3600000
       return s <= now && end >= now && e.enabled !== false
     })
   }, [events, now])
