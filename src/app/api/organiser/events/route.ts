@@ -45,8 +45,23 @@ export async function POST(req: NextRequest) {
   const isPaid = body.pricing?.type === 'paid'
   let ticketTypes = isPaid ? body.pricing?.ticketTypes || [] : []
 
+  // Preserve the free tier's limits submitted by the form (same fix as PATCH).
+  const numOrNull = (v: unknown) => {
+    const n = typeof v === 'string' ? Number(v) : (v as number)
+    return Number.isInteger(n) && (n as number) > 0 ? (n as number) : null
+  }
+
   if (!isPaid) {
-    ticketTypes = [{ name: 'Free Admission', price: 0, description: 'General free admission' }]
+    const free = (body.pricing?.ticketTypes || [])[0] as any
+    ticketTypes = [
+      {
+        name: 'Free Admission',
+        price: 0,
+        description: 'General free admission',
+        maxPerOrder: numOrNull(free?.maxPerOrder),
+        totalStock: numOrNull(free?.totalStock),
+      },
+    ]
   }
 
   let isTenantVerified = user.role === 'super-admin'
