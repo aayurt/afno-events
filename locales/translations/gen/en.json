@@ -90,6 +90,8 @@
     "registerFree": "Register Free",
     "noTickets": "No tickets available",
     "selectTickets": "Select Tickets",
+    "bookingPaused": "Booking paused",
+    "bookingPausedDesc": "Ticket sales are currently paused by the organiser. Please check back later.",
     "priceFrom": "Price From",
     "viewAll": "View All",
     "total": "Total",

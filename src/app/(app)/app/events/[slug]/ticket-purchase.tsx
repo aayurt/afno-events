@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Loader2, Minus, Plus, ExternalLink, TicketCheck } from 'lucide-react'
+import { Loader2, Minus, Plus, ExternalLink, TicketCheck, Ban } from 'lucide-react'
 import { authClient } from '@/lib/auth/client'
 import { useScopedI18n } from '@/locales/client'
 
@@ -196,6 +196,24 @@ export function TicketPurchase({
     } finally {
       setLoading(false)
     }
+  }
+
+  // Booking paused by the organiser: no quantity steppers, no buy button.
+  // (Server-side Orders hook enforces this too — this is the visible state.)
+  if (event.isBookable === false) {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-muted bg-muted/30 p-4 text-center space-y-3">
+          <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+            <Ban size={20} className="text-muted-foreground" />
+          </div>
+          <div>
+            <p className="font-bold">{t('bookingPaused')}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{t('bookingPausedDesc')}</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

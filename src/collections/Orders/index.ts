@@ -114,6 +114,12 @@ export const Orders: CollectionConfig = {
               }
             }
           }
+          // Booking paused by the organiser: refuse new/changed ticket items.
+          // (Status-only updates returned early above, so pending → paid
+          // transitions for already-placed orders still go through.)
+          if ((eventDoc as any)?.isBookable === false) {
+            throw new Error('Booking is paused for this event.')
+          }
           const violation = validateOrderStock(tiers, items, soldByTier, singleTicket)
           if (violation) throw new Error(violation)
         }
