@@ -14,86 +14,137 @@
     font-weight: unset;
   }
 
+  /* 8848 UI — Mountain Design Tokens (OKLCH) */
   :root {
-    /* Background */
-    --background: 0 0% 100%;
-    --foreground: 222 47% 15%;
+    /* Mountain palette */
+    --color-mountain-snow: oklch(0.98 0.01 280);
+    --color-mountain-ice: oklch(0.94 0.02 270);
 
-    /* Card */
-    --card: 0 0% 98%;
-    --card-foreground: 222 47% 15%;
+    --color-slate-50: oklch(0.97 0.02 280);
+    --color-slate-100: oklch(0.92 0.03 270);
+    --color-slate-200: oklch(0.84 0.04 260);
+    --color-slate-300: oklch(0.70 0.04 250);
+    --color-slate-400: oklch(0.55 0.05 240);
+    --color-slate-500: oklch(0.42 0.05 235);
+    --color-slate-600: oklch(0.32 0.04 240);
+    --color-slate-700: oklch(0.25 0.04 250);
+    --color-slate-800: oklch(0.18 0.03 260);
+    --color-slate-900: oklch(0.12 0.02 270);
+    --color-slate-950: oklch(0.05 0.01 270);
 
-    /* Popover */
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 15%;
+    --color-alpine-50: oklch(0.95 0.03 250);
+    --color-alpine-100: oklch(0.90 0.06 250);
+    --color-alpine-200: oklch(0.82 0.10 250);
+    --color-alpine-300: oklch(0.72 0.14 250);
+    --color-alpine-400: oklch(0.63 0.17 250);
+    --color-alpine-500: oklch(0.55 0.18 250);
+    --color-alpine-600: oklch(0.48 0.16 250);
+    --color-alpine-700: oklch(0.40 0.14 250);
+    --color-alpine-800: oklch(0.33 0.12 250);
+    --color-alpine-900: oklch(0.27 0.10 250);
+    --color-alpine-950: oklch(0.20 0.08 250);
 
-    /* Primary - Nepal Crimson */
-    --primary: 347.7 83.33% 47.06%;
-    --primary-foreground: 0 0% 100%;
+    --color-sunrise-50: oklch(0.97 0.02 35);
+    --color-sunrise-100: oklch(0.93 0.04 35);
+    --color-sunrise-200: oklch(0.86 0.08 35);
+    --color-sunrise-300: oklch(0.78 0.12 35);
+    --color-sunrise-400: oklch(0.71 0.16 35);
+    --color-sunrise-500: oklch(0.65 0.18 35);
+    --color-sunrise-600: oklch(0.58 0.16 35);
+    --color-sunrise-700: oklch(0.48 0.14 35);
+    --color-sunrise-800: oklch(0.38 0.12 35);
+    --color-sunrise-900: oklch(0.30 0.10 35);
+    --color-sunrise-950: oklch(0.22 0.08 35);
 
-    /* Secondary - Nepal Blue */
-    --secondary: 220 85% 32%;
-    --secondary-foreground: 0 0% 100%;
+    --color-forest-50: oklch(0.96 0.02 150);
+    --color-forest-100: oklch(0.91 0.04 150);
+    --color-forest-200: oklch(0.83 0.08 150);
+    --color-forest-300: oklch(0.73 0.12 150);
+    --color-forest-400: oklch(0.62 0.15 150);
+    --color-forest-500: oklch(0.53 0.16 150);
+    --color-forest-600: oklch(0.44 0.14 150);
+    --color-forest-700: oklch(0.35 0.12 150);
+    --color-forest-800: oklch(0.27 0.10 150);
+    --color-forest-900: oklch(0.21 0.08 150);
+    --color-forest-950: oklch(0.15 0.06 150);
 
-    /* Muted */
-    --muted: 0 0% 95%;
-    --muted-foreground: 0 0% 50%;
+    --color-earth-50: oklch(0.97 0.02 60);
+    --color-earth-100: oklch(0.92 0.04 60);
+    --color-earth-200: oklch(0.84 0.07 60);
+    --color-earth-300: oklch(0.74 0.10 60);
+    --color-earth-400: oklch(0.63 0.13 60);
+    --color-earth-500: oklch(0.52 0.14 60);
+    --color-earth-600: oklch(0.43 0.12 60);
+    --color-earth-700: oklch(0.34 0.10 60);
+    --color-earth-800: oklch(0.26 0.08 60);
+    --color-earth-900: oklch(0.20 0.06 60);
+    --color-earth-950: oklch(0.14 0.04 60);
 
-    /* Accent - Soft Blue */
-    --accent: 220 60% 90%;
-    --accent-foreground: 220 85% 25%;
+    /* Semantic — Light (Basecamp) */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.21 0.03 280);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.21 0.03 280);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.21 0.03 280);
+    --primary: oklch(0.55 0.18 250);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.92 0.02 270);
+    --secondary-foreground: oklch(0.21 0.03 280);
+    --muted: oklch(0.92 0.02 270);
+    --muted-foreground: oklch(0.55 0.04 270);
+    --accent: oklch(0.92 0.02 270);
+    --accent-foreground: oklch(0.21 0.03 280);
+    --destructive: oklch(0.6 0.2 30);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.55 0.18 250 / 0.35);
+    --input: oklch(0.55 0.18 250 / 0.35);
+    --ring: oklch(0.55 0.18 250);
 
-    /* Destructive */
-    --destructive: 0 75% 50%;
-    --destructive-foreground: 0 0% 100%;
+    --success: oklch(0.53 0.16 150);
+    --warning: oklch(0.65 0.18 35);
+    --error: oklch(0.6 0.2 30);
 
-    /* Border & Input */
-    --border: 0 0% 89%;
-    --input: 0 0% 92%;
-    --ring: 350 78% 42%;
+    /* Radius (compact modern) */
+    --radius-canyon: 2px;
+    --radius-valley: 4px;
+    --radius-ridge: 6px;
+    --radius-peak: 8px;
+    --radius-summit: 9999px;
+    --radius: 0.25rem;
 
-    --radius: 1rem;
-
-    /* Status */
-    --success: 140 60% 45%;
-    --warning: 38 90% 55%;
-    --error: 0 75% 50%;
+    /* Fonts (set by next/font) */
+    --font-inter: "Inter", system-ui, sans-serif;
+    --font-jetbrains-mono: "JetBrains Mono", monospace;
+    --font-cal-sans: "Cal Sans", var(--font-sans);
   }
 
-  [data-theme='dark'] {
-    --background: 222 47% 8%;
-    --foreground: 0 0% 98%;
+  /* Dark (Night Expedition) */
+  .dark,
+  [data-theme="dark"] {
+    --background: oklch(0.15 0.02 285);
+    --foreground: oklch(0.95 0.01 280);
+    --card: oklch(0.17 0.02 285);
+    --card-foreground: oklch(0.95 0.01 280);
+    --popover: oklch(0.17 0.02 285);
+    --popover-foreground: oklch(0.95 0.01 280);
+    --primary: oklch(0.65 0.17 250);
+    --primary-foreground: oklch(0.15 0.02 285);
+    --secondary: oklch(0.22 0.03 280);
+    --secondary-foreground: oklch(0.95 0.01 280);
+    --muted: oklch(0.22 0.03 280);
+    --muted-foreground: oklch(0.65 0.04 280);
+    --accent: oklch(0.22 0.03 280);
+    --accent-foreground: oklch(0.95 0.01 280);
+    --destructive: oklch(0.55 0.19 25);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.65 0.17 250 / 0.45);
+    --input: oklch(0.65 0.17 250 / 0.45);
+    --ring: oklch(0.65 0.17 250);
 
-    --card: 222 47% 12%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 222 47% 10%;
-    --popover-foreground: 0 0% 98%;
-
-    /* Crimson adjusted for dark */
-    --primary: 350 78% 52%;
-    --primary-foreground: 0 0% 100%;
-
-    /* Blue adjusted for dark */
-    --secondary: 220 85% 45%;
-    --secondary-foreground: 0 0% 100%;
-
-    --muted: 222 30% 18%;
-    --muted-foreground: 0 0% 60%;
-
-    --accent: 220 40% 20%;
-    --accent-foreground: 220 85% 70%;
-
-    --destructive: 0 65% 45%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 0 0% 20%;
-    --input: 0 0% 18%;
-    --ring: 350 78% 52%;
-
-    --success: 140 50% 40%;
-    --warning: 38 70% 45%;
-    --error: 0 65% 45%;
+    --success: oklch(0.53 0.16 150);
+    --warning: oklch(0.65 0.18 35);
+    --error: oklch(0.55 0.19 25);
   }
 }
 
@@ -103,7 +154,48 @@
   }
 
   body {
-    @apply bg-background text-foreground min-h-[100vh] flex flex-col;
+    @apply bg-background text-foreground min-h-[100vh] flex flex-col font-sans antialiased;
+    font-family: var(--font-geist-sans), var(--font-inter), system-ui, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Focus ring */
+  .focus-ring {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: color-mix(in oklab, var(--primary) 20%, transparent);
+    color: var(--primary-foreground);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--muted);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--muted-foreground) 30%, transparent);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
@@ -111,6 +203,8 @@ html {
   opacity: 0;
 }
 
+html.dark,
+html.light,
 html[data-theme='dark'],
 html[data-theme='light'] {
   opacity: initial;

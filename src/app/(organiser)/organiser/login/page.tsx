@@ -138,50 +138,54 @@ export default function OrganiserLoginPage() {
 
   return (
     <>
-      <OrganiserHeader title="Sign in" />
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-3">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Building2 size={26} className="text-primary" />
+      <OrganiserHeader title="Workspace" />
+      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-12">
+        <div className="w-full max-w-[420px] space-y-6">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground border border-border/80 bg-muted/40 px-2 py-0.5 rounded">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Organiser Workspace
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground pt-1">
+              Sign in
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Manage your event ticketing, door scanning, and attendees.
+            </p>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Organiser Portal</h1>
-          <p className="text-sm text-muted-foreground">
-            Sign in to manage your events, tickets and door scanning.
-          </p>
-        </div>
 
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-lg">Sign in</CardTitle>
-            <CardDescription>Use your organiser account credentials.</CardDescription>
-          </CardHeader>
-          <CardContent>
+          <div className="border border-border/80 bg-card/40 backdrop-blur-sm rounded-xl p-6 sm:p-7 shadow-xs">
             {checking ? (
-              <div className="flex items-center justify-center py-8 text-muted-foreground">
-                <Loader2 className="animate-spin" size={20} />
+              <div className="flex items-center justify-center py-10 text-muted-foreground">
+                <Loader2 className="animate-spin text-muted-foreground" size={18} />
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    Email address
+                  </Label>
                   <Input
                     id="email"
                     type="email"
                     autoComplete="email"
-                    placeholder="you@yourevent.co.uk"
+                    placeholder="name@organisation.co.uk"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
+                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground transition-all"
                   />
                 </div>
-                <div className="space-y-2">
+
+                <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                      Password
+                    </Label>
                     <Link
                       href="/organiser/forgot-password"
-                      className="text-xs text-muted-foreground hover:text-foreground hover:underline transition-colors"
+                      className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -194,29 +198,27 @@ export default function OrganiserLoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
+                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground transition-all"
                   />
                 </div>
 
                 {error && (
-                  <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-3">
-                    <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                    <AlertCircle size={14} className="shrink-0 mt-0.5" />
                     <span>{error}</span>
                   </div>
                 )}
 
                 {notOrganiser && (
-                  <div className="text-sm rounded-lg p-3 space-y-3 text-amber-700 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900">
+                  <div className="text-xs rounded-lg p-3.5 space-y-3 text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20">
                     {requestSent ? (
-                      <p className="font-medium">
-                        Request received — your organiser workspace is being set up. Taking you
-                        to the dashboard…
+                      <p className="font-medium font-mono">
+                        Request received — setting up your workspace…
                       </p>
                     ) : (
                       <>
-                        <p>
-                          This account is a fan account, not an organiser account. Enter your
-                          organisation name and we&apos;ll upgrade it — you can draft events
-                          right away, and our team verifies organisations before events go live.
+                        <p className="leading-relaxed">
+                          This account is a fan account. Enter your organisation name below to request organiser access.
                         </p>
                         <form onSubmit={handleRequestAccess} className="space-y-2">
                           <Input
@@ -226,27 +228,28 @@ export default function OrganiserLoginPage() {
                             onChange={(e) => setOrgName(e.target.value)}
                             disabled={requesting}
                             required
+                            className="h-9 rounded-lg border-border/80 bg-background/80 text-xs"
                           />
-                          {requestError && <p className="text-red-600">{requestError}</p>}
+                          {requestError && <p className="text-red-500 text-xs">{requestError}</p>}
                           <Button
                             type="submit"
                             size="sm"
-                            className="w-full gap-2"
+                            className="w-full h-8 rounded-lg text-xs font-medium"
                             disabled={requesting || !orgName.trim()}
                           >
                             {requesting ? (
                               <>
-                                <Loader2 className="animate-spin" size={14} /> Submitting…
+                                <Loader2 className="animate-spin" size={12} /> Submitting…
                               </>
                             ) : (
                               'Request organiser access'
                             )}
                           </Button>
                         </form>
-                        <p>
-                          Prefer to talk first?{' '}
-                          <Link href="/contact" className="underline font-medium">
-                            Contact us
+                        <p className="text-[11px] text-muted-foreground">
+                          Prefer to speak first?{' '}
+                          <Link href="/contact" className="underline hover:text-foreground">
+                            Contact team
                           </Link>
                         </p>
                       </>
@@ -254,37 +257,38 @@ export default function OrganiserLoginPage() {
                   </div>
                 )}
 
-                <Button type="submit" size="lg" className="w-full gap-2" disabled={loading}>
+                <Button
+                  type="submit"
+                  size="default"
+                  className="w-full h-10 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                  disabled={loading}
+                >
                   {loading ? (
                     <>
-                      <Loader2 className="animate-spin" size={16} /> Signing in…
+                      <Loader2 className="animate-spin" size={14} /> Signing in…
                     </>
                   ) : (
                     <>
-                      Sign in <ArrowRight size={16} />
+                      Sign in <ArrowRight size={14} />
                     </>
                   )}
                 </Button>
               </form>
             )}
-          </CardContent>
-        </Card>
+          </div>
 
-        <div className="text-center space-y-2 text-xs text-muted-foreground">
-          <p>
-            New promoter or organisation?{' '}
-            <Link href="/organiser/register" className="font-semibold text-primary hover:underline">
-              Register for Organiser Access →
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-1 text-xs text-muted-foreground font-mono">
+            <span>
+              New promoter?{' '}
+              <Link href="/organiser/register" className="text-foreground underline underline-offset-4 hover:opacity-80 transition-opacity">
+                Register access
+              </Link>
+            </span>
+            <Link href="/contact" className="hover:text-foreground transition-colors">
+              Contact support →
             </Link>
-          </p>
-          <p>
-            Want to speak with our team first?{' '}
-            <Link href="/contact" className="underline hover:text-foreground">
-              Contact us
-            </Link>
-          </p>
+          </div>
         </div>
-      </div>
       </div>
     </>
   )

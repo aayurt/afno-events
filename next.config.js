@@ -26,6 +26,7 @@ const nextConfig = {
     ],
   },
   reactStrictMode: true,
+  transpilePackages: ['@aayurt/8848-ui-core'],
   redirects,
   output: 'standalone',
   outputFileTracingRoot: dirname,

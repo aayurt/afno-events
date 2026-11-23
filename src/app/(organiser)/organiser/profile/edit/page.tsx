@@ -11,16 +11,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
+  AlertCircle,
   ArrowLeft,
+  Building2,
   Camera,
   CheckCircle2,
+  ExternalLink,
   Loader2,
-  AlertCircle,
-  Building2,
   Mail,
   Phone,
-  MapPin,
+  ShieldCheck,
   Trash2,
+  UploadCloud,
+  User,
 } from 'lucide-react'
 import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
@@ -83,7 +86,9 @@ export default function OrganiserProfileEditPage() {
       }
     }
     init()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [router])
 
   const handleAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +99,12 @@ export default function OrganiserProfileEditPage() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('/api/organiser/media', { method: 'POST', body: formData, credentials: 'include' })
+      if (tenant?.id) formData.append('tenantId', String(tenant.id))
+      const res = await fetch('/api/organiser/media', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+      })
       if (res.ok) {
         const data = await res.json()
         setAvatarUrl(data.url)
@@ -110,8 +120,9 @@ export default function OrganiserProfileEditPage() {
       }
     } catch {
       setError('Failed to upload image')
+    } finally {
+      setAvatarUploading(false)
     }
-    setAvatarUploading(false)
   }
 
   const save = async (e: React.FormEvent) => {
@@ -168,27 +179,36 @@ export default function OrganiserProfileEditPage() {
 
   if (loading) {
     return (
-      <div className="container py-12 max-w-2xl space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-96 w-full rounded-2xl" />
-      </div>
+      <>
+        <OrganiserHeader title="Profile" />
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+          <Skeleton className="h-4 w-32 rounded-[2px]" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div className="lg:col-span-7 space-y-4">
+              <Skeleton className="h-72 w-full rounded-[6px]" />
+            </div>
+            <div className="lg:col-span-5 space-y-4">
+              <Skeleton className="h-64 w-full rounded-[6px]" />
+            </div>
+          </div>
+        </div>
+      </>
     )
   }
 
   if (!tenant) {
     return (
-      <div className="container py-20 flex justify-center">
-        <Card className="w-full max-w-md text-center p-8 space-y-6">
-          <Building2 size={48} className="mx-auto text-muted-foreground" />
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold">Organiser Access Required</h1>
-            <p className="text-muted-foreground">Please sign in to edit your organisation profile.</p>
-          </div>
-          <Link href="/organiser/login">
-            <Button size="lg" className="w-full gap-2">Sign In</Button>
-          </Link>
-        </Card>
-      </div>
+      <>
+        <OrganiserHeader title="Profile" />
+        <div className="mx-auto max-w-md py-16 px-4 text-center space-y-4">
+          <Building2 size={40} className="mx-auto text-alpine-500 opacity-60" />
+          <h1 className="text-xl font-bold font-sans">Organiser Access Required</h1>
+          <p className="text-xs font-mono text-muted-foreground">Please sign in to edit your organisation profile.</p>
+          <Button asChild className="rounded-[4px] font-mono text-xs bg-alpine-600 hover:bg-alpine-700 text-white">
+            <Link href="/organiser/login">Sign In</Link>
+          </Button>
+        </div>
+      </>
     )
   }
 
@@ -197,193 +217,320 @@ export default function OrganiserProfileEditPage() {
   return (
     <>
       <OrganiserHeader title="Profile" />
-      <div className="container py-8 max-w-2xl space-y-6">
-      <Link href="/organiser/dashboard">
-        <Button variant="ghost" size="sm" className="gap-1.5">
-          <ArrowLeft size={16} /> Back to Dashboard
-        </Button>
-      </Link>
-
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold">Edit Organisation Profile</h1>
-        <p className="text-sm text-muted-foreground">Manage your organisation details and public profile.</p>
-      </div>
-
-      {!isVerified && (
-        <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs text-amber-700 dark:text-amber-400">
-          <strong>Account Under Review</strong> — Your organiser account is pending admin verification. Profile changes will be visible after approval.
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* Top Header */}
+        <div>
+          <Link
+            href="/organiser/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors"
+          >
+            <ArrowLeft size={13} className="text-alpine-500" /> Back to Dashboard
+          </Link>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-sans font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                Organiser Profile & Brand
+              </h1>
+              <p className="text-xs sm:text-sm font-mono text-muted-foreground mt-0.5">
+                Manage your public organiser identity, brand artwork, and contact details.
+              </p>
+            </div>
+          </div>
         </div>
-      )}
 
-      <Card>
-        <CardContent className="p-6">
-          <form onSubmit={save} className="space-y-6">
-            {/* Avatar */}
-            <div className="flex flex-col items-center gap-2">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <Building2 size={40} className="text-primary" />
+        {!isVerified && (
+          <div className="p-3.5 rounded-[4px] border border-amber-500/40 bg-amber-500/10 text-xs font-mono text-amber-700 dark:text-amber-400 flex items-center gap-2">
+            <AlertCircle size={15} className="shrink-0" />
+            <span>
+              <strong>Pending Verification:</strong> Your organiser account is awaiting administrator review. Changes will display to attendees upon approval.
+            </span>
+          </div>
+        )}
+
+        {/* 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left Column: Profile Settings Form (lg:col-span-7) */}
+          <div className="lg:col-span-7 space-y-6">
+            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+              <CardContent className="p-5 space-y-5">
+                <form onSubmit={save} className="space-y-4">
+                  {/* Avatar Upload */}
+                  <div className="flex items-center gap-4 pb-4 border-b border-alpine-500/20">
+                    <div className="relative">
+                      <div className="w-20 h-20 rounded-[6px] bg-slate-50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <Building2 size={32} className="text-alpine-500 opacity-60" />
+                        )}
+                      </div>
+                      <label className="absolute -bottom-1 -right-1 w-7 h-7 rounded-[4px] bg-alpine-600 text-white flex items-center justify-center cursor-pointer hover:bg-alpine-700 transition-colors shadow-xs">
+                        {avatarUploading ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Camera size={13} />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleAvatar}
+                          disabled={avatarUploading}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="space-y-1">
+                      <h4 className="font-mono font-bold text-xs uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                        Brand Logo / Avatar
+                      </h4>
+                      <p className="text-[11px] font-mono text-muted-foreground">
+                        JPG, PNG, or WebP. Square 1:1 image works best for public event badges.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Organisation Name */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="org-name" className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      Organisation Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="org-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Sunny Events London"
+                      className="h-9 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm font-sans"
+                      disabled={saving}
+                      required
+                    />
+                  </div>
+
+                  {/* Contact Email */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="org-email" className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      Public Support Email
+                    </Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                      <Input
+                        id="org-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="promoter@sunnyevents.co.uk"
+                        className="pl-9 h-9 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono"
+                        disabled={saving}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="org-phone" className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      Phone / WhatsApp Helpline
+                    </Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                      <Input
+                        id="org-phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="+44 7123 456789"
+                        className="pl-9 h-9 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono"
+                        disabled={saving}
+                      />
+                    </div>
+                  </div>
+
+                  {/* About / Description */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="org-description" className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      About Organisation
+                    </Label>
+                    <Textarea
+                      id="org-description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe your collective, music genre specialisms, or community initiatives..."
+                      rows={4}
+                      className="rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 resize-y text-xs sm:text-sm leading-relaxed"
+                      disabled={saving}
+                    />
+                  </div>
+
+                  {/* Feedback alerts */}
+                  {success && (
+                    <div className="p-3 rounded-[4px] bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-mono flex items-center gap-2">
+                      <CheckCircle2 size={14} />
+                      <span>Profile updated successfully! Redirecting…</span>
+                    </div>
+                  )}
+                  {error && (
+                    <div className="p-3 rounded-[4px] bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-mono flex items-center gap-2">
+                      <AlertCircle size={14} />
+                      <span>{error}</span>
+                    </div>
+                  )}
+
+                  {/* Buttons */}
+                  <div className="flex gap-2.5 pt-2">
+                    <Button
+                      type="submit"
+                      disabled={saving || success}
+                      className="rounded-[4px] px-6 font-mono font-bold text-xs h-9 bg-alpine-600 hover:bg-alpine-700 text-white shadow-xs"
+                    >
+                      {saving && <Loader2 size={13} className="animate-spin mr-1.5" />}
+                      SAVE CHANGES
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => router.push('/organiser/dashboard')}
+                      className="rounded-[4px] h-9 px-4 text-xs font-mono border-alpine-500/35 hover:bg-alpine-50 dark:hover:bg-slate-800"
+                    >
+                      DISCARD
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+
+            {/* Danger Zone */}
+            <Card className="rounded-[6px] border border-red-500/35 bg-white dark:bg-slate-900 shadow-xs">
+              <CardContent className="p-5 space-y-3">
+                <div>
+                  <h3 className="font-mono font-bold text-xs uppercase tracking-wider text-red-600 dark:text-red-400">
+                    Danger Zone: Delete Organisation
+                  </h3>
+                  <p className="text-[11px] font-mono text-muted-foreground mt-1 leading-relaxed">
+                    Permanently deletes “{tenant.name}” and unlinks all members. This action cannot be reversed.
+                  </p>
+                </div>
+
+                {deleteError && (
+                  <div className="p-3 rounded-[4px] bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-mono flex items-center gap-2">
+                    <AlertCircle size={14} className="shrink-0" />
+                    <span>{deleteError}</span>
+                  </div>
+                )}
+
+                {!confirmDelete ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setDeleteError(null)
+                      setConfirmDelete(true)
+                    }}
+                    className="h-8 px-3 rounded-[4px] font-mono text-xs text-red-600 dark:text-red-400 border-red-500/35 hover:bg-red-500/10"
+                  >
+                    <Trash2 size={13} className="mr-1.5" /> Delete Organisation…
+                  </Button>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setConfirmDelete(false)}
+                      disabled={deleting}
+                      className="h-8 px-3 rounded-[4px] font-mono text-xs border-alpine-500/30"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      onClick={removeTenant}
+                      disabled={deleting}
+                      className="h-8 px-3 rounded-[4px] font-mono text-xs bg-red-600 hover:bg-red-700 text-white font-bold"
+                    >
+                      {deleting && <Loader2 size={13} className="animate-spin mr-1.5" />}
+                      Confirm Delete “{tenant.name}”
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column: Live Organiser Public Brand Card Preview (lg:col-span-5) */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="lg:sticky lg:top-20 space-y-4">
+              <div className="flex items-center justify-between pb-1 border-b border-alpine-500/20">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                  Public Brand Preview
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground uppercase">
+                  Attendee View
+                </span>
+              </div>
+
+              {/* Public Organiser Badge Card */}
+              <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 p-5 space-y-4 shadow-sm">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-14 h-14 rounded-[6px] bg-slate-50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <Building2 size={26} className="text-alpine-500 opacity-60" />
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="font-sans font-bold text-base text-slate-900 dark:text-slate-100 truncate">
+                        {name.trim() || 'Organiser Name'}
+                      </h3>
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      <span className="px-1.5 py-0.5 rounded-[2px] bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[9px] font-mono font-bold uppercase flex items-center gap-1">
+                        <ShieldCheck size={11} /> VERIFIED ORGANISER
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {description.trim() ? (
+                  <p className="text-xs font-sans text-slate-600 dark:text-slate-400 leading-relaxed border-t border-alpine-500/15 pt-3">
+                    {description.trim()}
+                  </p>
+                ) : (
+                  <p className="text-xs font-mono text-muted-foreground italic border-t border-alpine-500/15 pt-3">
+                    No bio description provided yet.
+                  </p>
+                )}
+
+                <div className="pt-2 border-t border-alpine-500/15 space-y-1.5 text-xs font-mono text-slate-600 dark:text-slate-300">
+                  {email.trim() && (
+                    <div className="flex items-center gap-2">
+                      <Mail size={12} className="text-alpine-500 shrink-0" />
+                      <span className="truncate">{email.trim()}</span>
+                    </div>
+                  )}
+                  {phone.trim() && (
+                    <div className="flex items-center gap-2">
+                      <Phone size={12} className="text-alpine-500 shrink-0" />
+                      <span>{phone.trim()}</span>
+                    </div>
                   )}
                 </div>
-                <label className="absolute -bottom-1 -right-1 w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors shadow-md">
-                  {avatarUploading ? (
-                    <Loader2 size={15} className="animate-spin" />
-                  ) : (
-                    <Camera size={15} />
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatar}
-                    disabled={avatarUploading}
-                  />
-                </label>
               </div>
-              <p className="text-xs text-muted-foreground">Click to upload organisation logo/image</p>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="org-name">Organisation Name *</Label>
-              <Input
-                id="org-name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Purbeli Samaj UK"
-                disabled={saving}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="org-email">Contact Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                <Input
-                  id="org-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="promoter@organisation.co.uk"
-                  className="pl-10"
-                  disabled={saving}
-                />
+              {/* Brand Guidelines Card */}
+              <div className="rounded-[6px] border border-alpine-500/25 dark:border-alpine-400/25 bg-slate-50 dark:bg-slate-900 p-4 space-y-2 text-xs font-mono">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Brand Guidelines
+                </span>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Your organiser brand card is featured across all your event tickets, receipts, and discoverable event headers. Keep support details up to date so attendees can reach your team quickly.
+                </p>
               </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="org-phone">Phone / WhatsApp</Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                <Input
-                  id="org-phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+44 7123 456789"
-                  className="pl-10"
-                  disabled={saving}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="org-description">About / Description</Label>
-              <Textarea
-                id="org-description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your organisation, what events you run, your mission..."
-                rows={4}
-                className="rounded-xl resize-y"
-                disabled={saving}
-              />
-            </div>
-
-            {success && (
-              <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                <CheckCircle2 size={16} /> Profile updated successfully
-              </div>
-            )}
-            {error && (
-              <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
-
-            <div className="flex gap-3 pt-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => router.push('/organiser/dashboard')}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" className="flex-1 gap-2" disabled={saving || success}>
-                {saving && <Loader2 size={16} className="animate-spin" />}
-                Save Changes
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {/* Danger Zone */}
-      <Card className="border-destructive/40">
-        <CardContent className="p-6 space-y-3">
-          <div>
-            <h2 className="font-bold text-sm text-destructive">Delete organisation</h2>
-            <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-              Permanently removes “{tenant?.name}” and unlinks its members. Only possible when it
-              has no events left — delete or move them first.
-            </p>
           </div>
-          {deleteError && (
-            <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl p-3">
-              <AlertCircle size={15} className="shrink-0 mt-0.5" />
-              <span>{deleteError}</span>
-            </div>
-          )}
-          {!confirmDelete ? (
-            <Button
-              type="button"
-              variant="outline"
-              className="gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
-              onClick={() => {
-                setDeleteError(null)
-                setConfirmDelete(true)
-              }}
-            >
-              <Trash2 size={15} /> Delete organisation…
-            </Button>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1"
-                onClick={() => setConfirmDelete(false)}
-                disabled={deleting}
-              >
-                Keep it
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                className="flex-1 gap-2"
-                onClick={removeTenant}
-                disabled={deleting}
-              >
-                {deleting && <Loader2 size={15} className="animate-spin" />}
-                Yes, delete “{tenant?.name}”
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
       </div>
     </>
   )

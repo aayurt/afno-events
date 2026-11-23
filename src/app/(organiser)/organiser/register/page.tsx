@@ -91,172 +91,163 @@ export default function OrganiserRegisterPage() {
 
   return (
     <>
-      <OrganiserHeader title="Register" />
-      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-10 sm:py-16">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2.5">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Building2 size={26} className="text-primary" />
+      <OrganiserHeader title="Registration" />
+      <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4 py-10 sm:py-14">
+        <div className="w-full max-w-[460px] space-y-6">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-muted-foreground border border-border/80 bg-muted/40 px-2 py-0.5 rounded">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              New Organiser
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground pt-1">
+              Register organisation
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              Publish community events, manage ticketing, and access live door scanning.
+            </p>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Register as an Organiser</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground max-w-xs mx-auto">
-            List community events, sell tickets, and run door entry scanning.
-          </p>
-        </div>
 
-        {/* Informational Callout */}
-        <div className="p-3.5 rounded-2xl border border-primary/20 bg-primary/5 flex items-start gap-2.5 text-xs text-muted-foreground">
-          <Sparkles size={16} className="text-primary shrink-0 mt-0.5" />
-          <p className="leading-relaxed">
-            New organiser accounts can draft events immediately. Shows are verified before going live to fans.
-          </p>
-        </div>
-
-        <Card className="rounded-2xl shadow-xs border-border/80">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Create Organiser Profile</CardTitle>
-            <CardDescription className="text-xs">
-              Enter your organisation and personal contact details.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <div className="border border-border/80 bg-card/40 backdrop-blur-sm rounded-xl p-6 sm:p-7 shadow-xs">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="orgName" className="text-xs font-semibold">
-                  Organisation or Brand Name *
+                <Label htmlFor="orgName" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                  Organisation / Brand Name *
                 </Label>
                 <Input
                   id="orgName"
                   type="text"
-                  placeholder="e.g. Purbeli Samaj UK or Bassline Events"
+                  placeholder="e.g. Bassline Events or Purbeli Samaj"
                   value={organisationName}
                   onChange={(e) => setOrganisationName(e.target.value)}
-                  className="h-10 rounded-xl text-sm"
+                  className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
                   required
                   disabled={loading}
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="contactName" className="text-xs font-semibold">
-                  Contact Person Name *
-                </Label>
-                <Input
-                  id="contactName"
-                  type="text"
-                  placeholder="e.g. Aayush Shrestha"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="h-10 rounded-xl text-sm"
-                  required
-                  disabled={loading}
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="contactName" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    Contact Name *
+                  </Label>
+                  <Input
+                    id="contactName"
+                    type="text"
+                    placeholder="Full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label htmlFor="phone" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    Phone / WhatsApp
+                  </Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="+44 7123 456789"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                    disabled={loading}
+                  />
+                </div>
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-semibold">
-                  Work / Contact Email *
+                <Label htmlFor="email" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                  Work Email *
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   autoComplete="email"
-                  placeholder="promoter@organisation.co.uk"
+                  placeholder="name@organisation.co.uk"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 rounded-xl text-sm"
+                  className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
                   required
                   disabled={loading}
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-xs font-semibold">
-                  Phone / WhatsApp Number
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="+44 7123 456789"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="h-10 rounded-xl text-sm"
-                  disabled={loading}
-                />
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    Password *
+                  </Label>
+                  <PasswordInput
+                    id="password"
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                    required
+                    disabled={loading}
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-xs font-semibold">
-                  Password *
-                </Label>
-                <PasswordInput
-                  id="password"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-10 rounded-xl text-sm"
-                  required
-                  disabled={loading}
-                />
+                <div className="space-y-1.5">
+                  <Label htmlFor="confirmPassword" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                    Confirm *
+                  </Label>
+                  <PasswordInput
+                    id="confirmPassword"
+                    autoComplete="new-password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={cn(
+                      "h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all",
+                      confirmPassword && !passwordsMatch && "border-destructive"
+                    )}
+                    required
+                    disabled={loading}
+                  />
+                </div>
               </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="confirmPassword" className="text-xs font-semibold">
-                  Confirm Password *
-                </Label>
-                <PasswordInput
-                  id="confirmPassword"
-                  autoComplete="new-password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className={cn(
-                    "h-10 rounded-xl text-sm",
-                    confirmPassword && !passwordsMatch && "border-destructive"
-                  )}
-                  required
-                  disabled={loading}
-                />
-                {confirmPassword && !passwordsMatch && (
-                  <p className="text-xs text-destructive">Passwords do not match</p>
-                )}
-              </div>
+              {confirmPassword && !passwordsMatch && (
+                <p className="text-xs text-destructive font-mono">Passwords do not match</p>
+              )}
 
               {error && (
-                <div className="flex items-start gap-2 text-xs text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl p-3">
-                  <AlertCircle size={15} className="shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                  <AlertCircle size={14} className="shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
               )}
 
               <Button
                 type="submit"
-                size="lg"
-                className="w-full gap-2 rounded-xl font-bold text-sm h-11 bg-primary text-primary-foreground shadow-sm"
+                size="default"
+                className="w-full h-10 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-xs"
                 disabled={loading || !passwordsMatch}
               >
                 {loading ? (
                   <>
-                    <Loader2 className="animate-spin" size={16} /> Creating account…
+                    <Loader2 className="animate-spin" size={14} /> Creating account…
                   </>
                 ) : (
                   <>
-                    Register & Start Creating <ArrowRight size={16} />
+                    Register Organisation <ArrowRight size={14} />
                   </>
                 )}
               </Button>
             </form>
-          </CardContent>
-        </Card>
+          </div>
 
-        <p className="text-center text-xs text-muted-foreground">
-          Already registered as an organiser?{' '}
-          <Link href="/organiser/login" className="underline font-semibold text-foreground hover:text-primary transition-colors">
-            Sign in here
-          </Link>
-        </p>
-      </div>
+          <div className="text-center text-xs text-muted-foreground font-mono">
+            Already registered?{' '}
+            <Link href="/organiser/login" className="text-foreground underline underline-offset-4 hover:opacity-80 transition-opacity">
+              Sign in to workspace →
+            </Link>
+          </div>
+        </div>
       </div>
     </>
   )

@@ -26,11 +26,13 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       // explicit default instead of following the OS.
       window.localStorage.removeItem(themeLocalStorageKey)
       document.documentElement.setAttribute('data-theme', defaultTheme)
+      document.documentElement.classList.toggle('dark', defaultTheme === 'dark')
       setThemeState(defaultTheme)
     } else {
       setThemeState(themeToSet)
       window.localStorage.setItem(themeLocalStorageKey, themeToSet)
       document.documentElement.setAttribute('data-theme', themeToSet)
+      document.documentElement.classList.toggle('dark', themeToSet === 'dark')
     }
   }, [])
 
@@ -45,6 +47,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     document.documentElement.setAttribute('data-theme', themeToSet)
+    document.documentElement.classList.toggle('dark', themeToSet === 'dark')
     setThemeState(themeToSet)
   }, [])
 

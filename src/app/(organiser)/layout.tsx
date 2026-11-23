@@ -22,15 +22,15 @@ export default async function OrganiserRootLayout({ children }: { children: Reac
   const locale: Locale = raw === 'en' || raw === 'ne' ? raw : 'en'
 
   return (
-    <html className={cn(GeistSans.variable, GeistMono.variable)} lang={locale} suppressHydrationWarning>
+    <html className={cn(GeistSans.variable, GeistMono.variable, 'font-sans')} lang={locale} suppressHydrationWarning>
       <head>
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
       </head>
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-foreground selection:text-background transition-colors duration-150">
         <Providers>
           <I18nProvider locale={locale}>
-            <div className="min-h-screen flex flex-col">{children}</div>
+            <div className="min-h-screen flex flex-col font-sans bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">{children}</div>
           </I18nProvider>
         </Providers>
       </body>

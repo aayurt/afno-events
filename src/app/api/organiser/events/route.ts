@@ -196,10 +196,29 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10) || 50, 100)
   const page = parseInt(searchParams.get('page') || '1', 10) || 1
+  const search = searchParams.get('search') || ''
+  const status = searchParams.get('status') || 'all'
+  const sort = searchParams.get('sort') || '-createdAt'
 
   const where: Record<string, unknown> = {}
   if (user.role !== 'super-admin' || tenantIds.length > 0) {
     where.tenant = { in: tenantIds }
+  }
+
+  if (search) {
+    where.title = { contains: search }
+  }
+
+  if (status !== 'all') {
+    if (status === 'published') {
+      where.enabled = { equals: true }
+      where.approvalStatus = { equals: 'approved' }
+    } else if (status === 'draft') {
+      where.enabled = { equals: false }
+    } else if (status === 'scheduled') {
+      where.enabled = { equals: true }
+      where.approvalStatus = { equals: 'pending_review' }
+    }
   }
 
   const result = await payload.find({
@@ -208,14 +227,17 @@ export async function GET(req: NextRequest) {
     depth: 1,
     limit,
     page,
-    sort: '-startDatetime',
+    sort,
     overrideAccess: true,
   })
 
+  const hasMore = page < result.totalPages
+
   return NextResponse.json({
-    docs: result.docs,
+    events: result.docs,
     totalDocs: result.totalDocs,
     page: result.page,
     totalPages: result.totalPages,
+    hasMore,
   })
 }

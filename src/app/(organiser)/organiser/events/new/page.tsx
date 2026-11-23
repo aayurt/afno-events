@@ -42,16 +42,27 @@ export default function NewEventPage() {
   return (
     <>
       <OrganiserHeader title="New Event" />
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 py-6 sm:py-10 space-y-6">
-      <div>
-        <Link href="/organiser/dashboard" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors">
-          <ArrowLeft size={14} /> Back to Dashboard
-        </Link>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Create New Event</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground">Add details, poster artwork, and ticket pricing.</p>
-      </div>
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <div>
+          <Link
+            href="/organiser/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-muted-foreground hover:text-foreground mb-3 transition-colors"
+          >
+            <ArrowLeft size={13} className="text-alpine-500" /> Back to Dashboard
+          </Link>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-sans font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                Create New Event
+              </h1>
+              <p className="text-xs sm:text-sm font-mono text-muted-foreground mt-0.5">
+                Configure event profile, schedule, venue map, and live ticket tiers.
+              </p>
+            </div>
+          </div>
+        </div>
 
-      <EventForm onSubmit={handleCreate} submitLabel="Create Event" isTenantVerified={isTenantVerified} />
+        <EventForm onSubmit={handleCreate} submitLabel="Create Event" isTenantVerified={isTenantVerified} />
       </div>
     </>
   )

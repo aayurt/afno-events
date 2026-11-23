@@ -86,3 +86,69 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
     docs,
   })
 }
+
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const payload = await getPayload({ config: configPromise })
+  const { id } = await ctx.params
+  const eventId = parseInt(id, 10)
+
+  if (isNaN(eventId)) {
+    return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
+  }
+
+  let user: any = (req as any).user ?? null
+  if (!user) {
+    const result = await payload.auth({ headers: req.headers, canSetHeaders: false }).catch(() => null)
+    user = result?.user ?? null
+  }
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (user.role !== 'admin' && user.role !== 'super-admin') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const event = await payload.findByID({ collection: 'events', id: eventId, depth: 0 }).catch(() => null)
+  if (!event) return NextResponse.json({ error: 'Event not found' }, { status: 404 })
+
+  if (user.role !== 'super-admin') {
+    const tenantIds = getUserTenantIDs(user).map(String)
+    const eventTenant = String(
+      (event as any).tenant && typeof (event as any).tenant === 'object'
+        ? (event as any).tenant.id
+        : (event as any).tenant ?? '',
+    )
+    if (!eventTenant || !tenantIds.includes(eventTenant)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
+  const body = await req.json().catch(() => ({}))
+  const { ticketId, status } = body
+
+  if (!ticketId || (status !== 'checked-in' && status !== 'unused')) {
+    return NextResponse.json({ error: 'Invalid ticketId or status' }, { status: 400 })
+  }
+
+  const ticket = await payload.findByID({ collection: 'tickets', id: ticketId, depth: 0 }).catch(() => null)
+  if (!ticket) return NextResponse.json({ error: 'Ticket not found' }, { status: 404 })
+
+  const ticketEventId = typeof ticket.event === 'object' ? (ticket.event as any)?.id : ticket.event
+  if (Number(ticketEventId) !== eventId) {
+    return NextResponse.json({ error: 'Ticket does not belong to this event' }, { status: 400 })
+  }
+
+  const updated = await payload.update({
+    collection: 'tickets',
+    id: ticketId,
+    data: {
+      status,
+      checkedInAt: status === 'checked-in' ? new Date().toISOString() : null,
+    },
+    overrideAccess: true,
+  })
+
+  return NextResponse.json({
+    id: updated.id,
+    status: updated.status,
+    checkedInAt: (updated as any).checkedInAt ?? null,
+  })
+}

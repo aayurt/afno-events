@@ -26,9 +26,9 @@ const LeafletMap = dynamic<LeafletMapProps>(
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 w-full rounded-2xl bg-muted/50 flex flex-col items-center justify-center text-muted-foreground border border-border">
-        <Loader2 className="animate-spin mb-2" size={24} />
-        <span className="text-xs">Loading map view…</span>
+      <div className="h-64 w-full rounded-[6px] bg-slate-50 dark:bg-slate-900/60 flex flex-col items-center justify-center text-muted-foreground border border-alpine-500/30">
+        <Loader2 className="animate-spin mb-2 text-alpine-500" size={24} />
+        <span className="text-xs font-mono">Loading map view…</span>
       </div>
     ),
   }
@@ -126,28 +126,28 @@ export function VenueMapPicker({ value, onChange }: Props) {
   return (
     <div className="space-y-4">
       {/* Venue Name Input */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label htmlFor="venueName" className="text-sm font-semibold">
-            Venue Name or Address *
+          <Label htmlFor="venueName" className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            Venue Name or Address <span className="text-destructive">*</span>
           </Label>
           <button
             type="button"
             onClick={() => setShowMap(!showMap)}
-            className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
+            className="text-xs text-alpine-600 dark:text-alpine-400 font-mono font-medium hover:underline flex items-center gap-1"
           >
             <MapPin size={12} />
             {showMap ? 'Hide map' : 'Choose on map'}
           </button>
         </div>
         <div className="relative">
-          <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <MapPin size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="venueName"
             value={venueName}
             onChange={(e) => handleVenueNameChange(e.target.value)}
             placeholder="e.g. Scala, 275 Pentonville Rd, London"
-            className="pl-10 h-10 rounded-xl"
+            className="pl-9 h-9 rounded-[4px] border-alpine-500/30 text-xs sm:text-sm"
             required
           />
         </div>
@@ -155,16 +155,16 @@ export function VenueMapPicker({ value, onChange }: Props) {
 
       {/* Map search & interactive picker */}
       {showMap && (
-        <div className="p-4 rounded-2xl border border-border bg-muted/20 space-y-3">
+        <div className="p-3.5 rounded-[6px] border border-alpine-500/30 bg-slate-50 dark:bg-slate-900 space-y-3">
           <div className="flex gap-2">
             <div className="relative flex-1 min-w-0">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch(e)}
                 placeholder="Search city, venue or postcode..."
-                className="pl-9 h-9 rounded-xl text-xs bg-background w-full"
+                className="pl-8 h-8 rounded-[4px] border-alpine-500/30 text-xs bg-white dark:bg-slate-900 w-full"
               />
             </div>
             <Button
@@ -173,7 +173,7 @@ export function VenueMapPicker({ value, onChange }: Props) {
               size="sm"
               onClick={() => handleSearch()}
               disabled={isSearching}
-              className="rounded-xl h-9 text-xs gap-1 px-3 shrink-0"
+              className="rounded-[4px] h-8 text-xs font-mono gap-1 px-3 shrink-0 border-alpine-500/30"
             >
               {isSearching ? <Loader2 size={13} className="animate-spin" /> : <Navigation size={13} />}
               <span className="hidden sm:inline">Search</span>
@@ -182,23 +182,23 @@ export function VenueMapPicker({ value, onChange }: Props) {
 
           {/* Search suggestions dropdown */}
           {results.length > 0 && (
-            <div className="border border-border rounded-xl bg-card overflow-hidden divide-y divide-border text-xs shadow-md max-h-48 overflow-y-auto">
+            <div className="border border-alpine-500/30 rounded-[4px] bg-white dark:bg-slate-900 overflow-hidden divide-y divide-alpine-500/15 text-xs shadow-md max-h-48 overflow-y-auto">
               {results.map((r, i) => (
                 <button
                   type="button"
                   key={i}
                   onClick={() => handleSelectResult(r)}
-                  className="w-full text-left p-2.5 hover:bg-muted/50 transition-colors flex items-start gap-2 min-w-0"
+                  className="w-full text-left p-2.5 hover:bg-alpine-50 dark:hover:bg-slate-800/60 transition-colors flex items-start gap-2 min-w-0"
                 >
-                  <MapPin size={14} className="text-primary shrink-0 mt-0.5" />
-                  <span className="truncate flex-1">{r.display_name}</span>
+                  <MapPin size={13} className="text-alpine-500 shrink-0 mt-0.5" />
+                  <span className="truncate flex-1 font-sans">{r.display_name}</span>
                 </button>
               ))}
             </div>
           )}
 
           {/* Interactive Leaflet Map */}
-          <div className="h-56 sm:h-72 w-full rounded-xl overflow-hidden border border-border shadow-xs">
+          <div className="h-56 sm:h-64 w-full rounded-[4px] overflow-hidden border border-alpine-500/30 shadow-xs">
             <LeafletMap
               latitude={value?.latitude || 51.5312} // Default London
               longitude={value?.longitude || -0.1226}
@@ -208,7 +208,7 @@ export function VenueMapPicker({ value, onChange }: Props) {
 
           {value?.mapLocation && (
             <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-mono min-w-0">
-              <span className="font-semibold text-foreground shrink-0">Selected:</span>
+              <span className="font-semibold text-foreground shrink-0 uppercase text-[10px]">PINNED:</span>
               <span className="truncate flex-1">{value.mapLocation}</span>
             </div>
           )}
