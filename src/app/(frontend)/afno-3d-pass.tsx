@@ -171,7 +171,6 @@ function generateBarcodeSvgBars(seed: string): string {
 export function Afno3DPass() {
   const [activeTier, setActiveTier] = useState<string>('vip')
   const [isFlipped, setIsFlipped] = useState(false)
-  const [autoFloat, setAutoFloat] = useState(false)
   const [copied, setCopied] = useState(false)
 
   // Physics state
@@ -197,11 +196,8 @@ export function Afno3DPass() {
     currentPx: 50,
     currentPy: 50,
     isHovering: false,
-    autoFloat: false,
     clock: 0,
   })
-
-  physicsRef.current.autoFloat = autoFloat
 
   const tier = TIER_CONFIG[activeTier] || TIER_CONFIG.vip
 
@@ -211,7 +207,7 @@ export function Afno3DPass() {
     const normX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
     const normY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
 
-    const maxTilt = 13
+    const maxTilt = 12
     physicsRef.current.targetRx = (0.5 - normY) * 2 * maxTilt
     physicsRef.current.targetRy = (normX - 0.5) * 2 * maxTilt
     physicsRef.current.targetPx = normX * 100
@@ -226,19 +222,12 @@ export function Afno3DPass() {
       const p = physicsRef.current
       p.clock += 0.02
 
-      if (p.autoFloat && !p.isHovering) {
-        p.targetRx = Math.sin(p.clock) * 7.5
-        p.targetRy = Math.cos(p.clock * 0.75) * 10
-        p.targetPx = 50 + Math.cos(p.clock * 0.75) * 35
-        p.targetPy = 50 + Math.sin(p.clock) * 35
-      }
-
       p.currentRx += (p.targetRx - p.currentRx) * LERP_FACTOR
       p.currentRy += (p.targetRy - p.currentRy) * LERP_FACTOR
       p.currentPx += (p.targetPx - p.currentPx) * LERP_FACTOR
       p.currentPy += (p.targetPy - p.currentPy) * LERP_FACTOR
 
-      const hyp = Math.min(1, Math.hypot(p.currentRx / 13, p.currentRy / 13))
+      const hyp = Math.min(1, Math.hypot(p.currentRx / 12, p.currentRy / 12))
 
       setSpringStyle({
         rx: p.currentRx,
@@ -267,19 +256,19 @@ export function Afno3DPass() {
   const barcodeBars = generateBarcodeSvgBars(tier.serial)
 
   return (
-    <div className="w-full flex flex-col items-center">
-      {/* Controls Bar: Tiers, Auto-float, Flip */}
-      <div className="flex flex-wrap items-center justify-center gap-3 mb-6 z-20">
-        {/* Tier Selector */}
-        <div className="inline-flex p-1 rounded-xl bg-slate-900/80 border border-slate-700/60 backdrop-blur-md">
+    <div className="w-full flex flex-col items-center px-1 sm:px-0">
+      {/* Controls Bar: Tiers and Flip Pass */}
+      <div className="flex flex-wrap items-center justify-center gap-3 mb-5 z-20">
+        {/* Tier Selector Pills with dedicated dark backgrounds and clear hover states */}
+        <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-700/80 shadow-md">
           {Object.entries(TIER_CONFIG).map(([key, item]) => (
             <button
               key={key}
               onClick={() => setActiveTier(key)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                 activeTier === key
-                  ? 'bg-alpine-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-alpine-600 text-white shadow-sm font-bold'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               {item.name}
@@ -287,24 +276,14 @@ export function Afno3DPass() {
           ))}
         </div>
 
-        {/* Action Toggles */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setAutoFloat(!autoFloat)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition-all active:scale-95 shadow-sm"
-          >
-            <Orbit size={14} className={autoFloat ? 'text-cyan-400 animate-spin' : 'text-slate-400'} />
-            <span>Auto-Float: <strong className={autoFloat ? 'text-cyan-300' : 'text-white'}>{autoFloat ? 'ON' : 'OFF'}</strong></span>
-          </button>
-
-          <button
-            onClick={() => setIsFlipped(!isFlipped)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-alpine-600 hover:bg-alpine-700 text-white border border-alpine-500/50 transition-all active:scale-95 shadow-md"
-          >
-            <RotateCw size={14} className={isFlipped ? 'rotate-180 transition-transform' : ''} />
-            <span>{isFlipped ? 'View Front' : 'Flip Ticket Pass'}</span>
-          </button>
-        </div>
+        {/* Flip Action Button */}
+        <button
+          onClick={() => setIsFlipped(!isFlipped)}
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-alpine-600 hover:bg-alpine-700 text-white border border-alpine-500/50 transition-all active:scale-95 shadow-md"
+        >
+          <RotateCw size={14} className={isFlipped ? 'rotate-180 transition-transform duration-300' : 'transition-transform duration-300'} />
+          <span>{isFlipped ? 'View Front' : 'Flip Ticket Pass'}</span>
+        </button>
       </div>
 
       {/* 3D Ticket Stage */}
@@ -316,12 +295,10 @@ export function Afno3DPass() {
         onMouseMove={(e) => handlePointerMove(e.clientX, e.clientY)}
         onMouseLeave={() => {
           physicsRef.current.isHovering = false
-          if (!autoFloat) {
-            physicsRef.current.targetRx = 0
-            physicsRef.current.targetRy = 0
-            physicsRef.current.targetPx = 50
-            physicsRef.current.targetPy = 50
-          }
+          physicsRef.current.targetRx = 0
+          physicsRef.current.targetRy = 0
+          physicsRef.current.targetPx = 50
+          physicsRef.current.targetPy = 50
         }}
         onTouchStart={(e) => {
           if (e.touches[0]) handlePointerMove(e.touches[0].clientX, e.touches[0].clientY)
@@ -331,10 +308,8 @@ export function Afno3DPass() {
         }}
         onTouchEnd={() => {
           physicsRef.current.isHovering = false
-          if (!autoFloat) {
-            physicsRef.current.targetRx = 0
-            physicsRef.current.targetRy = 0
-          }
+          physicsRef.current.targetRx = 0
+          physicsRef.current.targetRy = 0
         }}
         onPointerDown={(e) => {
           pointerDownPos.current = { x: e.clientX, y: e.clientY }
@@ -409,15 +384,21 @@ export function Afno3DPass() {
                 }}
               />
 
-              {/* Perforation Cutouts */}
+              {/* Perforation Cutouts - Desktop: Vertical; Mobile: Horizontal */}
+              {/* Desktop Perforations */}
               <div className="hidden md:block absolute -top-3.5 right-[29%] w-7 h-7 rounded-full bg-slate-950 border-b border-white/15 z-30 shadow-inner translate-x-1/2" />
               <div className="hidden md:block absolute -bottom-3.5 right-[29%] w-7 h-7 rounded-full bg-slate-950 border-t border-white/15 z-30 shadow-inner translate-x-1/2" />
               <div className="hidden md:block absolute top-4 bottom-4 right-[29%] w-px border-r-2 border-dashed border-white/20 z-25" />
 
-              {/* Pass Body (Left: 71%, Right: 29%) */}
+              {/* Mobile Perforations */}
+              <div className="md:hidden absolute top-[68%] -left-3.5 w-7 h-7 rounded-full bg-slate-950 border-r border-white/15 z-30 shadow-inner -translate-y-1/2" />
+              <div className="md:hidden absolute top-[68%] -right-3.5 w-7 h-7 rounded-full bg-slate-950 border-l border-white/15 z-30 shadow-inner -translate-y-1/2" />
+              <div className="md:hidden absolute left-4 right-4 top-[68%] h-px border-b-2 border-dashed border-white/20 z-25 -translate-y-1/2" />
+
+              {/* Pass Body (Left: 71%, Right: 29% on desktop; vertical stack on mobile) */}
               <div className="relative z-10 flex flex-col md:flex-row min-h-[360px]">
                 {/* Left: Main Event Body */}
-                <div className="w-full md:w-[71%] p-6 sm:p-8 flex flex-col justify-between relative bg-gradient-to-br from-slate-900/90 via-slate-950/95 to-slate-900/90 backdrop-blur-md">
+                <div className="w-full md:w-[71%] p-5 sm:p-7 md:p-8 flex flex-col justify-between relative bg-gradient-to-br from-slate-900/95 via-slate-950 to-slate-900/95 backdrop-blur-md">
                   {/* Subtle Geometric Background */}
                   <div className="absolute inset-0 pointer-events-none opacity-5">
                     <svg className="w-full h-full" viewBox="0 0 600 400" fill="none">
@@ -428,10 +409,10 @@ export function Afno3DPass() {
                   </div>
 
                   {/* Top Row: Tier Badge + Security Seal */}
-                  <div className="flex items-start justify-between gap-4 relative z-10">
+                  <div className="flex items-start justify-between gap-3 relative z-10">
                     <div>
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest border ${tier.badgeClasses}`}>
+                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest border ${tier.badgeClasses}`}>
                           <Crown size={12} />
                           <span>{tier.badgeText}</span>
                         </span>
@@ -439,13 +420,13 @@ export function Afno3DPass() {
                           VERIFIED CREDENTIAL
                         </span>
                       </div>
-                      <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-slate-400">
+                      <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] sm:tracking-[0.2em] text-slate-400">
                         AFNO EVENTS • UK NEPALI FESTIVAL 2026
                       </p>
                     </div>
 
                     {/* Iridescent Hologram Seal */}
-                    <div className="relative w-12 h-12 rounded-full p-[2px] shadow-lg shrink-0" style={{ background: `conic-gradient(from 0deg, ${tier.accent1}, ${tier.accent2}, ${tier.accent3}, ${tier.accent1})` }}>
+                    <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full p-[2px] shadow-lg shrink-0" style={{ background: `conic-gradient(from 0deg, ${tier.accent1}, ${tier.accent2}, ${tier.accent3}, ${tier.accent1})` }}>
                       <div className="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center text-center border border-white/20">
                         <ShieldCheck size={14} className="text-white mb-0.5" />
                         <span className="text-[7px] font-mono font-bold tracking-tighter text-white leading-none">AFNO</span>
@@ -455,13 +436,13 @@ export function Afno3DPass() {
                   </div>
 
                   {/* Middle Title */}
-                  <div className="my-5 relative z-10">
+                  <div className="my-4 sm:my-5 relative z-10">
                     <div className="text-xs font-mono font-bold tracking-widest text-alpine-400 uppercase mb-1 flex items-center gap-1.5">
                       <Sparkles size={13} />
                       <span>OFFICIAL DIGITAL PASS</span>
                     </div>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-sans tracking-tight text-white leading-none">
-                      AFNO <span className="text-alpine-500">SYNTHESIS</span>
+                    <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-sans tracking-tight text-white leading-none">
+                      AFNO <span className="text-alpine-500">EVENT</span>
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-300 mt-2 font-normal max-w-md">
                       Live Headline Concerts • Traditional Folk & Fusion • Nepalese Street Food & Cultural Village
@@ -469,7 +450,7 @@ export function Afno3DPass() {
                   </div>
 
                   {/* Bottom Metadata Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-white/10 relative z-10">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3.5 sm:pt-4 border-t border-white/10 relative z-10">
                     <div>
                       <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-400 mb-0.5">DATE</span>
                       <span className="block font-sans font-bold text-xs sm:text-sm text-white">28 NOV 2026</span>
@@ -489,10 +470,10 @@ export function Afno3DPass() {
                   </div>
                 </div>
 
-                {/* Right: Tear-off Stub */}
-                <div className="w-full md:w-[29%] p-5 sm:p-6 bg-slate-900/90 flex flex-col justify-between items-center text-center relative border-t md:border-t-0 md:border-l border-white/10">
+                {/* Right: Tear-off Stub (Mobile: bottom section) */}
+                <div className="w-full md:w-[29%] p-5 sm:p-6 bg-slate-900/95 flex flex-col justify-between items-center text-center relative border-t md:border-t-0 md:border-l border-white/10">
                   {/* Stub Header */}
-                  <div className="w-full flex md:flex-col items-center justify-between md:justify-center gap-1 pb-2 border-b border-white/10">
+                  <div className="w-full flex items-center justify-between md:justify-center md:flex-col gap-1 pb-2 border-b border-white/10">
                     <div className="text-left md:text-center">
                       <span className="block text-[9px] font-mono uppercase tracking-widest text-slate-400">SEAT / ADMIT</span>
                       <span className="font-sans font-black text-sm sm:text-base text-white">{tier.seat}</span>
@@ -515,7 +496,7 @@ export function Afno3DPass() {
                   {/* Barcode & Serial */}
                   <div className="w-full">
                     <svg
-                      className="w-full h-8 text-white/90 mx-auto mb-1"
+                      className="w-full h-7 sm:h-8 text-white/90 mx-auto mb-1"
                       viewBox="0 0 220 40"
                       preserveAspectRatio="none"
                       shapeRendering="crispEdges"
