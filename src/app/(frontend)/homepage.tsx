@@ -9,6 +9,7 @@ import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import { displayPriceRange } from '@/utilities/pricing'
 import { APP_STORE_URL } from '@/utilities/constants'
 import { NewsletterSection } from '@/components/NewsletterSection'
+import { TiltTicketCard } from './tilt-ticket'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -176,80 +177,20 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Right 5 Cols: Nearest Bookable Event Spotlight Card */}
+            {/* Right 5 Cols: Nearest Bookable Event 3D Tilt Ticket Pass */}
             {featuredEvent && (
-              <div className="lg:col-span-5">
-                <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
-                  <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] rounded-[10px] overflow-hidden border border-alpine-500/35 dark:border-alpine-400/35 shadow-card group cursor-pointer bg-white dark:bg-slate-900 hover:border-alpine-500 hover:shadow-card-hover transition-all duration-300">
-                    
-                    {/* Full-bleed background poster */}
-                    {featuredCover ? (
-                      <img 
-                        src={featuredCover} 
-                        alt={featuredEvent.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-alpine-50 dark:bg-slate-900">
-                        <Calendar className="w-16 h-16 text-alpine-400/40" />
-                      </div>
-                    )}
-
-                    {/* Gradient scrim overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
-
-                    {/* Top status badges */}
-                    <div className="absolute top-4 left-4 flex items-center gap-2">
-                      <span className="bg-alpine-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-[4px] shadow-xs">
-                        {featuredIsBookable ? 'Featured Spotlight' : featuredIsExpired ? 'Past Event' : 'Featured'}
-                      </span>
-                    </div>
-
-                    {/* Bottom-aligned metadata & typography */}
-                    <div className="absolute inset-x-0 bottom-0 p-5 space-y-1.5 text-left">
-                      {/* Crimson metadata line: [DAY MONTH] • [LOCATION] */}
-                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-alpine-400 flex items-center gap-1.5 drop-shadow-md">
-                        <span>
-                          {featuredEvent.startDatetime
-                            ? new Date(featuredEvent.startDatetime).toLocaleDateString('en-GB', {
-                                day: 'numeric',
-                                month: 'short',
-                              }).toUpperCase()
-                            : 'DATE TBD'}
-                        </span>
-                        {featuredEvent.location?.location && (
-                          <>
-                            <span>•</span>
-                            <span className="truncate max-w-[200px]">
-                              {featuredEvent.location.location.split(',')[0].toUpperCase()}
-                            </span>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Heavy, clean title */}
-                      <h2 className="text-2xl sm:text-3xl font-sans font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors">
-                        {featuredEvent.title}
-                      </h2>
-
-                      {/* Clean inline price & booking status */}
-                      <div className="flex items-center justify-between pt-1 border-t border-white/10">
-                        <span className="text-sm font-bold text-white font-mono drop-shadow-sm flex items-center gap-1.5">
-                          <Ticket size={13} className="text-alpine-400" />
-                          {featuredEvent.pricing?.type === 'paid' 
-                            ? displayPriceRange(featuredEvent.pricing.ticketTypes, featuredEvent.pricing.priceRange) 
-                            : 'Free Entry'}
-                        </span>
-
-                        <span className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          Book Tickets →
-                        </span>
-                      </div>
-                    </div>
-
-                  </div>
-                </Link>
+              <div className="lg:col-span-5 flex justify-center items-center">
+                <TiltTicketCard
+                  event={featuredEvent}
+                  featuredCover={featuredCover}
+                  isBookable={featuredIsBookable}
+                  isExpired={featuredIsExpired}
+                  priceText={
+                    featuredEvent.pricing?.type === 'paid'
+                      ? displayPriceRange(featuredEvent.pricing.ticketTypes, featuredEvent.pricing.priceRange)
+                      : 'Free Entry'
+                  }
+                />
               </div>
             )}
 
