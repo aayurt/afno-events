@@ -10,6 +10,7 @@ import { displayPriceRange } from '@/utilities/pricing'
 import { APP_STORE_URL } from '@/utilities/constants'
 import { NewsletterSection } from '@/components/NewsletterSection'
 import { Afno3DPass } from './afno-3d-pass'
+import { Afno3DCalendar } from './afno-3d-calendar'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -183,113 +184,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 🟢 THE FEATURE: Infinite Smooth-Scrolling Poster Marquee Carousel */}
-      <section className="py-14 overflow-hidden relative border-b border-alpine-500/20 dark:border-alpine-400/20 group bg-white dark:bg-slate-950">
-        
-        <div className="container px-4 sm:px-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-alpine-600 dark:text-alpine-400 text-xs font-mono font-bold uppercase tracking-wider mb-1">
-              <Sparkles size={14} />
-              Confirmed Community Calendar
-            </div>
-            <h2 className="text-3xl font-sans font-black tracking-tight text-slate-900 dark:text-slate-100">Trending Across the UK</h2>
-          </div>
-          <Link href="/app/events">
-            <Button variant="ghost" className="text-xs font-mono font-semibold text-alpine-600 dark:text-alpine-400 hover:text-alpine-700 hover:bg-alpine-50 dark:hover:bg-slate-800 rounded-[4px] group">
-              Browse Full Catalog 
-              <ArrowRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-        </div>
-
-        {/* Subtle Edge Mask Gradients */}
-        <div className="absolute top-16 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-white dark:from-slate-950 via-white/80 dark:via-slate-950/80 to-transparent z-20 pointer-events-none" />
-        <div className="absolute top-16 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-white dark:from-slate-950 via-white/80 dark:via-slate-950/80 to-transparent z-20 pointer-events-none" />
-
-        {/* Infinite Moving Marquee Track */}
-        <div className="animate-marquee-track gap-5 pl-6">
-          
-          {/* Repeat set 3x to guarantee seamless infinite movement across all viewport sizes */}
-          {[...marqueeEvents, ...marqueeEvents, ...marqueeEvents].map((event: any, idx: number) => {
-            const coverUrl = getCardImageUrl(event.coverImage)
-            const bookable = isEventBookable(event)
-            const expired = isEventExpired(event)
-
-            return (
-              <Link 
-                key={`${event.id}-${idx}`} 
-                href={`/app/events/${event.slug || event.id}`}
-                className="w-64 sm:w-72 h-[380px] sm:h-[420px] rounded-[10px] overflow-hidden shrink-0 relative group shadow-card transition-all duration-300 cursor-pointer border border-alpine-500/35 dark:border-alpine-400/35 hover:border-alpine-500 hover:shadow-card-hover hover:scale-[1.02]"
-              >
-                {/* Full-bleed poster image */}
-                {coverUrl ? (
-                  <img 
-                    src={coverUrl} 
-                    alt={event.title} 
-                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${expired ? 'grayscale contrast-75 opacity-60' : ''}`} 
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-alpine-50 dark:bg-slate-900">
-                    <Calendar className="w-12 h-12 text-alpine-400/30" />
-                  </div>
-                )}
-
-                {/* Dark gradient scrim at the bottom (matches screenshot gradient) */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent p-5 flex flex-col justify-end pointer-events-none" />
-
-                {/* Bottom-aligned text content */}
-                <div className="absolute inset-x-0 bottom-0 p-5 space-y-1 text-left z-10">
-                  {/* Meta line: Date • Location in bright alpine crimson */}
-                  <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-alpine-400 drop-shadow-md">
-                    <span>
-                      {event.startDatetime
-                        ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                          }).toUpperCase()
-                        : 'UPCOMING'}
-                    </span>
-                    {event.location?.location && (
-                      <>
-                        <span> • </span>
-                        <span>{event.location.location.split(',')[0].toUpperCase()}</span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* High-contrast bold title */}
-                  <h3 className="text-lg font-sans font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors line-clamp-2">
-                    {event.title}
-                  </h3>
-
-                  {/* Clean unbadged price or status text */}
-                  <div className="pt-1 flex items-center justify-between border-t border-white/10">
-                    <span className="text-xs font-mono font-bold text-gray-200 drop-shadow-sm">
-                      {expired 
-                        ? 'Expired' 
-                        : event.pricing?.type === 'paid' 
-                          ? displayPriceRange(event.pricing?.ticketTypes, event.pricing?.priceRange)
-                          : 'Free'}
-                    </span>
-
-                    {bookable && (
-                      <span className="text-[10px] font-mono font-bold text-emerald-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        Book →
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Subtle top badge if expired */}
-                {expired && (
-                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-slate-300 text-[10px] font-mono px-2 py-0.5 rounded-[3px] border border-white/10">
-                    Past
-                  </div>
-                )}
-              </Link>
-            )
-          })}
-
+      {/* 🟢 Interactive 3D Perspective Wall Calendar Component with Event Posters */}
+      <section className="py-14 relative border-b border-alpine-500/20 dark:border-alpine-400/20 bg-white dark:bg-slate-950">
+        <div className="container px-4 sm:px-6">
+          <Afno3DCalendar events={sortedEvents} />
         </div>
       </section>
 
