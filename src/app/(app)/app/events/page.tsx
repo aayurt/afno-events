@@ -25,6 +25,7 @@ import { FavoriteButton } from './[slug]/favorite-button'
 import { EventSearchBar } from './search-bar'
 import { getEventStatus } from '@/components/events/event-status'
 import { EventStatusBadge } from '@/components/events/event-status-badge'
+import { EventAlertFallback } from './event-alert-fallback'
 
 function formatMonthDay(startDatetime: string | null) {
   if (!startDatetime) return ''
@@ -75,7 +76,22 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
   const { docs: events, totalPages, page } = result
   const current = page ?? 1
 
-  const featuredEvent = events.find((e: any) => e.featured === true) || events[0] || null
+  const nowMs = Date.now()
+  const upcomingEvents = events.filter((e: any) => {
+    const time = e.startDatetime ? new Date(e.startDatetime).getTime() : 0
+    return time >= nowMs
+  })
+  const pastEvents = events.filter((e: any) => {
+    const time = e.startDatetime ? new Date(e.startDatetime).getTime() : 0
+    return time < nowMs
+  })
+
+  // If there are upcoming events, prioritize them; otherwise past events
+  const displayEvents = upcomingEvents.length > 0 ? upcomingEvents : events
+  const featuredEvent = displayEvents.find((e: any) => e.featured === true) || displayEvents[0] || null
+
+  const isFiltered = Boolean(q || tag)
+  const isSparse = upcomingEvents.length < 3
 
   return (
     <div className="container py-12 space-y-10">
@@ -117,20 +133,21 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
       </form>
 
       <p className="my-8 text-primary/70 text-sm capitalize">
-        This week in UK
+        {upcomingEvents.length > 0 ? 'Upcoming Events in the UK' : 'Confirmed Events Directory'}
       </p>
 
       {events.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-xl text-muted-foreground">{t('noEventsFound')}</p>
-          <Link href="/app/events" className="text-primary hover:underline mt-2 block">
-            {t('viewAll')}
-          </Link>
+        <div className="py-6">
+          <EventAlertFallback
+            currentQuery={q}
+            currentTag={tag}
+            isFiltered={isFiltered}
+          />
         </div>
       ) : (
         <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {events.map((event: any) => {
+          {displayEvents.map((event: any) => {
             const isFeatured = event.id === featuredEvent?.id
             const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
             const isFree = event.pricing?.type === 'free'
@@ -222,6 +239,76 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
             )
           })}
         </div>
+
+        {/* When events are sparse (e.g. fewer than 3 upcoming), show Alert Signup & Organiser CTA */}
+        {isSparse && (
+          <div className="pt-6">
+            <EventAlertFallback
+              currentQuery={q}
+              currentTag={tag}
+              isFiltered={isFiltered}
+            />
+          </div>
+        )}
+
+        {/* If upcoming events was prioritized and there are past events to browse, show them as Past Highlights */}
+        {upcomingEvents.length > 0 && pastEvents.length > 0 && (
+          <div className="pt-10 space-y-6 border-t border-alpine-500/20">
+            <div className="space-y-1">
+              <h3 className="text-xl font-sans font-bold tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <span>Past Community Highlights & Archives</span>
+              </h3>
+              <p className="text-xs text-muted-foreground font-sans">
+                Browse memories, verified past listings, and cultural gatherings across Britain.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+              {pastEvents.slice(0, 4).map((event: any) => {
+                const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
+                return (
+                  <Link
+                    key={`past-${event.id}`}
+                    href={`/app/events/${event.slug || event.id}`}
+                    className="group rounded-[8px] border border-alpine-500/20 bg-white/70 dark:bg-slate-900/70 p-3 hover:border-alpine-500/50 transition-all flex flex-col justify-between shadow-xs"
+                  >
+                    <div className="aspect-video relative rounded-[6px] overflow-hidden bg-slate-100 dark:bg-slate-800 mb-2.5">
+                      {getCardImageUrl(event.coverImage) ? (
+                        <img
+                          src={getCardImageUrl(event.coverImage)!}
+                          alt={event.title}
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Calendar size={20} className="text-slate-400" />
+                        </div>
+                      )}
+                      <span className="absolute top-1.5 left-1.5 bg-slate-900/85 text-[9px] font-mono text-slate-300 uppercase px-1.5 py-0.5 rounded-[3px]">
+                        Concluded
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="text-[11px] font-mono text-muted-foreground flex items-center gap-1 mb-1">
+                        <span>{month} {day}</span>
+                        {event.location?.location && (
+                          <>
+                            <span>•</span>
+                            <span className="truncate max-w-[120px]">{event.location.location.split(',')[0]}</span>
+                          </>
+                        )}
+                      </div>
+                      <h4 className="font-semibold text-xs text-foreground line-clamp-1 group-hover:text-alpine-600 transition-colors">
+                        {event.title}
+                      </h4>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
           {totalPages > 1 && (
             <div className="flex justify-center gap-4 pt-8">
