@@ -516,7 +516,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
         <div className="lg:col-span-7 xl:col-span-7 space-y-6">
           {/* Organisation Picker (Super-admin only) */}
           {showTenantPicker && (
-            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
               <CardContent className="p-4 sm:p-5 space-y-2">
                 <Label htmlFor="eventTenant" className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Target Organisation <span className="text-destructive">*</span>
@@ -545,7 +545,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           )}
 
           {/* 1. Basic Info */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <Sparkles size={16} className="text-alpine-500 shrink-0" />
@@ -583,7 +583,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 2. Poster Artwork */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <UploadCloud size={16} className="text-alpine-500 shrink-0" />
@@ -647,7 +647,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 3. Showcase Gallery Images */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <ImageIcon size={16} className="text-alpine-500 shrink-0" />
@@ -702,7 +702,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 4. Schedule & Timezone */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <Calendar size={16} className="text-alpine-500 shrink-0" />
@@ -766,7 +766,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 5. Venue & Map Location */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <MapPin size={16} className="text-alpine-500 shrink-0" />
@@ -781,7 +781,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 6. Tickets & Pricing */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <Ticket size={16} className="text-alpine-500 shrink-0" />
@@ -1009,7 +1009,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 7. Tags & Categories */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-3">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <Tag size={16} className="text-alpine-500 shrink-0" />
@@ -1042,7 +1042,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
           </Card>
 
           {/* 8. Visibility & Booking Status */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 sm:p-5 space-y-4">
               <div className="flex items-center gap-2 pb-2.5 border-b border-alpine-500/20 text-slate-900 dark:text-slate-100 font-sans font-bold text-sm tracking-tight">
                 <Globe size={16} className="text-alpine-500 shrink-0" />
@@ -1201,7 +1201,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
             </div>
 
             {/* Buyer Event Card */}
-            <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
+            <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-card">
               {/* Cover Artwork Container */}
               <div className="relative aspect-[16/10] bg-alpine-50 dark:bg-slate-950 overflow-hidden border-b border-alpine-500/20">
                 {coverImageUrl ? (

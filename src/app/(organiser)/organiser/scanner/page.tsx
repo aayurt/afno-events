@@ -380,7 +380,7 @@ export default function OrganiserScannerPage() {
 
         {/* 4 Session Stats Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3 rounded-[6px] border border-alpine-500/30 bg-white dark:bg-slate-900 space-y-1">
+          <div className="p-3 rounded-[6px] border border-alpine-500/30 bg-white dark:bg-slate-900 shadow-card space-y-1">
             <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
               Total Scanned
             </span>
@@ -388,7 +388,7 @@ export default function OrganiserScannerPage() {
               {sessionStats.total}
             </div>
           </div>
-          <div className="p-3 rounded-[6px] border border-emerald-500/30 bg-white dark:bg-slate-900 space-y-1">
+          <div className="p-3 rounded-[6px] border border-emerald-500/30 bg-white dark:bg-slate-900 shadow-card space-y-1">
             <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
               Checked In
             </span>
@@ -396,7 +396,7 @@ export default function OrganiserScannerPage() {
               {sessionStats.valid}
             </div>
           </div>
-          <div className="p-3 rounded-[6px] border border-amber-500/30 bg-white dark:bg-slate-900 space-y-1">
+          <div className="p-3 rounded-[6px] border border-amber-500/30 bg-white dark:bg-slate-900 shadow-card space-y-1">
             <span className="text-[10px] font-mono uppercase tracking-wider text-amber-600 dark:text-amber-400">
               Already Used
             </span>
@@ -404,7 +404,7 @@ export default function OrganiserScannerPage() {
               {sessionStats.already}
             </div>
           </div>
-          <div className="p-3 rounded-[6px] border border-red-500/30 bg-white dark:bg-slate-900 space-y-1">
+          <div className="p-3 rounded-[6px] border border-red-500/30 bg-white dark:bg-slate-900 shadow-card space-y-1">
             <span className="text-[10px] font-mono uppercase tracking-wider text-red-600 dark:text-red-400">
               Invalid Codes
             </span>
@@ -415,7 +415,7 @@ export default function OrganiserScannerPage() {
         </div>
 
         {/* Event Scope Selector */}
-        <div className="p-3.5 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="p-3.5 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Ticket size={16} className="text-alpine-500 shrink-0" />
             <span className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -441,7 +441,7 @@ export default function OrganiserScannerPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Column: Camera Viewfinder (lg:col-span-7) */}
           <div className="lg:col-span-7 space-y-4">
-            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-card">
               <CardContent className="p-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -626,7 +626,7 @@ export default function OrganiserScannerPage() {
             )}
 
             {/* Recent Scans Session Log */}
-            <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 p-4 space-y-3">
+            <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <History size={14} className="text-alpine-500" />

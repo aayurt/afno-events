@@ -59,6 +59,13 @@ const config = {
         'pulse-slow': 'pulse 3s ease-in-out infinite',
         'shimmer': 'shimmer 2s ease-in-out infinite',
       },
+      boxShadow: {
+        card: '0 2px 8px -2px rgba(220, 21, 60, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+        'card-hover': '0 6px 18px -3px rgba(220, 21, 60, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+        trail: '0 1px 3px 0 rgba(220, 21, 60, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        ridge: '0 4px 14px -2px rgba(220, 21, 60, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+        expedition: '0 12px 32px -4px rgba(220, 21, 60, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.06)',
+      },
       borderRadius: {
         lg: '6px',
         md: '4px',

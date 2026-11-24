@@ -42,10 +42,10 @@ function Card({
   hover?: boolean
 }) {
   const elevationClasses = {
-    basecamp: 'shadow-basecamp',
-    trail: 'shadow-trail',
+    basecamp: 'shadow-none',
+    trail: 'shadow-card',
     ridge: 'shadow-ridge',
-    summit: 'shadow-summit',
+    summit: 'shadow-card-hover',
     expedition: 'shadow-expedition',
   }
 
@@ -53,7 +53,7 @@ function Card({
     <div
       className={`bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 transition-all duration-200 ${
         elevationClasses[elevation]
-      } ${hover ? 'hover:shadow-ridge hover:-translate-y-0.5 hover:border-alpine-500 dark:hover:border-alpine-400' : ''} ${className}`}
+      } ${hover ? 'hover:shadow-card-hover hover:-translate-y-0.5 hover:border-alpine-500 dark:hover:border-alpine-400' : ''} ${className}`}
       {...props}
     >
       {children}
@@ -222,7 +222,7 @@ function EventCard({
     event.pricing?.priceRange || (event.pricing?.type === 'free' ? 'Free Admission' : 'TBA')
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[6px] bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-alpine-500/35 dark:border-alpine-400/35 shadow-trail transition-all duration-200 hover:shadow-ridge hover:border-alpine-500 dark:hover:border-alpine-400">
+    <article className="group relative flex flex-col overflow-hidden rounded-[6px] bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-alpine-500/35 dark:border-alpine-400/35 shadow-card transition-all duration-200 hover:shadow-card-hover hover:-translate-y-0.5 hover:border-alpine-500 dark:hover:border-alpine-400">
       {/* Cover Media */}
       <div className="relative aspect-[16/9] w-full bg-muted/40 overflow-hidden">
         {coverUrl ? (
@@ -577,7 +577,7 @@ export default function OrganiserDashboardPage() {
   const isVerified = Boolean(activeTenant?.verified || activeTenant?.status === 'verified')
 
   return (
-    <div className="min-h-screen bg-alpine-50/25 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col selection:bg-foreground selection:text-background transition-colors duration-150">
+    <div className="min-h-screen bg-[#faf7f7] dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col selection:bg-foreground selection:text-background transition-colors duration-150">
       <OrganiserHeader />
 
       {/* Main Content Area */}
@@ -647,7 +647,7 @@ export default function OrganiserDashboardPage() {
         {/* Event List Section */}
         <section className="space-y-4 pt-2">
           {/* Controls Bar: Search, Status, Sort */}
-          <div className="p-3 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-basecamp">
+          <div className="p-3 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-card">
             {/* Search Input */}
             <form onSubmit={handleSearchSubmit} className="relative flex-1 min-w-[200px] max-w-md">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />

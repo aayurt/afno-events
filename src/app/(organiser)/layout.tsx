@@ -27,10 +27,10 @@ export default async function OrganiserRootLayout({ children }: { children: Reac
         <InitTheme />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
       </head>
-      <body className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-foreground selection:text-background transition-colors duration-150">
+      <body className="min-h-screen bg-[#faf7f7] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-foreground selection:text-background transition-colors duration-150">
         <Providers>
           <I18nProvider locale={locale}>
-            <div className="min-h-screen flex flex-col font-sans bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">{children}</div>
+            <div className="min-h-screen flex flex-col font-sans bg-[#faf7f7] dark:bg-slate-950 text-slate-900 dark:text-slate-100">{children}</div>
           </I18nProvider>
         </Providers>
       </body>

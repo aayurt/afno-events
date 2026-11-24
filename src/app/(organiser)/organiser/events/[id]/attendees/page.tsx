@@ -302,7 +302,7 @@ export default function AttendeesPage() {
         {/* 4 Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
           {/* Card 1: Total Sold */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 space-y-1.5">
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[10px] font-mono uppercase tracking-wider font-semibold">
@@ -320,7 +320,7 @@ export default function AttendeesPage() {
           </Card>
 
           {/* Card 2: Checked In */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 space-y-1.5">
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[10px] font-mono uppercase tracking-wider font-semibold">
@@ -346,7 +346,7 @@ export default function AttendeesPage() {
           </Card>
 
           {/* Card 3: Awaiting Arrival */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 space-y-1.5">
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[10px] font-mono uppercase tracking-wider font-semibold">
@@ -364,7 +364,7 @@ export default function AttendeesPage() {
           </Card>
 
           {/* Card 4: Ticket Revenue */}
-          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+          <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
             <CardContent className="p-4 space-y-1.5">
               <div className="flex items-center justify-between text-muted-foreground">
                 <span className="text-[10px] font-mono uppercase tracking-wider font-semibold">
@@ -383,7 +383,7 @@ export default function AttendeesPage() {
         </div>
 
         {/* Search & Filters Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
           {/* Search Box */}
           <div className="relative flex-1 min-w-0">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
@@ -434,7 +434,7 @@ export default function AttendeesPage() {
         </div>
 
         {/* Data Grid / Table */}
-        <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+        <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-card">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>

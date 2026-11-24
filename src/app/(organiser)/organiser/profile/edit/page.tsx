@@ -251,7 +251,7 @@ export default function OrganiserProfileEditPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Profile Settings Form (lg:col-span-7) */}
           <div className="lg:col-span-7 space-y-6">
-            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-xs">
+            <Card className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 shadow-card">
               <CardContent className="p-5 space-y-5">
                 <form onSubmit={save} className="space-y-4">
                   {/* Avatar Upload */}
@@ -398,7 +398,7 @@ export default function OrganiserProfileEditPage() {
             </Card>
 
             {/* Danger Zone */}
-            <Card className="rounded-[6px] border border-red-500/35 bg-white dark:bg-slate-900 shadow-xs">
+            <Card className="rounded-[6px] border border-red-500/35 bg-white dark:bg-slate-900 shadow-card">
               <CardContent className="p-5 space-y-3">
                 <div>
                   <h3 className="font-mono font-bold text-xs uppercase tracking-wider text-red-600 dark:text-red-400">
@@ -468,7 +468,7 @@ export default function OrganiserProfileEditPage() {
               </div>
 
               {/* Public Organiser Badge Card */}
-              <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 p-5 space-y-4 shadow-sm">
+              <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 p-5 space-y-4 shadow-card">
                 <div className="flex items-start gap-3.5">
                   <div className="w-14 h-14 rounded-[6px] bg-alpine-50/50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
                     {avatarUrl ? (
