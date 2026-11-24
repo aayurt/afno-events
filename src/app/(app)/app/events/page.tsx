@@ -20,7 +20,9 @@ import { getScopedI18n } from '@/locales/server'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import { formatEventDate } from '@/utilities/formatEventDate'
 import { cn } from '@/utilities/ui'
+import { displayPriceRange } from '@/utilities/pricing'
 import { FavoriteButton } from './[slug]/favorite-button'
+import { EventSearchBar } from './search-bar'
 import { getEventStatus } from '@/components/events/event-status'
 import { EventStatusBadge } from '@/components/events/event-status-badge'
 
@@ -83,20 +85,11 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
       </div>
 
       <form action="/app/events" method="GET" className="space-y-4">
-        <div className="flex gap-3 p-1.5 rounded-[8px] bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 shadow-card">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              name="q"
-              placeholder={t('search')}
-              defaultValue={q || ''}
-              className="pl-10 h-11 rounded-[4px] border-alpine-500/25 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
-            />
-          </div>
-          <Button type="submit" size="default" className="rounded-[4px] px-6 h-11 bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm">
-            {t('searchButton')}
-          </Button>
-        </div>
+        <EventSearchBar
+          defaultValue={q || ''}
+          placeholder={t('search')}
+          buttonLabel={t('searchButton')}
+        />
 
         <div className="flex gap-2 flex-wrap pt-1">
           {FILTER_TAGS.map(({ label, value }) => {
@@ -141,8 +134,10 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
             const isFeatured = event.id === featuredEvent?.id
             const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
             const isFree = event.pricing?.type === 'free'
-            const priceText = isFree ? t('free') : event.pricing?.priceRange || t('paid')
-            const stockClass = isFree ? 'text-muted-foreground' : 'text-primary text-base font-extrabold'
+            const priceText = isFree
+              ? t('free')
+              : displayPriceRange(event.pricing?.ticketTypes, event.pricing?.priceRange) || t('paid')
+            const stockClass = isFree ? 'text-muted-foreground' : 'text-alpine-600 text-base font-extrabold font-mono'
             const stockText = isFree ? 'Free entry' : 'Available'
 
             return (

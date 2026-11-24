@@ -7,11 +7,18 @@ export function displayPriceRange(
   ticketTypes: Array<{ price?: number | null }> | null | undefined,
   manualRange?: string | null,
 ): string {
-  if (manualRange?.trim()) return manualRange.trim()
-  const prices = (ticketTypes || [])
+  // If actual ticket types exist, compute the real minimum price so card doesn't
+  // show stale manual strings (e.g. "£5+" when tickets are actually £15).
+  const validPrices = (ticketTypes || [])
     .map((t) => Number(t?.price))
     .filter((p) => Number.isFinite(p) && p >= 0)
-  if (prices.length === 0) return 'Paid'
-  const min = Math.min(...prices)
-  return `From £${Number.isInteger(min) ? min : min.toFixed(2)}`
+
+  if (validPrices.length > 0) {
+    const min = Math.min(...validPrices)
+    const formatted = Number.isInteger(min) ? String(min) : min.toFixed(2)
+    return `From £${formatted}`
+  }
+
+  if (manualRange?.trim()) return manualRange.trim()
+  return 'Paid'
 }

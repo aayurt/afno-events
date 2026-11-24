@@ -3,7 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Loader2, Minus, Plus, ExternalLink, TicketCheck, Ban } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
+import { Loader2, Minus, Plus, ExternalLink, TicketCheck, Ban, Lock, User, AlertCircle, ArrowRight } from 'lucide-react'
 import { authClient } from '@/lib/auth/client'
 import { useScopedI18n } from '@/locales/client'
 
@@ -58,6 +62,15 @@ export function TicketPurchase({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [alreadyOrdered, setAlreadyOrdered] = useState(false)
+
+  // Guest checkout modal state
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin')
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authName, setAuthName] = useState('')
+  const [authLoading, setAuthLoading] = useState(false)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   // One order per account: if this account already holds a live order,
   // replace the buy box (server still enforces as backstop).
@@ -142,13 +155,16 @@ export function TicketPurchase({
       const user = session.data?.user
 
       if (!user) {
-        router.push(`/app/auth/login?redirect=/app/events/${event.slug || event.id}`)
+        setAuthModalOpen(true)
+        setLoading(false)
         return
       }
 
       const buyerID = Number((user as { id?: unknown }).id)
       if (!Number.isInteger(buyerID)) {
-        throw new Error('Could not determine your account. Please sign out and sign in again.')
+        setAuthModalOpen(true)
+        setLoading(false)
+        return
       }
 
       const res = await fetch('/api/orders', {
@@ -170,6 +186,11 @@ export function TicketPurchase({
       })
 
       if (!res.ok) {
+        if (res.status === 401) {
+          setAuthModalOpen(true)
+          setLoading(false)
+          return
+        }
         const err = await res.json()
         throw new Error(err.errors?.[0]?.message || 'Failed to create order')
       }
@@ -195,6 +216,43 @@ export function TicketPurchase({
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleModalAuth = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setAuthLoading(true)
+    setAuthError(null)
+
+    try {
+      if (authMode === 'signin') {
+        const res = await authClient.signIn.email({
+          email: authEmail,
+          password: authPassword,
+        })
+        if ((res as any)?.error) {
+          throw new Error((res as any).error?.message || 'Invalid email or password')
+        }
+      } else {
+        const res = await authClient.signUp.email({
+          email: authEmail,
+          password: authPassword,
+          name: authName.trim() || 'Attendee',
+        })
+        if ((res as any)?.error) {
+          throw new Error((res as any).error?.message || 'Failed to create account')
+        }
+      }
+
+      setAuthModalOpen(false)
+      // Automatically proceed with purchase now that user is logged in
+      setTimeout(() => {
+        handlePurchase()
+      }, 300)
+    } catch (err: any) {
+      setAuthError(err.message || 'Authentication failed')
+    } finally {
+      setAuthLoading(false)
     }
   }
 
@@ -355,6 +413,132 @@ export function TicketPurchase({
       ) : (
         <p className="text-sm text-muted-foreground text-center font-mono">{t('noTickets')}</p>
       )}
+
+      {/* Guest Checkout Authentication Modal */}
+      <Dialog open={authModalOpen} onOpenChange={setAuthModalOpen}>
+        <div className="p-6 space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-alpine-500/20">
+            <div>
+              <h3 className="text-base font-semibold text-foreground">
+                {authMode === 'signin' ? 'Sign in to complete order' : 'Create attendee account'}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Your tickets will be saved directly to this account.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleModalAuth} className="space-y-3.5">
+            {authMode === 'signup' && (
+              <div className="space-y-1">
+                <Label htmlFor="authName" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                  Your Name
+                </Label>
+                <Input
+                  id="authName"
+                  type="text"
+                  placeholder="Full name"
+                  value={authName}
+                  onChange={(e) => setAuthName(e.target.value)}
+                  className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
+                  required
+                  disabled={authLoading}
+                />
+              </div>
+            )}
+
+            <div className="space-y-1">
+              <Label htmlFor="authEmail" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                Email address
+              </Label>
+              <Input
+                id="authEmail"
+                type="email"
+                placeholder="you@example.com"
+                value={authEmail}
+                onChange={(e) => setAuthEmail(e.target.value)}
+                className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
+                required
+                disabled={authLoading}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="authPassword" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                Password
+              </Label>
+              <PasswordInput
+                id="authPassword"
+                placeholder="••••••••"
+                value={authPassword}
+                onChange={(e) => setAuthPassword(e.target.value)}
+                className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
+                required
+                disabled={authLoading}
+              />
+            </div>
+
+            {authError && (
+              <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-[4px] p-2.5 font-mono">
+                <AlertCircle size={14} className="shrink-0 mt-0.5" />
+                <span>{authError}</span>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              className="w-full h-10 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              disabled={authLoading}
+            >
+              {authLoading ? (
+                <>
+                  <Loader2 className="animate-spin" size={14} /> Please wait…
+                </>
+              ) : authMode === 'signin' ? (
+                <>
+                  Sign in & Continue <ArrowRight size={14} />
+                </>
+              ) : (
+                <>
+                  Create Account & Continue <ArrowRight size={14} />
+                </>
+              )}
+            </Button>
+          </form>
+
+          <div className="text-center pt-1 border-t border-alpine-500/15 text-xs text-muted-foreground font-mono">
+            {authMode === 'signin' ? (
+              <span>
+                New attendee?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('signup')
+                    setAuthError(null)
+                  }}
+                  className="text-alpine-600 hover:text-alpine-700 underline underline-offset-2 font-semibold"
+                >
+                  Create account
+                </button>
+              </span>
+            ) : (
+              <span>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('signin')
+                    setAuthError(null)
+                  }}
+                  className="text-alpine-600 hover:text-alpine-700 underline underline-offset-2 font-semibold"
+                >
+                  Sign in
+                </button>
+              </span>
+            )}
+          </div>
+        </div>
+      </Dialog>
     </div>
   )
 }
