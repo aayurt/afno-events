@@ -59,7 +59,7 @@ export default async function HomePage() {
   const featuredIsExpired = featuredEvent ? isEventExpired(featuredEvent) : false
 
   return (
-    <div className="flex flex-col min-h-screen overflow-x-hidden selection:bg-primary selection:text-white">
+    <div className="flex flex-col min-h-screen overflow-x-hidden bg-white dark:bg-slate-950 selection:bg-primary selection:text-white">
       
       {/* Inline CSS animation for the infinite marquee */}
       <style>{`
@@ -78,81 +78,81 @@ export default async function HomePage() {
       `}</style>
 
       {/* 🟢 Split-Hero: Left Brand/Search & Right Spotlight Card */}
-      <section className="relative border-b border-border/80 overflow-hidden pt-8 pb-16 lg:py-20">
+      <section className="relative border-b border-alpine-500/20 dark:border-alpine-400/20 overflow-hidden pt-8 pb-16 lg:py-20 bg-white dark:bg-slate-950">
         {/* Subtle Ambient Radial Brand Glows */}
-        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-primary/15 rounded-full blur-[150px] pointer-events-none -z-10" />
-        <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-secondary/20 rounded-full blur-[140px] pointer-events-none -z-10" />
+        <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-alpine-500/10 rounded-full blur-[150px] pointer-events-none -z-10" />
+        <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-alpine-500/5 rounded-full blur-[140px] pointer-events-none -z-10" />
 
         <div className="container px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
             
             {/* Left 7 Cols: Brand Message, Search Bar, Community Stats */}
             <div className="lg:col-span-7 space-y-8 text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[4px] bg-alpine-50 dark:bg-alpine-950/50 border border-alpine-500/30 text-alpine-700 dark:text-alpine-300 text-xs font-mono font-bold uppercase tracking-wider">
+                <span className="w-2 h-2 rounded-full bg-alpine-500 animate-pulse" />
                 The Home for UK Nepalese Events
               </div>
 
               <div className="space-y-4">
-                <h1 className="text-4xl sm:text-6xl font-black tracking-tight leading-[1.08]">
+                <h1 className="text-4xl sm:text-6xl font-sans font-black tracking-tight leading-[1.08] text-slate-900 dark:text-slate-100">
                   Elevate Your Events. <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-rose-400 to-secondary">
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-alpine-600 via-rose-500 to-alpine-500">
                     Connect the Community.
                   </span>
                 </h1>
-                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
+                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl font-sans">
                   Bringing Nepali concerts, cultural gatherings, summer festivals, and club nights across Britain into one verified ticketing platform.
                 </p>
               </div>
 
-              {/* Integrated Search Box */}
-              <form action="/app/events" method="GET" className="bg-card border border-border p-2.5 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-2 max-w-xl">
-                <div className="flex-1 flex items-center px-3 gap-2 border-b sm:border-b-0 sm:border-r border-border pb-2 sm:pb-0">
-                  <Search className="text-muted-foreground w-4 h-4 flex-shrink-0" />
+              {/* Integrated Search Box — light blush background with white inputs */}
+              <form action="/app/events" method="GET" className="bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 dark:border-alpine-400/35 p-2 rounded-[8px] shadow-card flex flex-col sm:flex-row gap-2 max-w-xl">
+                <div className="flex-1 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
+                  <Search className="text-alpine-600 dark:text-alpine-400 w-4 h-4 flex-shrink-0" />
                   <input 
                     type="text"
                     name="q" 
                     placeholder="Search artist, festival, or venue..." 
-                    className="bg-transparent text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-muted-foreground/60 text-foreground shadow-none ring-0 appearance-none" 
+                    className="bg-transparent text-xs sm:text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-slate-400 text-slate-900 dark:text-slate-100 shadow-none ring-0 appearance-none font-sans" 
                   />
                 </div>
-                <div className="w-full sm:w-44 flex items-center px-3 gap-2 border-b sm:border-b-0 sm:border-r border-border pb-2 sm:pb-0">
-                  <MapPin className="text-muted-foreground w-3.5 h-3.5 flex-shrink-0" />
-                  <select className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-foreground cursor-pointer appearance-none shadow-none ring-0">
-                    <option className="bg-card">All UK Cities</option>
-                    <option className="bg-card">London</option>
-                    <option className="bg-card">Aldershot</option>
-                    <option className="bg-card">Reading</option>
-                    <option className="bg-card">Wembley</option>
+                <div className="w-full sm:w-44 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
+                  <MapPin className="text-alpine-600 dark:text-alpine-400 w-3.5 h-3.5 flex-shrink-0" />
+                  <select className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-slate-800 dark:text-slate-200 cursor-pointer appearance-none shadow-none ring-0 font-sans">
+                    <option className="bg-white dark:bg-slate-900">All UK Cities</option>
+                    <option className="bg-white dark:bg-slate-900">London</option>
+                    <option className="bg-white dark:bg-slate-900">Aldershot</option>
+                    <option className="bg-white dark:bg-slate-900">Reading</option>
+                    <option className="bg-white dark:bg-slate-900">Wembley</option>
                   </select>
                 </div>
-                <Button type="submit" className="bg-primary text-primary-foreground font-bold text-xs px-6 py-2.5 rounded-xl hover:brightness-110 shadow-md shadow-primary/20 transition-all flex-shrink-0">
+                <Button type="submit" className="bg-alpine-600 hover:bg-alpine-700 text-white font-mono font-bold text-xs px-6 py-2.5 rounded-[6px] shadow-trail hover:shadow-card-hover transition-all flex-shrink-0 h-10">
                   Find Events
                 </Button>
               </form>
 
               {/* Verified Metrics Strip */}
-              <div className="grid grid-cols-3 gap-6 pt-4 border-t border-border/80 max-w-xl">
+              <div className="grid grid-cols-3 gap-6 pt-4 border-t border-alpine-500/20 max-w-xl">
                 <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight">{marqueeEvents.length}+</div>
-                  <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">Live Events</div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">{marqueeEvents.length}+</div>
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">Live Events</div>
                 </div>
                 <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight">8</div>
-                  <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">UK Cities</div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">8</div>
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">UK Cities</div>
                 </div>
                 <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-primary">0%</div>
-                  <div className="text-xs text-muted-foreground uppercase font-medium mt-0.5">Listing Fee</div>
+                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-alpine-600 dark:text-alpine-400 tabular-nums">0%</div>
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">Listing Fee</div>
                 </div>
               </div>
             </div>
 
-            {/* Right 5 Cols: Nearest Bookable Event Spotlight Card in the image's sleek full-bleed style */}
+            {/* Right 5 Cols: Nearest Bookable Event Spotlight Card */}
             {featuredEvent && (
               <div className="lg:col-span-5">
                 <Link href={`/app/events/${featuredEvent.slug || featuredEvent.id}`}>
-                  <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] rounded-[2rem] overflow-hidden border border-primary/50 shadow-2xl group cursor-pointer bg-card hover:border-primary transition-all duration-300">
+                  <div className="relative w-full aspect-[4/5] sm:aspect-[3/4] rounded-[10px] overflow-hidden border border-alpine-500/35 dark:border-alpine-400/35 shadow-card group cursor-pointer bg-white dark:bg-slate-900 hover:border-alpine-500 hover:shadow-card-hover transition-all duration-300">
                     
                     {/* Full-bleed background poster */}
                     {featuredCover ? (
@@ -162,8 +162,8 @@ export default async function HomePage() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-muted">
-                        <Calendar className="w-16 h-16 text-muted-foreground/40" />
+                      <div className="w-full h-full flex items-center justify-center bg-alpine-50 dark:bg-slate-900">
+                        <Calendar className="w-16 h-16 text-alpine-400/40" />
                       </div>
                     )}
 
@@ -171,16 +171,16 @@ export default async function HomePage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent pointer-events-none" />
 
                     {/* Top status badges */}
-                    <div className="absolute top-5 left-5 flex items-center gap-2">
-                      <span className="bg-primary text-primary-foreground text-[10px] font-extrabold uppercase px-3 py-1 rounded-full shadow-lg">
+                    <div className="absolute top-4 left-4 flex items-center gap-2">
+                      <span className="bg-alpine-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-[4px] shadow-xs">
                         {featuredIsBookable ? 'Featured Spotlight' : featuredIsExpired ? 'Past Event' : 'Featured'}
                       </span>
                     </div>
 
-                    {/* Bottom-aligned metadata & typography directly matching the design */}
-                    <div className="absolute inset-x-0 bottom-0 p-6 space-y-1.5 text-left">
-                      {/* Coral-red metadata line: [DAY MONTH] • [LOCATION] */}
-                      <div className="text-xs font-bold uppercase tracking-wider text-[#FF2A55] flex items-center gap-1.5 drop-shadow-md">
+                    {/* Bottom-aligned metadata & typography */}
+                    <div className="absolute inset-x-0 bottom-0 p-5 space-y-1.5 text-left">
+                      {/* Crimson metadata line: [DAY MONTH] • [LOCATION] */}
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-alpine-400 flex items-center gap-1.5 drop-shadow-md">
                         <span>
                           {featuredEvent.startDatetime
                             ? new Date(featuredEvent.startDatetime).toLocaleDateString('en-GB', {
@@ -200,7 +200,7 @@ export default async function HomePage() {
                       </div>
 
                       {/* Heavy, clean title */}
-                      <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors">
+                      <h2 className="text-2xl sm:text-3xl font-sans font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors">
                         {featuredEvent.title}
                       </h2>
 
@@ -210,7 +210,7 @@ export default async function HomePage() {
                           {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'Paid' : 'Free Entry'}
                         </span>
 
-                        <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                        <span className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1">
                           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                           Open for Booking →
                         </span>
@@ -226,19 +226,19 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 🟢 THE FEATURE: Infinite Smooth-Scrolling Poster Marquee Carousel in the exact image card style */}
-      <section className="py-14 overflow-hidden relative border-b border-border/80 group">
+      {/* 🟢 THE FEATURE: Infinite Smooth-Scrolling Poster Marquee Carousel */}
+      <section className="py-14 overflow-hidden relative border-b border-alpine-500/20 dark:border-alpine-400/20 group bg-white dark:bg-slate-950">
         
         <div className="container px-4 sm:px-6 mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-wider mb-1">
+            <div className="flex items-center gap-2 text-alpine-600 dark:text-alpine-400 text-xs font-mono font-bold uppercase tracking-wider mb-1">
               <Sparkles size={14} />
               Confirmed Community Calendar
             </div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-foreground">Trending Across the UK</h2>
+            <h2 className="text-3xl font-sans font-black tracking-tight text-slate-900 dark:text-slate-100">Trending Across the UK</h2>
           </div>
           <Link href="/app/events">
-            <Button variant="ghost" className="text-xs font-semibold hover:text-primary group">
+            <Button variant="ghost" className="text-xs font-mono font-semibold text-alpine-600 dark:text-alpine-400 hover:text-alpine-700 hover:bg-alpine-50 dark:hover:bg-slate-800 rounded-[4px] group">
               Browse Full Catalog 
               <ArrowRight size={14} className="ml-1 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -246,8 +246,8 @@ export default async function HomePage() {
         </div>
 
         {/* Subtle Edge Mask Gradients */}
-        <div className="absolute top-16 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-background via-background/80 to-transparent z-20 pointer-events-none" />
-        <div className="absolute top-16 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-background via-background/80 to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-16 bottom-0 left-0 w-24 sm:w-40 bg-gradient-to-r from-white dark:from-slate-950 via-white/80 dark:via-slate-950/80 to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-16 bottom-0 right-0 w-24 sm:w-40 bg-gradient-to-l from-white dark:from-slate-950 via-white/80 dark:via-slate-950/80 to-transparent z-20 pointer-events-none" />
 
         {/* Infinite Moving Marquee Track */}
         <div className="animate-marquee-track gap-5 pl-6">
@@ -262,7 +262,7 @@ export default async function HomePage() {
               <Link 
                 key={`${event.id}-${idx}`} 
                 href={`/app/events/${event.slug || event.id}`}
-                className="w-64 sm:w-72 h-[380px] sm:h-[420px] rounded-2xl sm:rounded-[1.4rem] overflow-hidden shrink-0 relative group shadow-2xl transition-all duration-300 cursor-pointer border border-border hover:border-primary/70 hover:scale-[1.02]"
+                className="w-64 sm:w-72 h-[380px] sm:h-[420px] rounded-[10px] overflow-hidden shrink-0 relative group shadow-card transition-all duration-300 cursor-pointer border border-alpine-500/35 dark:border-alpine-400/35 hover:border-alpine-500 hover:shadow-card-hover hover:scale-[1.02]"
               >
                 {/* Full-bleed poster image */}
                 {coverUrl ? (
@@ -272,8 +272,8 @@ export default async function HomePage() {
                     className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ${expired ? 'grayscale contrast-75 opacity-60' : ''}`} 
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-card">
-                    <Calendar className="w-12 h-12 text-muted-foreground/30" />
+                  <div className="w-full h-full flex items-center justify-center bg-alpine-50 dark:bg-slate-900">
+                    <Calendar className="w-12 h-12 text-alpine-400/30" />
                   </div>
                 )}
 
@@ -282,8 +282,8 @@ export default async function HomePage() {
 
                 {/* Bottom-aligned text content */}
                 <div className="absolute inset-x-0 bottom-0 p-5 space-y-1 text-left z-10">
-                  {/* Meta line: Date • Location in bright coral-red */}
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-[#FF2A55] drop-shadow-md">
+                  {/* Meta line: Date • Location in bright alpine crimson */}
+                  <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-alpine-400 drop-shadow-md">
                     <span>
                       {event.startDatetime
                         ? new Date(event.startDatetime).toLocaleDateString('en-GB', {
@@ -301,7 +301,7 @@ export default async function HomePage() {
                   </div>
 
                   {/* High-contrast bold title */}
-                  <h3 className="text-lg font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors line-clamp-2">
+                  <h3 className="text-lg font-sans font-black text-white leading-tight drop-shadow-md group-hover:text-gray-200 transition-colors line-clamp-2">
                     {event.title}
                   </h3>
 
@@ -316,7 +316,7 @@ export default async function HomePage() {
                     </span>
 
                     {bookable && (
-                      <span className="text-[10px] font-semibold text-emerald-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[10px] font-mono font-semibold text-emerald-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         Book →
                       </span>
                     )}
@@ -325,7 +325,7 @@ export default async function HomePage() {
 
                 {/* Subtle top badge if expired */}
                 {expired && (
-                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-muted-foreground text-[10px] font-mono px-2 py-0.5 rounded border border-white/10">
+                  <div className="absolute top-3 right-3 bg-black/80 backdrop-blur-md text-slate-300 text-[10px] font-mono px-2 py-0.5 rounded-[3px] border border-white/10">
                     Past
                   </div>
                 )}
@@ -336,60 +336,60 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 🟢 Dual Platform & App Showcase */}
-      <section className="py-20 bg-muted/20">
+      {/* 🟢 Dual Platform & App Showcase — White Canvas with Light Blush Cards */}
+      <section className="py-20 bg-white dark:bg-slate-950">
         <div className="container px-4 sm:px-6 space-y-16">
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* FOR COMMUNITY & FANS */}
-            <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-primary/40 transition-all">
+            <div className="bg-alpine-50/60 dark:bg-slate-900 border border-alpine-500/25 dark:border-alpine-400/25 p-8 sm:p-10 rounded-[12px] flex flex-col justify-between space-y-8 shadow-card hover:shadow-card-hover hover:border-alpine-500/50 transition-all">
               <div className="space-y-4">
-                <span className="text-xs uppercase font-mono tracking-widest text-primary font-bold flex items-center gap-2">
+                <span className="text-xs uppercase font-mono tracking-widest text-alpine-600 dark:text-alpine-400 font-bold flex items-center gap-2">
                   <QrCode size={16} />
                   FOR COMMUNITY & FANS
                 </span>
-                <h3 className="text-3xl font-black tracking-tight text-foreground">
+                <h3 className="text-2xl sm:text-3xl font-sans font-black tracking-tight text-slate-900 dark:text-slate-100">
                   Get passes straight to your Apple Wallet.
                 </h3>
-                <p className="text-base text-muted-foreground leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
                   Never search through spam emails for a ticket PDF again. Download Afno Events on iOS for 1-tap gate scans, attendee circles with friends, and gate location notifications.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-alpine-500/15">
                 <a href={APP_STORE_URL} target="_blank" rel="noopener noreferrer">
-                  <Button size="lg" className="rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs px-8 py-3.5 hover:scale-105 active:scale-95 transition-all shadow-md">
+                  <Button size="lg" className="rounded-[4px] bg-slate-900 text-white hover:bg-slate-800 font-mono font-bold text-xs px-6 py-3 transition-all shadow-trail hover:shadow-card">
                     Download on App Store
                   </Button>
                 </a>
-                <span className="text-xs text-muted-foreground font-medium">
+                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                   Android app in active review
                 </span>
               </div>
             </div>
 
             {/* FOR UK ORGANISERS & PROMOTERS */}
-            <div className="bg-card text-card-foreground border border-border p-8 sm:p-10 rounded-[2.5rem] flex flex-col justify-between space-y-8 shadow-lg hover:border-secondary/40 transition-all">
+            <div className="bg-alpine-50/60 dark:bg-slate-900 border border-alpine-500/25 dark:border-alpine-400/25 p-8 sm:p-10 rounded-[12px] flex flex-col justify-between space-y-8 shadow-card hover:shadow-card-hover hover:border-alpine-500/50 transition-all">
               <div className="space-y-4">
-                <span className="text-xs uppercase font-mono tracking-widest text-secondary font-bold flex items-center gap-2">
+                <span className="text-xs uppercase font-mono tracking-widest text-alpine-600 dark:text-alpine-400 font-bold flex items-center gap-2">
                   <ShieldCheck size={16} />
                   FOR UK ORGANISERS & PROMOTERS
                 </span>
-                <h3 className="text-3xl font-black tracking-tight text-foreground">
+                <h3 className="text-2xl sm:text-3xl font-sans font-black tracking-tight text-slate-900 dark:text-slate-100">
                   Promote & sell to 15,000+ UK Nepalis.
                 </h3>
-                <p className="text-base text-muted-foreground leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-sans">
                   Free event listings, automated Stripe payouts, door scanner app for gate volunteers, and multi-tenant organiser profiles. Start selling in minutes.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-border/70">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-alpine-500/15">
                 <Link href="/organiser/events/new">
-                  <Button size="lg" className="rounded-xl bg-primary text-primary-foreground hover:brightness-110 font-bold text-xs px-8 py-3.5 shadow-lg shadow-primary/25 hover:scale-105 active:scale-95 transition-all">
+                  <Button size="lg" className="rounded-[4px] bg-alpine-600 text-white hover:bg-alpine-700 font-mono font-bold text-xs px-6 py-3 shadow-trail hover:shadow-card transition-all">
                     Sign Up Your Event
                   </Button>
                 </Link>
-                <Link href="/contact-us" className="text-xs text-muted-foreground hover:text-foreground font-medium underline">
+                <Link href="/contact-us" className="text-xs font-mono text-slate-600 dark:text-slate-400 hover:text-alpine-600 dark:hover:text-alpine-400 transition-colors underline">
                   Speak with Team
                 </Link>
               </div>
