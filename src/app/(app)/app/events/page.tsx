@@ -80,18 +80,26 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
   const upcomingEvents = events.filter((e: any) => {
     const time = e.startDatetime ? new Date(e.startDatetime).getTime() : 0
     return time >= nowMs
+  }).sort((a: any, b: any) => {
+    const timeA = a.startDatetime ? new Date(a.startDatetime).getTime() : 0
+    const timeB = b.startDatetime ? new Date(b.startDatetime).getTime() : 0
+    return timeA - timeB
   })
+
   const pastEvents = events.filter((e: any) => {
     const time = e.startDatetime ? new Date(e.startDatetime).getTime() : 0
     return time < nowMs
+  }).sort((a: any, b: any) => {
+    const timeA = a.startDatetime ? new Date(a.startDatetime).getTime() : 0
+    const timeB = b.startDatetime ? new Date(b.startDatetime).getTime() : 0
+    return timeB - timeA
   })
 
-  // If there are upcoming events, prioritize them; otherwise past events
-  const displayEvents = upcomingEvents.length > 0 ? upcomingEvents : events
-  const featuredEvent = displayEvents.find((e: any) => e.featured === true) || displayEvents[0] || null
+  // Unified Feed: Upcoming events first, then recent past events
+  const unifiedEvents = [...upcomingEvents, ...pastEvents]
+  const featuredEvent = upcomingEvents.find((e: any) => e.featured === true) || unifiedEvents[0] || null
 
   const isFiltered = Boolean(q || tag)
-  const isSparse = upcomingEvents.length < 3
 
   return (
     <div className="container py-12 space-y-10">
@@ -133,7 +141,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
       </form>
 
       <p className="my-8 text-primary/70 text-sm capitalize">
-        {upcomingEvents.length > 0 ? 'Upcoming Events in the UK' : 'Confirmed Events Directory'}
+        Community Events Directory ({unifiedEvents.length} Total)
       </p>
 
       {events.length === 0 ? (
@@ -147,15 +155,26 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
       ) : (
         <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {displayEvents.map((event: any) => {
+          {unifiedEvents.map((event: any) => {
             const isFeatured = event.id === featuredEvent?.id
             const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
             const isFree = event.pricing?.type === 'free'
-            const priceText = isFree
+            const eventTime = event.startDatetime ? new Date(event.startDatetime).getTime() : 0
+            const isPast = eventTime > 0 && eventTime < nowMs
+
+            const priceText = isPast
+              ? 'Concluded'
+              : isFree
               ? t('free')
               : displayPriceRange(event.pricing?.ticketTypes, event.pricing?.priceRange) || t('paid')
-            const stockClass = isFree ? 'text-muted-foreground' : 'text-alpine-600 text-base font-extrabold font-mono'
-            const stockText = isFree ? 'Free entry' : 'Available'
+
+            const stockClass = isPast
+              ? 'text-slate-400 dark:text-slate-500 font-mono text-xs uppercase'
+              : isFree
+              ? 'text-muted-foreground'
+              : 'text-alpine-600 text-base font-extrabold font-mono'
+
+            const stockText = isPast ? 'Past Event' : isFree ? 'Free entry' : 'Available'
 
             return (
               <Link
@@ -163,7 +182,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                 href={`/app/events/${event.slug || event.id}`}
                 className={`group overflow-hidden ${isFeatured ? 'col-span-2 row-span-2 max-lg:col-span-2 h-auto' : ''}`}
               >
-                <div className={`rounded-[10px] border border-alpine-500/35 bg-alpine-50/60 dark:bg-slate-900 shadow-card hover:shadow-card-hover overflow-hidden flex flex-col transition-all duration-200 group-hover:-translate-y-0.5 ${isFeatured ? 'h-auto' : 'h-full'}`}>
+                <div className={`rounded-[10px] border ${isPast ? 'border-slate-300/40 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50' : 'border-alpine-500/35 bg-alpine-50/60 dark:bg-slate-900'} shadow-card hover:shadow-card-hover overflow-hidden flex flex-col transition-all duration-200 group-hover:-translate-y-0.5 ${isFeatured ? 'h-auto' : 'h-full'}`}>
                   <div className="relative aspect-[4/5] bg-muted overflow-hidden shrink-0">
                     <div
                       className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-80"
@@ -173,7 +192,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                       <img
                         src={getCardImageUrl(event.coverImage)!}
                         alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isPast ? 'opacity-90 grayscale-[15%] group-hover:grayscale-0' : ''}`}
                       />
                     ) : (
                       <div
@@ -196,7 +215,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                     </div>
 
                     <div className="absolute bottom-2 left-2 bg-white/95 dark:bg-slate-900/95 border border-alpine-500/25 rounded-[4px] px-2 py-1 text-xs font-semibold shadow-xs">
-                      <span className="text-alpine-600 uppercase text-xs font-mono font-bold">{month}</span>
+                      <span className={`${isPast ? 'text-slate-500' : 'text-alpine-600'} uppercase text-xs font-mono font-bold`}>{month}</span>
                       <span className="ml-1 font-bold text-foreground font-mono">{day}</span>
                     </div>
 
@@ -207,12 +226,12 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
                   <div className="p-4 pb-1">
                     <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground mb-1.5">
-                      <Calendar size={13} className="text-alpine-600" />
+                      <Calendar size={13} className={isPast ? 'text-slate-400' : 'text-alpine-600'} />
                       {event.startDatetime
                         ? formatEventDate(event.startDatetime, event.timezone)
                         : t('tbd')}
                     </div>
-                    <h3 className={`font-semibold tracking-tight text-foreground line-clamp-2 ${isFeatured ? 'text-2xl' : 'text-base'}`}>
+                    <h3 className={`font-semibold tracking-tight text-foreground line-clamp-2 ${isFeatured ? 'text-2xl' : 'text-base'} ${isPast ? 'text-slate-700 dark:text-slate-200' : ''}`}>
                       {event.title}
                     </h3>
                   </div>
@@ -240,75 +259,14 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
           })}
         </div>
 
-        {/* When events are sparse (e.g. fewer than 3 upcoming), show Alert Signup & Organiser CTA */}
-        {isSparse && (
-          <div className="pt-6">
-            <EventAlertFallback
-              currentQuery={q}
-              currentTag={tag}
-              isFiltered={isFiltered}
-            />
-          </div>
-        )}
-
-        {/* If upcoming events was prioritized and there are past events to browse, show them as Past Highlights */}
-        {upcomingEvents.length > 0 && pastEvents.length > 0 && (
-          <div className="pt-10 space-y-6 border-t border-alpine-500/20">
-            <div className="space-y-1">
-              <h3 className="text-xl font-sans font-bold tracking-tight text-slate-900 dark:text-slate-100 flex items-center gap-2">
-                <span>Past Community Highlights & Archives</span>
-              </h3>
-              <p className="text-xs text-muted-foreground font-sans">
-                Browse memories, verified past listings, and cultural gatherings across Britain.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {pastEvents.slice(0, 4).map((event: any) => {
-                const { month = '', day = '' } = formatMonthDay(event.startDatetime) || {} as any
-                return (
-                  <Link
-                    key={`past-${event.id}`}
-                    href={`/app/events/${event.slug || event.id}`}
-                    className="group rounded-[8px] border border-alpine-500/20 bg-white/70 dark:bg-slate-900/70 p-3 hover:border-alpine-500/50 transition-all flex flex-col justify-between shadow-xs"
-                  >
-                    <div className="aspect-video relative rounded-[6px] overflow-hidden bg-slate-100 dark:bg-slate-800 mb-2.5">
-                      {getCardImageUrl(event.coverImage) ? (
-                        <img
-                          src={getCardImageUrl(event.coverImage)!}
-                          alt={event.title}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Calendar size={20} className="text-slate-400" />
-                        </div>
-                      )}
-                      <span className="absolute top-1.5 left-1.5 bg-slate-900/85 text-[9px] font-mono text-slate-300 uppercase px-1.5 py-0.5 rounded-[3px]">
-                        Concluded
-                      </span>
-                    </div>
-
-                    <div>
-                      <div className="text-[11px] font-mono text-muted-foreground flex items-center gap-1 mb-1">
-                        <span>{month} {day}</span>
-                        {event.location?.location && (
-                          <>
-                            <span>•</span>
-                            <span className="truncate max-w-[120px]">{event.location.location.split(',')[0]}</span>
-                          </>
-                        )}
-                      </div>
-                      <h4 className="font-semibold text-xs text-foreground line-clamp-1 group-hover:text-alpine-600 transition-colors">
-                        {event.title}
-                      </h4>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        )}
+        {/* Drop Alerts & Organiser CTA Banner */}
+        <div className="pt-6">
+          <EventAlertFallback
+            currentQuery={q}
+            currentTag={tag}
+            isFiltered={isFiltered}
+          />
+        </div>
 
           {totalPages > 1 && (
             <div className="flex justify-center gap-4 pt-8">
