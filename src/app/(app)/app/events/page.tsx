@@ -81,23 +81,23 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
         <p className="text-muted-foreground text-lg max-w-2xl">{t('subtitle')}</p>
       </div>
 
-      <form action="/app/events" method="GET" className="space-y-6">
-        <div className="flex gap-4">
+      <form action="/app/events" method="GET" className="space-y-4">
+        <div className="flex gap-3 p-1.5 rounded-[8px] bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 shadow-card">
           <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               name="q"
               placeholder={t('search')}
               defaultValue={q || ''}
-              className="pl-12 h-14 rounded-2xl"
+              className="pl-10 h-11 rounded-[4px] border-alpine-500/25 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
             />
           </div>
-          <Button type="submit" size="lg" className="rounded-2xl px-8">
+          <Button type="submit" size="default" className="rounded-[4px] px-6 h-11 bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm">
             {t('searchButton')}
           </Button>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap pt-1">
           {FILTER_TAGS.map(({ label, value }) => {
             const isActive = value === '' ? !tag : tag === value
             const href = value === '' ? '/app/events' : `/app/events?tag=${value}${q ? `&q=${q}` : ''}`
@@ -106,7 +106,13 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                 <Button
                   type="button"
                   variant={isActive ? 'default' : 'outline'}
-                  className="rounded-full px-3 py-1 text-sm"
+                  size="sm"
+                  className={cn(
+                    'rounded-[4px] px-3 h-7 text-xs font-mono uppercase tracking-wider transition-all',
+                    isActive
+                      ? 'bg-alpine-600 hover:bg-alpine-700 text-white border-alpine-600 shadow-xs'
+                      : 'border-alpine-500/30 bg-white/80 dark:bg-slate-900/80 text-foreground hover:bg-alpine-50/80 dark:hover:bg-slate-800'
+                  )}
                 >
                   {label}
                 </Button>
@@ -144,7 +150,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                 href={`/app/events/${event.slug || event.id}`}
                 className={`group overflow-hidden ${isFeatured ? 'col-span-2 row-span-2 max-lg:col-span-2 h-auto' : ''}`}
               >
-                <Card className={`rounded-2xl overflow-hidden flex flex-col transition-all duration-200 group-hover:shadow-xl group-hover:-translate-y-1 ${isFeatured ? 'h-auto' : 'h-full'}`}>
+                <div className={`rounded-[10px] border border-alpine-500/35 bg-alpine-50/60 dark:bg-slate-900 shadow-card hover:shadow-card-hover overflow-hidden flex flex-col transition-all duration-200 group-hover:-translate-y-0.5 ${isFeatured ? 'h-auto' : 'h-full'}`}>
                   <div className="relative aspect-[4/5] bg-muted overflow-hidden shrink-0">
                     <div
                       className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-80"
@@ -166,7 +172,7 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
 
                     <div className="absolute top-2 left-2 flex flex-col items-start gap-1.5">
                       <span
-                        className="bg-background/85 text-foreground border border-border text-xs font-semibold rounded-full px-2.5 py-1 backdrop-blur-sm"
+                        className="bg-white/90 dark:bg-slate-900/90 text-foreground border border-alpine-500/30 text-[11px] font-mono uppercase tracking-wider rounded-[4px] px-2 py-0.5 backdrop-blur-sm shadow-xs"
                       >
                         {event.tags?.[0] || t('allEvents')}
                       </span>
@@ -176,9 +182,9 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                       />
                     </div>
 
-                    <div className="absolute bottom-2 left-2 bg-white rounded-xl px-2.5 py-1.5 text-xs font-semibold">
-                      <span className="text-primary uppercase text-xs">{month}</span>
-                      <span className="ml-1 font-bold">{day}</span>
+                    <div className="absolute bottom-2 left-2 bg-white/95 dark:bg-slate-900/95 border border-alpine-500/25 rounded-[4px] px-2 py-1 text-xs font-semibold shadow-xs">
+                      <span className="text-alpine-600 uppercase text-xs font-mono font-bold">{month}</span>
+                      <span className="ml-1 font-bold text-foreground font-mono">{day}</span>
                     </div>
 
                     <div className="absolute top-2 right-2">
@@ -186,36 +192,36 @@ export default async function EventsPage({ searchParams: searchParamsPromise }: 
                     </div>
                   </div>
 
-                    <CardHeader className="p-4 pb-1">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                        <Calendar size={14} />
-                        {event.startDatetime
-                          ? formatEventDate(event.startDatetime, event.timezone)
-                          : t('tbd')}
-                      </div>
-                      <CardTitle className={`font-bold tracking-tight line-clamp-2 ${isFeatured ? 'text-2xl' : 'text-base'}`}>
-                        {event.title}
-                      </CardTitle>
-                    </CardHeader>
+                  <div className="p-4 pb-1">
+                    <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground mb-1.5">
+                      <Calendar size={13} className="text-alpine-600" />
+                      {event.startDatetime
+                        ? formatEventDate(event.startDatetime, event.timezone)
+                        : t('tbd')}
+                    </div>
+                    <h3 className={`font-semibold tracking-tight text-foreground line-clamp-2 ${isFeatured ? 'text-2xl' : 'text-base'}`}>
+                      {event.title}
+                    </h3>
+                  </div>
 
-                    <CardContent className="px-4 pt-3 pb-4 flex flex-col flex-1 min-h-[7.5rem] gap-2">
-                      {event.location?.location && (
-                        <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-relaxed">
-                          <MapPin size={13} className="shrink-0 mt-0.5 text-muted-foreground/80" />
-                          <span>{event.location.location}</span>
-                        </p>
-                      )}
+                  <div className="px-4 pt-2 pb-4 flex flex-col flex-1 min-h-[6.5rem] gap-2">
+                    {event.location?.location && (
+                      <p className="text-xs text-muted-foreground flex items-start gap-1.5 leading-relaxed">
+                        <MapPin size={13} className="shrink-0 mt-0.5 text-muted-foreground/80" />
+                        <span>{event.location.location}</span>
+                      </p>
+                    )}
 
-                      <div className="mt-auto pt-2.5 flex items-baseline justify-between">
-                        <span className={stockClass}>
-                          {priceText}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          {stockText}
-                        </span>
-                      </div>
-                    </CardContent>
-                </Card>
+                    <div className="mt-auto pt-2.5 flex items-baseline justify-between border-t border-alpine-500/15">
+                      <span className={stockClass}>
+                        {priceText}
+                      </span>
+                      <span className="text-muted-foreground font-mono text-xs">
+                        {stockText}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </Link>
             )
           })}

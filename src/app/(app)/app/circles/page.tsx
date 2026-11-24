@@ -185,17 +185,17 @@ export default function CirclesPage() {
   if (!session) {
     return (
       <div className="container py-20 flex justify-center">
-        <Card className="w-full max-w-md text-center p-8 space-y-6">
-          <Users size={48} className="mx-auto text-muted-foreground" />
+        <div className="w-full max-w-md text-center p-8 space-y-6 rounded-[10px] border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 shadow-card">
+          <Users size={48} className="mx-auto text-alpine-600" />
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">{t('signInTitle')}</h1>
-            <p className="text-muted-foreground">{t('signInDesc')}</p>
+            <p className="text-muted-foreground text-sm">{t('signInDesc')}</p>
           </div>
           <div className="pt-2" />
           <Link href="/app/auth/login?redirect=/app/circles">
-            <Button size="lg" className="w-full">{t('signIn')}</Button>
+            <Button size="lg" className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm">{t('signIn')}</Button>
           </Link>
-        </Card>
+        </div>
       </div>
     )
   }
@@ -208,41 +208,41 @@ export default function CirclesPage() {
           <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="gap-2" onClick={() => setJoinOpen(true)}>
-            <LogIn size={16} /> {t('join')}
+          <Button variant="outline" className="gap-2 rounded-[4px] border-alpine-500/30 text-xs font-mono uppercase tracking-wider" onClick={() => setJoinOpen(true)}>
+            <LogIn size={14} /> {t('join')}
           </Button>
-          <Button className="gap-2" onClick={() => setCreateOpen(true)}>
-            <Plus size={16} /> {t('newSquad')}
+          <Button className="gap-2 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm" onClick={() => setCreateOpen(true)}>
+            <Plus size={14} /> {t('newSquad')}
           </Button>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 rounded-xl p-4 text-sm">
+        <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 rounded-[6px] p-4 text-xs font-mono">
           {error}
         </div>
       )}
 
       {circles.length === 0 && !error ? (
-        <Card>
-          <CardContent className="text-center py-16 space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-              <Users size={28} className="text-primary" />
+        <div className="rounded-[10px] border border-alpine-500/35 bg-alpine-50/60 dark:bg-slate-900 shadow-card">
+          <div className="text-center py-16 space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-alpine-500/10 flex items-center justify-center">
+              <Users size={28} className="text-alpine-600" />
             </div>
             <div className="space-y-1">
               <p className="text-lg font-semibold">{t('emptyTitle')}</p>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">{t('emptyDesc')}</p>
             </div>
             <div className="flex gap-3 justify-center pt-2">
-              <Button variant="outline" className="gap-2" onClick={() => setJoinOpen(true)}>
-                <LogIn size={16} /> {t('joinWithCode')}
+              <Button variant="outline" className="gap-2 rounded-[4px] border-alpine-500/30 font-mono text-xs uppercase tracking-wider" onClick={() => setJoinOpen(true)}>
+                <LogIn size={14} /> {t('joinWithCode')}
               </Button>
-              <Button className="gap-2" onClick={() => setCreateOpen(true)}>
-                <Plus size={16} /> {t('createSquad')}
+              <Button className="gap-2 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm" onClick={() => setCreateOpen(true)}>
+                <Plus size={14} /> {t('createSquad')}
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {circles.map((circle) => {
@@ -250,8 +250,8 @@ export default function CirclesPage() {
             const liveCount = 0 // filled in by detail page polling
             return (
               <Link key={circle.id} href={`/app/circles/${circle.id}`}>
-                <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl h-full">
-                  <div className="relative h-32 bg-gradient-to-br from-primary/15 to-primary/5">
+                <div className="group overflow-hidden hover:shadow-card-hover transition-all border border-alpine-500/30 rounded-[10px] bg-alpine-50/60 dark:bg-slate-900 shadow-card h-full flex flex-col">
+                  <div className="relative h-32 bg-gradient-to-br from-alpine-500/20 to-alpine-500/5">
                     {getCardImageUrl(circle.coverImage) ? (
                       <img
                         src={getCardImageUrl(circle.coverImage)!}
@@ -260,33 +260,33 @@ export default function CirclesPage() {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Users size={40} className="text-primary/40" />
+                        <Users size={40} className="text-alpine-600/40" />
                       </div>
                     )}
                     <div className="absolute top-3 right-3">
-                      <span className="bg-black/50 text-white text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur">
+                      <span className="bg-black/60 text-white text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-[4px] backdrop-blur">
                         {members.length} {members.length === 1 ? t('memberOne') : t('memberMany')}
                       </span>
                     </div>
                   </div>
-                  <CardContent className="p-5 space-y-3">
+                  <div className="p-5 space-y-3 flex-1 flex flex-col justify-between">
                     <div>
-                      <p className="text-lg font-semibold group-hover:text-primary transition-colors">
+                      <p className="text-base font-semibold group-hover:text-alpine-600 transition-colors">
                         {circle.name}
                       </p>
                       {circle.description && (
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
                           {circle.description}
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between pt-2">
                       <div className="flex -space-x-2">
                         {members.slice(0, 5).map((m) => (
                           <MemberAvatar key={typeof m.user === 'object' ? m.user.id : m.user} user={m.user} size="sm" />
                         ))}
                         {members.length > 5 && (
-                          <div className="w-7 h-7 rounded-full bg-muted text-xs flex items-center justify-center ring-2 ring-background shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-muted text-xs font-mono flex items-center justify-center ring-2 ring-background shrink-0">
                             +{members.length - 5}
                           </div>
                         )}
@@ -308,17 +308,17 @@ export default function CirclesPage() {
                             )}
                           </button>
                         )}
-                        <ArrowRight size={16} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                        <ArrowRight size={16} className="text-muted-foreground group-hover:text-alpine-600 transition-colors" />
                       </div>
                     </div>
                     {liveCount > 0 && (
-                      <p className="text-xs text-green-600 flex items-center gap-1.5">
+                      <p className="text-xs text-green-600 flex items-center gap-1.5 font-mono">
                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                         {liveCount} sharing live now
                       </p>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </Link>
             )
           })}

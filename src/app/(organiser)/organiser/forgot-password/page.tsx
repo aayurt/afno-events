@@ -69,14 +69,14 @@ export default function OrganiserForgotPasswordPage() {
             </p>
           </div>
 
-          <div className="border border-border/80 bg-card/40 backdrop-blur-sm rounded-xl p-6 sm:p-7 shadow-xs">
+          <div className="border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 rounded-[8px] p-6 sm:p-7 shadow-card">
             {success ? (
               <div className="space-y-4">
-                <div className="flex items-start gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3.5 font-mono">
+                <div className="flex items-start gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-[6px] p-3.5 font-mono">
                   <CheckCircle2 size={15} className="shrink-0 mt-0.5" />
                   <span>Reset link sent. Check your inbox (and spam folder).</span>
                 </div>
-                <Button asChild variant="outline" className="w-full h-10 rounded-lg border-border/80 text-xs font-mono uppercase tracking-wider gap-2">
+                <Button asChild variant="outline" className="w-full h-10 rounded-[4px] border-alpine-500/30 text-xs font-mono uppercase tracking-wider gap-2">
                   <Link href="/organiser/login">
                     <ArrowLeft size={14} /> Back to sign in
                   </Link>
@@ -100,7 +100,7 @@ export default function OrganiserForgotPasswordPage() {
                       placeholder="name@organisation.co.uk"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-9 h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                      className="pl-9 h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
                       required
                       disabled={loading}
                     />
@@ -108,7 +108,7 @@ export default function OrganiserForgotPasswordPage() {
                 </div>
 
                 {error && (
-                  <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                  <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-[6px] p-3 font-mono">
                     <AlertCircle size={14} className="shrink-0 mt-0.5" />
                     <span>{error}</span>
                   </div>
@@ -117,7 +117,7 @@ export default function OrganiserForgotPasswordPage() {
                 <Button
                   type="submit"
                   size="default"
-                  className="w-full h-10 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full h-10 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm"
                   disabled={loading}
                 >
                   {loading ? (

@@ -71,13 +71,13 @@ function ResetPasswordFormContent() {
 
   if (!token) {
     return (
-      <Card className="rounded-2xl">
+      <Card className="rounded-[8px] border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 shadow-card">
         <CardHeader>
           <CardTitle className="text-lg">Invalid link</CardTitle>
           <CardDescription>The password reset link is invalid or has expired.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button asChild variant="outline" className="w-full gap-2">
+          <Button asChild variant="outline" className="w-full rounded-[4px] border-alpine-500/30 gap-2">
             <Link href="/organiser/forgot-password">
               <ArrowLeft size={16} /> Request a new link
             </Link>
@@ -88,7 +88,7 @@ function ResetPasswordFormContent() {
   }
 
   return (
-    <Card className="rounded-2xl">
+    <Card className="rounded-[8px] border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 shadow-card">
       <CardHeader>
         <CardTitle className="text-lg">
           {success ? 'Password reset' : 'Set new password'}
@@ -102,11 +102,11 @@ function ResetPasswordFormContent() {
       <CardContent>
         {success ? (
           <div className="space-y-4">
-            <div className="flex items-start gap-2 text-sm text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-900 rounded-lg p-3">
+            <div className="flex items-start gap-2 text-sm text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-[6px] p-3 font-mono">
               <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
               <span>Done! Taking you back to sign in…</span>
             </div>
-            <Button asChild className="w-full gap-2">
+            <Button asChild className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white gap-2">
               <Link href="/organiser/login">Sign in now</Link>
             </Button>
           </div>
@@ -123,6 +123,7 @@ function ResetPasswordFormContent() {
                 required
                 disabled={loading}
                 minLength={8}
+                className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
               />
             </div>
 
@@ -137,17 +138,18 @@ function ResetPasswordFormContent() {
                 required
                 disabled={loading}
                 minLength={8}
+                className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
               />
             </div>
 
             {error && (
-              <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-lg p-3">
+              <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-[6px] p-3 font-mono">
                 <AlertCircle size={16} className="shrink-0 mt-0.5" />
                 <span>{error}</span>
               </div>
             )}
 
-            <Button type="submit" className="w-full gap-2" disabled={loading}>
+            <Button type="submit" className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white gap-2 font-mono uppercase tracking-wider text-xs" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="animate-spin" size={16} /> Resetting…

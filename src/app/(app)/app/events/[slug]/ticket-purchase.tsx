@@ -203,13 +203,13 @@ export function TicketPurchase({
   if (event.isBookable === false) {
     return (
       <div className="space-y-4">
-        <div className="rounded-2xl border border-muted bg-muted/30 p-4 text-center space-y-3">
+        <div className="rounded-[8px] border border-muted bg-white/70 dark:bg-slate-800/70 p-4 text-center space-y-3 shadow-xs">
           <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center">
             <Ban size={20} className="text-muted-foreground" />
           </div>
           <div>
-            <p className="font-bold">{t('bookingPaused')}</p>
-            <p className="text-sm text-muted-foreground mt-0.5">{t('bookingPausedDesc')}</p>
+            <p className="font-bold text-sm">{t('bookingPaused')}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{t('bookingPausedDesc')}</p>
           </div>
         </div>
       </div>
@@ -219,19 +219,19 @@ export function TicketPurchase({
   return (
     <div className="space-y-4">
       {alreadyOrdered ? (
-        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 text-center space-y-3">
-          <div className="mx-auto w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <TicketCheck size={20} className="text-primary" />
+        <div className="rounded-[8px] border border-alpine-500/30 bg-white/70 dark:bg-slate-800/70 p-4 text-center space-y-3 shadow-xs">
+          <div className="mx-auto w-10 h-10 rounded-full bg-alpine-500/10 flex items-center justify-center">
+            <TicketCheck size={20} className="text-alpine-600" />
           </div>
           <div>
-            <p className="font-bold">You&apos;re already booked</p>
-            <p className="text-sm text-muted-foreground mt-0.5">
+            <p className="font-bold text-sm">You&apos;re already booked</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
               One order per account for this event.
             </p>
           </div>
           <Button
             variant="outline"
-            className="rounded-full"
+            className="rounded-[4px] border-alpine-500/30 font-mono text-xs uppercase tracking-wider"
             onClick={() => router.push('/app/tickets')}
           >
             View my tickets
@@ -240,7 +240,7 @@ export function TicketPurchase({
       ) : hasExternalLink ? (
         <Button
           size="lg"
-          className="w-full rounded-full"
+          className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm"
           onClick={handlePurchase}
           disabled={loading}
         >
@@ -253,19 +253,19 @@ export function TicketPurchase({
       ) : ticketTypes.length > 0 ? (
         <>
           {event.limitOneOrderPerAccount && !allSoldOut && (
-            <p className="text-xs text-muted-foreground text-center">
+            <p className="text-xs text-muted-foreground text-center font-mono">
               Limit: 1 ticket per account for this event.
             </p>
           )}
           {allSoldOut && (
-            <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-4 text-center">
-              <p className="font-bold">Sold out</p>
-              <p className="text-sm text-muted-foreground mt-0.5">
+            <div className="rounded-[8px] border border-destructive/30 bg-destructive/5 p-4 text-center">
+              <p className="font-bold text-sm">Sold out</p>
+              <p className="text-xs text-muted-foreground mt-0.5 font-mono">
                 All tickets for this event have been sold.
               </p>
             </div>
           )}
-          <div className="border border-border rounded-2xl divide-y divide-border bg-card overflow-hidden">
+          <div className="border border-alpine-500/30 rounded-[8px] divide-y divide-alpine-500/20 bg-white dark:bg-slate-800 overflow-hidden shadow-xs">
             {ticketTypes.map((tt) => {
               const q = quantities[tt.name] || 0
               const max = effectiveMax(tt)
@@ -279,33 +279,33 @@ export function TicketPurchase({
                   {tt.description && (
                     <p className="text-xs text-muted-foreground mt-0.5">{tt.description}</p>
                   )}
-                  <p className="text-sm font-bold text-primary mt-1">£{tt.price}</p>
+                  <p className="text-sm font-bold text-alpine-600 font-mono mt-1">£{tt.price}</p>
                   {soldOut ? (
-                    <p className="text-[11px] font-bold text-destructive mt-0.5">Sold out</p>
+                    <p className="text-[11px] font-bold text-destructive font-mono mt-0.5">Sold out</p>
                   ) : (
                     <>
                       {tt.maxPerOrder && tt.maxPerOrder > 0 && (
-                        <p className="text-[11px] text-muted-foreground mt-0.5">Max {tt.maxPerOrder} per order</p>
+                        <p className="text-[11px] text-muted-foreground font-mono mt-0.5">Max {tt.maxPerOrder} per order</p>
                       )}
                       {remaining !== null && (
-                        <p className="text-[11px] text-muted-foreground mt-0.5">Only {remaining} left</p>
+                        <p className="text-[11px] text-muted-foreground font-mono mt-0.5">Only {remaining} left</p>
                       )}
                     </>
                   )}
                 </div>
-                <div className="flex items-center gap-1 rounded-full border border-border bg-background p-1 shrink-0">
+                <div className="flex items-center gap-1 rounded-[4px] border border-alpine-500/25 bg-background p-1 shrink-0">
                   <button
                     onClick={() => updateQuantity(tt.name, -1)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="w-7 h-7 rounded-[3px] flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     disabled={loading || q === 0}
                     aria-label={`Remove one ${tt.name}`}
                   >
                     <Minus size={14} />
                   </button>
-                  <span className="w-6 text-center font-bold text-sm">{q}</span>
+                  <span className="w-6 text-center font-bold text-sm font-mono">{q}</span>
                   <button
                     onClick={() => updateQuantity(tt.name, 1)}
-                    className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="w-7 h-7 rounded-[3px] bg-alpine-600 text-white flex items-center justify-center hover:bg-alpine-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     disabled={loading || atMax || soldOut}
                     aria-label={`Add one ${tt.name}`}
                   >
@@ -318,15 +318,15 @@ export function TicketPurchase({
           </div>
 
           {totalTickets > 0 && (
-            <div className="flex justify-between items-center pt-2 border-t border-border">
-              <span className="font-semibold">{t('total')}</span>
-              <span className="font-bold text-lg text-primary">£{total.toFixed(2)}</span>
+            <div className="flex justify-between items-center pt-2 border-t border-alpine-500/25">
+              <span className="font-semibold text-sm">{t('total')}</span>
+              <span className="font-black text-lg text-alpine-600 font-mono">£{total.toFixed(2)}</span>
             </div>
           )}
 
           <Button
             size="lg"
-            className="w-full rounded-full"
+            className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm"
             onClick={handlePurchase}
             disabled={loading || totalTickets === 0}
           >
@@ -340,20 +340,20 @@ export function TicketPurchase({
           </Button>
 
           {error && (
-            <p className="text-sm text-destructive text-center">{error}</p>
+            <p className="text-xs text-destructive text-center font-mono">{error}</p>
           )}
         </>
       ) : isFree ? (
         <Button
           size="lg"
-          className="w-full rounded-full"
+          className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm"
           onClick={handlePurchase}
           disabled={loading}
         >
           {loading ? <Loader2 className="animate-spin" /> : t('registerFree')}
         </Button>
       ) : (
-        <p className="text-sm text-muted-foreground text-center">{t('noTickets')}</p>
+        <p className="text-sm text-muted-foreground text-center font-mono">{t('noTickets')}</p>
       )}
     </div>
   )

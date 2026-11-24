@@ -177,7 +177,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               <div className="flex gap-2 flex-wrap">
                 {e.tags.map((t: string) => (
                   <Link key={t} href={`/app/events?tag=${t}`}>
-                    <span className="text-sm bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20 transition-colors cursor-pointer">
+                    <span className="text-xs font-mono uppercase tracking-wider bg-alpine-50 text-alpine-600 border border-alpine-500/25 px-2.5 py-1 rounded-[4px] hover:bg-alpine-100 transition-colors cursor-pointer">
                       {t}
                     </span>
                   </Link>
@@ -190,7 +190,7 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
                 {e.title}
               </h1>
               {e.description && (
-                <div className="mt-6 rounded-2xl bg-card/60 border border-border/80 p-5 sm:p-6 backdrop-blur-sm">
+                <div className="mt-6 rounded-[8px] bg-alpine-50/60 dark:bg-slate-900 border border-alpine-500/25 p-5 sm:p-6 shadow-card">
                   <p className="text-muted-foreground text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
                     {e.description}
                   </p>
@@ -207,10 +207,10 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="rounded-2xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('dateTime')}</div>
+              <div className="rounded-[8px] border border-alpine-500/25 bg-alpine-50/50 dark:bg-slate-900 p-4 flex flex-col justify-between shadow-card">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{t('dateTime')}</div>
                 <div className="mt-2">
-                  <div className="font-extrabold text-base sm:text-lg leading-tight text-foreground">
+                  <div className="font-semibold text-base sm:text-lg leading-tight text-foreground">
                     {start
                       ? new Date(start).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
                       : t('tbd')}
@@ -224,10 +224,10 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               </div>
 
               {e.location?.location && (
-                <div className="rounded-2xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('venue')}</div>
+                <div className="rounded-[8px] border border-alpine-500/25 bg-alpine-50/50 dark:bg-slate-900 p-4 flex flex-col justify-between shadow-card">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{t('venue')}</div>
                   <div className="mt-2">
-                    <div className="font-extrabold text-base sm:text-lg leading-tight text-foreground truncate" title={e.location.location}>
+                    <div className="font-semibold text-base sm:text-lg leading-tight text-foreground truncate" title={e.location.location}>
                       {e.location.location.split(',')[0]}
                     </div>
                     <div className="text-xs text-muted-foreground truncate mt-0.5">
@@ -238,24 +238,24 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
               )}
 
               {tenant && (
-                <div className="rounded-2xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('organiser')}</div>
+                <div className="rounded-[8px] border border-alpine-500/25 bg-alpine-50/50 dark:bg-slate-900 p-4 flex flex-col justify-between shadow-card">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{t('organiser')}</div>
                   <div className="mt-2">
-                    <div className="font-extrabold text-base sm:text-lg leading-tight text-foreground truncate" title={tenant.name}>
+                    <div className="font-semibold text-base sm:text-lg leading-tight text-foreground truncate" title={tenant.name}>
                       {tenant.name}
                     </div>
-                    <div className="text-xs text-muted-foreground mt-0.5">Verified Promoter</div>
+                    <div className="text-xs text-muted-foreground mt-0.5 font-mono">Verified Promoter</div>
                   </div>
                 </div>
               )}
 
-              <div className="rounded-2xl border border-border bg-card p-4 flex flex-col justify-between shadow-sm">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{t('price')}</div>
+              <div className="rounded-[8px] border border-alpine-500/25 bg-alpine-50/50 dark:bg-slate-900 p-4 flex flex-col justify-between shadow-card">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{t('price')}</div>
                 <div className="mt-2">
-                  <div className="font-black text-lg sm:text-xl leading-tight text-primary font-mono">
+                  <div className="font-bold text-lg sm:text-xl leading-tight text-alpine-600 font-mono">
                     {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
                   </div>
-                  <div className="text-xs text-emerald-500 font-medium mt-0.5">
+                  <div className="text-xs text-emerald-600 dark:text-emerald-400 font-mono mt-0.5">
                     {e.isBookable !== false ? 'Booking Open' : 'Announcement'}
                   </div>
                 </div>
@@ -433,21 +433,19 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
 
           <div className="lg:col-span-1">
             <div className="sticky top-24" id="ticket-card">
-              <Card className="rounded-2xl">
-                <CardContent className="p-6 space-y-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground">{t('price')}</p>
-                    <p className="text-3xl font-bold text-primary">
-              {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
-                    </p>
-                  </div>
+              <div className="rounded-[10px] border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 shadow-card p-6 space-y-6">
+                <div>
+                  <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">{t('price')}</p>
+                  <p className="text-3xl font-black text-alpine-600 font-mono mt-1">
+                    {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
+                  </p>
+                </div>
 
-                  <TicketPurchase
-                    event={e}
-                    availability={await getEventTierAvailability(payload, e.id).catch(() => [])}
-                  />
-                </CardContent>
-              </Card>
+                <TicketPurchase
+                  event={e}
+                  availability={await getEventTierAvailability(payload, e.id).catch(() => [])}
+                />
+              </div>
             </div>
           </div>
         </div>

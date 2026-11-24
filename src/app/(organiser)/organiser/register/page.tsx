@@ -107,7 +107,7 @@ export default function OrganiserRegisterPage() {
             </p>
           </div>
 
-          <div className="border border-border/80 bg-card/40 backdrop-blur-sm rounded-xl p-6 sm:p-7 shadow-xs">
+          <div className="border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 rounded-[8px] p-6 sm:p-7 shadow-card">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="orgName" className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
@@ -119,7 +119,7 @@ export default function OrganiserRegisterPage() {
                   placeholder="e.g. Bassline Events or Purbeli Samaj"
                   value={organisationName}
                   onChange={(e) => setOrganisationName(e.target.value)}
-                  className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                  className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
                   required
                   disabled={loading}
                 />
@@ -136,7 +136,7 @@ export default function OrganiserRegisterPage() {
                     placeholder="Full name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                    className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
                     required
                     disabled={loading}
                   />
@@ -152,7 +152,7 @@ export default function OrganiserRegisterPage() {
                     placeholder="+44 7123 456789"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                    className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
                     disabled={loading}
                   />
                 </div>
@@ -169,7 +169,7 @@ export default function OrganiserRegisterPage() {
                   placeholder="name@organisation.co.uk"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                  className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
                   required
                   disabled={loading}
                 />
@@ -186,7 +186,7 @@ export default function OrganiserRegisterPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all"
+                    className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs"
                     required
                     disabled={loading}
                   />
@@ -203,7 +203,7 @@ export default function OrganiserRegisterPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className={cn(
-                      "h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground transition-all",
+                      "h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 transition-all shadow-xs",
                       confirmPassword && !passwordsMatch && "border-destructive"
                     )}
                     required
@@ -216,7 +216,7 @@ export default function OrganiserRegisterPage() {
               )}
 
               {error && (
-                <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-[6px] p-3 font-mono">
                   <AlertCircle size={14} className="shrink-0 mt-0.5" />
                   <span>{error}</span>
                 </div>
@@ -225,7 +225,7 @@ export default function OrganiserRegisterPage() {
               <Button
                 type="submit"
                 size="default"
-                className="w-full h-10 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                className="w-full h-10 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm"
                 disabled={loading || !passwordsMatch}
               >
                 {loading ? (

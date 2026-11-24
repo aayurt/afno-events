@@ -154,10 +154,10 @@ export default function OrganiserLoginPage() {
             </p>
           </div>
 
-          <div className="border border-border/80 bg-card/40 backdrop-blur-sm rounded-xl p-6 sm:p-7 shadow-xs">
+          <div className="border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 rounded-[8px] p-6 sm:p-7 shadow-card">
             {checking ? (
               <div className="flex items-center justify-center py-10 text-muted-foreground">
-                <Loader2 className="animate-spin text-muted-foreground" size={18} />
+                <Loader2 className="animate-spin text-alpine-600" size={18} />
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -174,7 +174,7 @@ export default function OrganiserLoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground transition-all"
+                    className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 focus-visible:border-alpine-600 transition-all shadow-xs"
                   />
                 </div>
 
@@ -185,7 +185,7 @@ export default function OrganiserLoginPage() {
                     </Label>
                     <Link
                       href="/organiser/forgot-password"
-                      className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                      className="text-xs font-mono text-alpine-600 hover:text-alpine-700 transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -198,19 +198,19 @@ export default function OrganiserLoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-10 rounded-lg border-border/80 bg-background/70 text-sm focus-visible:ring-1 focus-visible:ring-foreground focus-visible:border-foreground transition-all"
+                    className="h-10 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-sm focus-visible:ring-1 focus-visible:ring-alpine-600 focus-visible:border-alpine-600 transition-all shadow-xs"
                   />
                 </div>
 
                 {error && (
-                  <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                  <div className="flex items-start gap-2 text-xs text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/20 rounded-[6px] p-3 font-mono">
                     <AlertCircle size={14} className="shrink-0 mt-0.5" />
                     <span>{error}</span>
                   </div>
                 )}
 
                 {notOrganiser && (
-                  <div className="text-xs rounded-lg p-3.5 space-y-3 text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20">
+                  <div className="text-xs rounded-[6px] p-3.5 space-y-3 text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20">
                     {requestSent ? (
                       <p className="font-medium font-mono">
                         Request received — setting up your workspace…
@@ -228,13 +228,13 @@ export default function OrganiserLoginPage() {
                             onChange={(e) => setOrgName(e.target.value)}
                             disabled={requesting}
                             required
-                            className="h-9 rounded-lg border-border/80 bg-background/80 text-xs"
+                            className="h-9 rounded-[4px] border-alpine-500/30 bg-white dark:bg-slate-800 text-xs"
                           />
                           {requestError && <p className="text-red-500 text-xs">{requestError}</p>}
                           <Button
                             type="submit"
                             size="sm"
-                            className="w-full h-8 rounded-lg text-xs font-medium"
+                            className="w-full h-8 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white text-xs font-medium font-mono uppercase tracking-wider"
                             disabled={requesting || !orgName.trim()}
                           >
                             {requesting ? (
@@ -260,7 +260,7 @@ export default function OrganiserLoginPage() {
                 <Button
                   type="submit"
                   size="default"
-                  className="w-full h-10 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full h-10 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-medium text-xs font-mono uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-sm"
                   disabled={loading}
                 >
                   {loading ? (

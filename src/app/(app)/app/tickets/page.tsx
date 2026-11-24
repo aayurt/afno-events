@@ -37,8 +37,8 @@ function TicketCard({ ticket, t }: { ticket: TicketDoc; t: (key: any) => string 
 
   return (
     <Link href={`/app/tickets/${ticket.id}`} className="block">
-      <Card className="group overflow-hidden hover:shadow-xl transition-all border-border rounded-2xl">
-        <CardContent className="p-0">
+      <div className="group overflow-hidden hover:shadow-card-hover transition-all border border-alpine-500/30 rounded-[10px] bg-alpine-50/60 dark:bg-slate-900 shadow-card">
+        <div className="p-0">
           <div className="flex">
             {img && (
               <div className="relative w-28 sm:w-36 shrink-0 bg-muted">
@@ -49,12 +49,12 @@ function TicketCard({ ticket, t }: { ticket: TicketDoc; t: (key: any) => string 
             <div className="flex-1 min-w-0 p-4 sm:p-5 flex items-center">
               <div className="min-w-0 flex-1 space-y-2">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-semibold truncate group-hover:text-primary transition-colors">
+                  <p className="font-semibold truncate group-hover:text-alpine-600 transition-colors">
                     {eventTitle(ticket)}
                   </p>
                   <span
                     className={cn(
-                      'text-xs px-2 py-0.5 rounded-full shrink-0 capitalize',
+                      'text-xs font-mono uppercase tracking-wider px-2 py-0.5 rounded-[4px] shrink-0 border border-alpine-500/20',
                       statusBadgeClasses[ticket.status] || 'bg-muted text-muted-foreground',
                     )}
                   >
@@ -62,14 +62,14 @@ function TicketCard({ ticket, t }: { ticket: TicketDoc; t: (key: any) => string 
                   </span>
                 </div>
                 {eventDateLabel(ticket) && (
-                  <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5 truncate">
-                    <Calendar size={13} className="shrink-0" />
+                  <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5 truncate font-mono">
+                    <Calendar size={13} className="shrink-0 text-alpine-600" />
                     <span className="truncate">{eventDateLabel(ticket)}</span>
                   </p>
                 )}
                 {eventLocationLabel(ticket) && (
                   <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1.5 truncate">
-                    <MapPin size={13} className="shrink-0" />
+                    <MapPin size={13} className="shrink-0 text-muted-foreground/80" />
                     <span className="truncate">{eventLocationLabel(ticket)}</span>
                   </p>
                 )}
@@ -78,11 +78,14 @@ function TicketCard({ ticket, t }: { ticket: TicketDoc; t: (key: any) => string 
                   <span className="text-xs font-mono text-muted-foreground">#{shortCode(ticket.code)}</span>
                 </div>
               </div>
-              <ChevronRight size={18} className="text-muted-foreground/50 group-hover:text-primary transition-colors shrink-0 ml-2" />
+              <ChevronRight
+                size={18}
+                className="text-muted-foreground/60 group-hover:text-alpine-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-2"
+              />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   )
 }
@@ -139,19 +142,19 @@ export default function MyTicketsPage() {
   if (!session) {
     return (
       <div className="container py-20 flex justify-center">
-        <Card className="w-full max-w-md text-center p-8 space-y-6">
-          <TicketIcon size={48} className="mx-auto text-muted-foreground" />
+        <div className="w-full max-w-md text-center p-8 space-y-6 rounded-[10px] border border-alpine-500/35 bg-alpine-50/70 dark:bg-slate-900 shadow-card">
+          <TicketIcon size={48} className="mx-auto text-alpine-600" />
           <div className="space-y-2">
             <h1 className="text-2xl font-bold">{t('signInRequired')}</h1>
-            <p className="text-muted-foreground">{t('signInDescription')}</p>
+            <p className="text-muted-foreground text-sm">{t('signInDescription')}</p>
           </div>
           <div className="pt-2" />
           <Link href="/app/auth/login?redirect=/app/tickets">
-            <Button size="lg" className="w-full gap-2">
+            <Button size="lg" className="w-full rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm gap-2">
               <LogIn size={16} /> {t('signIn')}
             </Button>
           </Link>
-        </Card>
+        </div>
       </div>
     )
   }
@@ -181,10 +184,10 @@ export default function MyTicketsPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium border transition-colors',
+                  'px-3 py-1.5 rounded-[4px] text-xs font-mono uppercase tracking-wider border transition-all',
                   isActive
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'border-border bg-card text-muted-foreground hover:text-foreground',
+                    ? 'bg-alpine-600 text-white border-alpine-600 shadow-xs'
+                    : 'border-alpine-500/30 bg-white/80 dark:bg-slate-900/80 text-foreground hover:bg-alpine-50/80 dark:hover:bg-slate-800',
                 )}
               >
                 {t(f)} ({countFor(f)})
@@ -195,30 +198,28 @@ export default function MyTicketsPage() {
       )}
 
       {!error && tickets.length === 0 ? (
-        <Card>
-          <CardContent className="text-center py-16 space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-              <TicketIcon size={28} className="text-primary" />
+        <div className="rounded-[10px] border border-alpine-500/35 bg-alpine-50/60 dark:bg-slate-900 shadow-card">
+          <div className="text-center py-16 space-y-4">
+            <div className="w-16 h-16 mx-auto rounded-full bg-alpine-500/10 flex items-center justify-center">
+              <TicketIcon size={28} className="text-alpine-600" />
             </div>
             <div className="space-y-1">
               <p className="text-lg font-semibold">{t('noTickets')}</p>
               <p className="text-sm text-muted-foreground max-w-sm mx-auto">{t('noTicketsDesc')}</p>
             </div>
             <Link href="/app/events">
-              <Button className="gap-2">
+              <Button className="rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm gap-2">
                 {t('browseEvents')} <ChevronRight size={16} />
               </Button>
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <div className="space-y-4">
           {filtered.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-12 text-muted-foreground">
-                <p>{t('noFilteredTickets')}</p>
-              </CardContent>
-            </Card>
+            <div className="rounded-[10px] border border-alpine-500/30 bg-alpine-50/50 dark:bg-slate-900 p-8 shadow-card text-center text-muted-foreground">
+              <p className="text-sm font-mono">{t('noFilteredTickets')}</p>
+            </div>
           ) : (
             filtered.map((tk) => <TicketCard key={tk.id} ticket={tk} t={t as any} />)
           )}
