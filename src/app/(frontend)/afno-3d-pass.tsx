@@ -442,7 +442,7 @@ export function Afno3DPass() {
                       <span>OFFICIAL DIGITAL PASS</span>
                     </div>
                     <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-sans tracking-tight text-white leading-none">
-                      AFNO <span className="text-alpine-500">EVENT</span>
+                      AFNO <span className="text-alpine-500">EVENTS</span>
                     </h2>
                     <p className="text-xs sm:text-sm text-slate-300 mt-2 font-normal max-w-md">
                       Live Headline Concerts • Traditional Folk & Fusion • Nepalese Street Food & Cultural Village
@@ -610,21 +610,14 @@ export function Afno3DPass() {
         </div>
       </div>
 
-      {/* Interactive Helper Hints */}
-      <div className="mt-4 flex flex-wrap items-center justify-center gap-5 text-xs text-slate-500 font-mono">
-        <span className="flex items-center gap-1.5">
-          <Sparkles size={12} className="text-alpine-500" />
-          Cursor tilt refracts holographic prism
-        </span>
-        <span className="flex items-center gap-1.5">
-          <RotateCw size={12} className="text-slate-400" />
-          Click anywhere on ticket to flip 180°
-        </span>
+      {/* Bottom CTA Link */}
+      <div className="mt-4 flex items-center justify-center">
         <Link
           href="/app/events"
-          className="inline-flex items-center gap-1 text-alpine-500 hover:text-alpine-400 font-semibold"
+          className="inline-flex items-center gap-1.5 text-xs font-mono font-semibold text-alpine-500 hover:text-alpine-400 transition-colors"
         >
-          Explore All Events <ArrowRight size={12} />
+          <span>Explore All Confirmed Community Events</span>
+          <ArrowRight size={13} />
         </Link>
       </div>
     </div>
