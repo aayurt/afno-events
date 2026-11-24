@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { ArrowRight, Calendar, MapPin, Search, Sparkles, ShieldCheck, QrCode } from 'lucide-react'
+import { ArrowRight, Calendar, MapPin, Search, Sparkles, ShieldCheck, QrCode, Ticket } from 'lucide-react'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import Link from 'next/link'
 import { getCardImageUrl } from '@/utilities/getCardImageUrl'
+import { displayPriceRange } from '@/utilities/pricing'
 import { APP_STORE_URL } from '@/utilities/constants'
 import { NewsletterSection } from '@/components/NewsletterSection'
 
@@ -106,30 +107,57 @@ export default async function HomePage() {
               </div>
 
               {/* Integrated Search Box — light blush background with white inputs */}
-              <form action="/app/events" method="GET" className="bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 dark:border-alpine-400/35 p-2 rounded-[8px] shadow-card flex flex-col sm:flex-row gap-2 max-w-xl">
-                <div className="flex-1 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
-                  <Search className="text-alpine-600 dark:text-alpine-400 w-4 h-4 flex-shrink-0" />
-                  <input 
-                    type="text"
-                    name="q" 
-                    placeholder="Search artist, festival, or venue..." 
-                    className="bg-transparent text-xs sm:text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-slate-400 text-slate-900 dark:text-slate-100 shadow-none ring-0 appearance-none font-sans" 
-                  />
+              <div className="space-y-3 max-w-xl">
+                <form action="/app/events" method="GET" className="bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 dark:border-alpine-400/35 p-2 rounded-[8px] shadow-card flex flex-col sm:flex-row gap-2">
+                  <div className="flex-1 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
+                    <Search className="text-alpine-600 dark:text-alpine-400 w-4 h-4 flex-shrink-0" />
+                    <input 
+                      type="text"
+                      name="q" 
+                      placeholder="Search artist, festival, or venue..." 
+                      className="bg-transparent text-xs sm:text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-slate-400 text-slate-900 dark:text-slate-100 shadow-none ring-0 appearance-none font-sans" 
+                    />
+                  </div>
+                  <div className="w-full sm:w-44 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
+                    <MapPin className="text-alpine-600 dark:text-alpine-400 w-3.5 h-3.5 flex-shrink-0" />
+                    <select name="city" className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-slate-800 dark:text-slate-200 cursor-pointer appearance-none shadow-none ring-0 font-sans">
+                      <option value="" className="bg-white dark:bg-slate-900">All UK Cities</option>
+                      <option value="London" className="bg-white dark:bg-slate-900">London</option>
+                      <option value="Aldershot" className="bg-white dark:bg-slate-900">Aldershot</option>
+                      <option value="Reading" className="bg-white dark:bg-slate-900">Reading</option>
+                      <option value="Wembley" className="bg-white dark:bg-slate-900">Wembley</option>
+                      <option value="Farnborough" className="bg-white dark:bg-slate-900">Farnborough</option>
+                      <option value="Ashford" className="bg-white dark:bg-slate-900">Ashford</option>
+                    </select>
+                  </div>
+                  <Button type="submit" className="bg-alpine-600 hover:bg-alpine-700 text-white font-mono font-bold text-xs px-6 py-2.5 rounded-[6px] shadow-trail hover:shadow-card-hover transition-all flex-shrink-0 h-10">
+                    Find Events
+                  </Button>
+                </form>
+
+                {/* Interactive Quick City Filter Tag Bar */}
+                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                  <span className="text-[11px] font-mono uppercase text-muted-foreground tracking-wider mr-1">
+                    Popular:
+                  </span>
+                  {[
+                    { name: 'London', query: 'London' },
+                    { name: 'Aldershot', query: 'Aldershot' },
+                    { name: 'Reading', query: 'Reading' },
+                    { name: 'Wembley', query: 'Wembley' },
+                    { name: 'Farnborough', query: 'Farnborough' },
+                  ].map((city) => (
+                    <Link
+                      key={city.name}
+                      href={`/app/events?q=${encodeURIComponent(city.query)}`}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-white/80 dark:bg-slate-800/80 hover:bg-alpine-50 dark:hover:bg-slate-700 border border-alpine-500/25 text-slate-700 dark:text-slate-300 hover:text-alpine-600 dark:hover:text-alpine-400 font-mono text-[11px] tracking-wide transition-all shadow-xs"
+                    >
+                      <MapPin size={10} className="text-alpine-500" />
+                      {city.name}
+                    </Link>
+                  ))}
                 </div>
-                <div className="w-full sm:w-44 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
-                  <MapPin className="text-alpine-600 dark:text-alpine-400 w-3.5 h-3.5 flex-shrink-0" />
-                  <select className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-slate-800 dark:text-slate-200 cursor-pointer appearance-none shadow-none ring-0 font-sans">
-                    <option className="bg-white dark:bg-slate-900">All UK Cities</option>
-                    <option className="bg-white dark:bg-slate-900">London</option>
-                    <option className="bg-white dark:bg-slate-900">Aldershot</option>
-                    <option className="bg-white dark:bg-slate-900">Reading</option>
-                    <option className="bg-white dark:bg-slate-900">Wembley</option>
-                  </select>
-                </div>
-                <Button type="submit" className="bg-alpine-600 hover:bg-alpine-700 text-white font-mono font-bold text-xs px-6 py-2.5 rounded-[6px] shadow-trail hover:shadow-card-hover transition-all flex-shrink-0 h-10">
-                  Find Events
-                </Button>
-              </form>
+              </div>
 
               {/* Verified Metrics Strip */}
               <div className="grid grid-cols-3 gap-6 pt-4 border-t border-alpine-500/20 max-w-xl">
@@ -205,14 +233,17 @@ export default async function HomePage() {
                       </h2>
 
                       {/* Clean inline price & booking status */}
-                      <div className="flex items-center justify-between pt-1">
-                        <span className="text-sm font-semibold text-gray-200 font-mono drop-shadow-sm">
-                          {featuredEvent.pricing?.type === 'paid' ? featuredEvent.pricing.priceRange || 'Paid' : 'Free Entry'}
+                      <div className="flex items-center justify-between pt-1 border-t border-white/10">
+                        <span className="text-sm font-bold text-white font-mono drop-shadow-sm flex items-center gap-1.5">
+                          <Ticket size={13} className="text-alpine-400" />
+                          {featuredEvent.pricing?.type === 'paid' 
+                            ? displayPriceRange(featuredEvent.pricing.ticketTypes, featuredEvent.pricing.priceRange) 
+                            : 'Free Entry'}
                         </span>
 
                         <span className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                          Open for Booking →
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Book Tickets →
                         </span>
                       </div>
                     </div>
@@ -306,17 +337,17 @@ export default async function HomePage() {
                   </h3>
 
                   {/* Clean unbadged price or status text */}
-                  <div className="pt-1 flex items-center justify-between">
-                    <span className="text-xs font-mono text-gray-300 drop-shadow-sm">
+                  <div className="pt-1 flex items-center justify-between border-t border-white/10">
+                    <span className="text-xs font-mono font-bold text-gray-200 drop-shadow-sm">
                       {expired 
                         ? 'Expired' 
                         : event.pricing?.type === 'paid' 
-                          ? event.pricing.priceRange || 'Paid' 
+                          ? displayPriceRange(event.pricing?.ticketTypes, event.pricing?.priceRange)
                           : 'Free'}
                     </span>
 
                     {bookable && (
-                      <span className="text-[10px] font-mono font-semibold text-emerald-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[10px] font-mono font-bold text-emerald-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         Book →
                       </span>
                     )}
