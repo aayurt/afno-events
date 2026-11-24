@@ -26,7 +26,7 @@ const LeafletMap = dynamic<LeafletMapProps>(
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 w-full rounded-[6px] bg-slate-50 dark:bg-slate-900/60 flex flex-col items-center justify-center text-muted-foreground border border-alpine-500/30">
+      <div className="h-64 w-full rounded-[6px] bg-alpine-50/50 dark:bg-slate-900/60 flex flex-col items-center justify-center text-muted-foreground border border-alpine-500/30">
         <Loader2 className="animate-spin mb-2 text-alpine-500" size={24} />
         <span className="text-xs font-mono">Loading map view…</span>
       </div>
@@ -155,7 +155,7 @@ export function VenueMapPicker({ value, onChange }: Props) {
 
       {/* Map search & interactive picker */}
       {showMap && (
-        <div className="p-3.5 rounded-[6px] border border-alpine-500/30 bg-slate-50 dark:bg-slate-900 space-y-3">
+        <div className="p-3.5 rounded-[6px] border border-alpine-500/30 bg-alpine-50/50 dark:bg-slate-900 space-y-3">
           <div className="flex gap-2">
             <div className="relative flex-1 min-w-0">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />

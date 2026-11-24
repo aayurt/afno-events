@@ -257,7 +257,7 @@ export default function OrganiserProfileEditPage() {
                   {/* Avatar Upload */}
                   <div className="flex items-center gap-4 pb-4 border-b border-alpine-500/20">
                     <div className="relative">
-                      <div className="w-20 h-20 rounded-[6px] bg-slate-50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="w-20 h-20 rounded-[6px] bg-alpine-50/50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
                         {avatarUrl ? (
                           <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
@@ -470,7 +470,7 @@ export default function OrganiserProfileEditPage() {
               {/* Public Organiser Badge Card */}
               <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 p-5 space-y-4 shadow-sm">
                 <div className="flex items-start gap-3.5">
-                  <div className="w-14 h-14 rounded-[6px] bg-slate-50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="w-14 h-14 rounded-[6px] bg-alpine-50/50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center overflow-hidden shrink-0">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -520,7 +520,7 @@ export default function OrganiserProfileEditPage() {
               </div>
 
               {/* Brand Guidelines Card */}
-              <div className="rounded-[6px] border border-alpine-500/25 dark:border-alpine-400/25 bg-slate-50 dark:bg-slate-900 p-4 space-y-2 text-xs font-mono">
+              <div className="rounded-[6px] border border-alpine-500/25 dark:border-alpine-400/25 bg-alpine-50/40 dark:bg-slate-900 p-4 space-y-2 text-xs font-mono">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                   Brand Guidelines
                 </span>

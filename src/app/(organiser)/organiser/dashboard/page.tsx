@@ -77,9 +77,9 @@ function Button({
     'inline-flex items-center justify-center font-sans font-medium rounded-[4px] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-alpine-500 focus:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none'
   const variants = {
     primary: 'bg-alpine-600 hover:bg-alpine-700 text-white shadow-trail border border-transparent',
-    secondary: 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 border border-alpine-500/25 dark:border-alpine-400/25',
+    secondary: 'bg-alpine-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-alpine-100 dark:hover:bg-slate-700 border border-alpine-500/25 dark:border-alpine-400/25',
     outline: 'border border-alpine-500/40 dark:border-alpine-400/40 bg-white dark:bg-slate-800 hover:bg-alpine-500/10 hover:border-alpine-500 text-slate-800 dark:text-slate-200',
-    ghost: 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100',
+    ghost: 'bg-transparent hover:bg-alpine-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100',
     destructive: 'bg-rose-600 hover:bg-rose-700 text-white shadow-trail border border-transparent',
     alpine: 'bg-alpine-600 hover:bg-alpine-700 text-white shadow-trail border border-transparent',
   }
@@ -106,7 +106,7 @@ function Badge({
   variant?: 'default' | 'primary' | 'success' | 'warning' | 'error' | 'outline' | 'mono'
 }) {
   const variants = {
-    default: 'bg-slate-100/90 dark:bg-slate-800/90 text-slate-600 dark:text-slate-300 border-alpine-500/30 dark:border-alpine-400/30 backdrop-blur-md',
+    default: 'bg-alpine-50/90 dark:bg-slate-800/90 text-alpine-900 dark:text-slate-200 border-alpine-500/30 dark:border-alpine-400/30 backdrop-blur-md',
     primary: 'bg-alpine-500/10 text-alpine-600 dark:text-alpine-400 border-alpine-500/40 dark:border-alpine-400/40 backdrop-blur-md shadow-xs',
     success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/40 dark:border-emerald-400/40 backdrop-blur-md shadow-xs',
     warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/40 dark:border-amber-400/40 backdrop-blur-md shadow-xs',
@@ -350,7 +350,7 @@ function MetricCard({
             </p>
           )}
         </div>
-        <div className="p-2 rounded-[4px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+        <div className="p-2 rounded-[4px] bg-alpine-50 dark:bg-slate-800 text-alpine-700 dark:text-slate-300">
           <Icon className="w-4 h-4 stroke-[1.75]" />
         </div>
       </div>
@@ -402,7 +402,7 @@ function TicketTiersModal({
             tiers.map((tier: any, i: number) => (
               <div
                 key={i}
-                className="p-3 rounded-[4px] border border-alpine-500/35 dark:border-alpine-400/35 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-between gap-3"
+                className="p-3 rounded-[4px] border border-alpine-500/35 dark:border-alpine-400/35 bg-alpine-50/70 dark:bg-slate-800 text-slate-900 dark:text-slate-100 flex items-center justify-between gap-3"
               >
                 <div className="min-w-0">
                   <p className="font-sans font-medium text-xs text-slate-900 dark:text-slate-100 truncate">
@@ -577,7 +577,7 @@ export default function OrganiserDashboardPage() {
   const isVerified = Boolean(activeTenant?.verified || activeTenant?.status === 'verified')
 
   return (
-    <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col selection:bg-foreground selection:text-background transition-colors duration-150">
+    <div className="min-h-screen bg-alpine-50/25 dark:bg-slate-950 font-sans text-slate-900 dark:text-slate-100 flex flex-col selection:bg-foreground selection:text-background transition-colors duration-150">
       <OrganiserHeader />
 
       {/* Main Content Area */}

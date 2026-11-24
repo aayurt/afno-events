@@ -332,7 +332,7 @@ export default function AttendeesPage() {
                 {summary.checkedIn}
               </div>
               <div className="flex items-center gap-2 pt-0.5">
-                <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="flex-1 h-1.5 bg-alpine-100/60 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-emerald-500 transition-all duration-300"
                     style={{ width: `${attendancePercent}%` }}
@@ -391,7 +391,7 @@ export default function AttendeesPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter by guest name, email, ticket code, or order ID..."
-              className="pl-9 h-8 rounded-[4px] border-alpine-500/30 text-xs font-mono bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 w-full"
+              className="pl-9 h-8 rounded-[4px] border-alpine-500/30 text-xs font-mono bg-alpine-50/40 dark:bg-slate-900 text-slate-900 dark:text-slate-100 w-full"
             />
           </div>
 
@@ -438,7 +438,7 @@ export default function AttendeesPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-alpine-500/20 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono text-[11px] uppercase tracking-wider">
+                <tr className="border-b border-alpine-500/20 bg-alpine-50/60 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-mono text-[11px] uppercase tracking-wider">
                   <th className="px-4 py-3 font-semibold">Guest</th>
                   <th className="px-4 py-3 font-semibold">Email</th>
                   <th className="px-4 py-3 font-semibold">Ticket Code</th>
@@ -463,7 +463,7 @@ export default function AttendeesPage() {
                   filtered.map((d) => (
                     <tr
                       key={d.id}
-                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                      className="hover:bg-alpine-50/50 dark:hover:bg-slate-800/40 transition-colors"
                     >
                       {/* Guest Name */}
                       <td className="px-4 py-3 font-sans font-bold text-slate-900 dark:text-slate-100">
@@ -477,7 +477,7 @@ export default function AttendeesPage() {
 
                       {/* Ticket Code */}
                       <td className="px-4 py-3 font-mono">
-                        <span className="px-2 py-0.5 rounded-[2px] bg-slate-100 dark:bg-slate-800 border border-alpine-500/20 text-slate-800 dark:text-slate-200 text-[11px]">
+                        <span className="px-2 py-0.5 rounded-[2px] bg-alpine-50 dark:bg-slate-800 border border-alpine-500/25 text-alpine-950 dark:text-slate-200 text-[11px]">
                           {d.code}
                         </span>
                       </td>
@@ -488,7 +488,7 @@ export default function AttendeesPage() {
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[3px] font-mono text-[10px] font-bold uppercase tracking-wider ${
                             d.status === 'checked-in'
                               ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-alpine-500/20'
+                              : 'bg-alpine-50 dark:bg-slate-800 text-alpine-800 dark:text-alpine-300 border border-alpine-500/20'
                           }`}
                         >
                           {d.status === 'checked-in' ? (
@@ -525,7 +525,7 @@ export default function AttendeesPage() {
                                 className={`text-[9px] uppercase px-1 py-0.2 rounded-[2px] ${
                                   d.orderStatus === 'paid'
                                     ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold'
-                                    : 'bg-slate-100 dark:bg-slate-800 text-muted-foreground'
+                                    : 'bg-alpine-50 dark:bg-slate-800 text-muted-foreground'
                                 }`}
                               >
                                 {d.orderStatus}
@@ -572,7 +572,7 @@ export default function AttendeesPage() {
           </div>
 
           {/* Table Footer info */}
-          <div className="p-3 border-t border-alpine-500/20 bg-slate-50 dark:bg-slate-900 flex items-center justify-between text-[11px] font-mono text-muted-foreground">
+          <div className="p-3 border-t border-alpine-500/20 bg-alpine-50/50 dark:bg-slate-900 flex items-center justify-between text-[11px] font-mono text-muted-foreground">
             <span>
               Showing {filtered.length} of {docs.length} total attendees
             </span>

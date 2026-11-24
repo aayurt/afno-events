@@ -70,7 +70,7 @@ export function OrganiserHeader({
             <span className="font-mono text-xs uppercase tracking-wider font-semibold text-slate-900 dark:text-slate-50 group-hover:text-alpine-600 dark:group-hover:text-alpine-400 transition-colors">
               Afno Events
             </span>
-            <span className="font-mono text-[10px] tracking-widest uppercase px-1.5 py-0.5 rounded-[3px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-alpine-500/35 dark:border-alpine-400/35">
+            <span className="font-mono text-[10px] tracking-widest uppercase px-1.5 py-0.5 rounded-[3px] bg-alpine-50 dark:bg-slate-800 text-alpine-800 dark:text-alpine-300 border border-alpine-500/35 dark:border-alpine-400/35">
               WORKSPACE
             </span>
           </Link>
@@ -142,7 +142,7 @@ export function OrganiserHeader({
 
           <button
             type="button"
-            className="h-8 w-8 inline-flex items-center justify-center rounded-[4px] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0 transition-colors"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-[4px] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-alpine-50 dark:hover:bg-slate-800 shrink-0 transition-colors"
             onClick={toggleTheme}
             aria-label="Toggle Theme"
           >

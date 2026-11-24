@@ -591,7 +591,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
               </div>
 
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 pt-1">
-                <div className="w-28 h-36 rounded-[4px] bg-slate-50 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center shrink-0 overflow-hidden shadow-xs relative">
+                <div className="w-28 h-36 rounded-[4px] bg-alpine-50/40 dark:bg-slate-900 border border-alpine-500/30 flex items-center justify-center shrink-0 overflow-hidden shadow-xs relative">
                   {coverImageUrl ? (
                     <img src={coverImageUrl} alt="Poster" className="w-full h-full object-cover" />
                   ) : (
@@ -682,7 +682,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                     {showcaseImageUrls.map((url, idx) => (
                       <div
                         key={idx}
-                        className="relative aspect-square rounded-[4px] overflow-hidden bg-slate-100 dark:bg-slate-950 border border-alpine-500/25 group"
+                        className="relative aspect-square rounded-[4px] overflow-hidden bg-alpine-50 dark:bg-slate-950 border border-alpine-500/25 group"
                       >
                         <img src={url} alt={`Showcase ${idx + 1}`} className="w-full h-full object-cover" />
                         <button
@@ -796,7 +796,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   className={`flex-1 px-4 py-2 rounded-[4px] text-xs font-mono font-bold transition-all border text-center ${
                     pricingType === 'free'
                       ? 'bg-alpine-600 text-white border-alpine-600 shadow-xs'
-                      : 'bg-slate-50 dark:bg-slate-900 text-muted-foreground border-alpine-500/25 hover:border-alpine-500'
+                      : 'bg-alpine-50/40 dark:bg-slate-900 text-muted-foreground border-alpine-500/25 hover:border-alpine-500'
                   }`}
                 >
                   FREE EVENT
@@ -807,7 +807,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   className={`flex-1 px-4 py-2 rounded-[4px] text-xs font-mono font-bold transition-all border text-center ${
                     pricingType === 'paid'
                       ? 'bg-alpine-600 text-white border-alpine-600 shadow-xs'
-                      : 'bg-slate-50 dark:bg-slate-900 text-muted-foreground border-alpine-500/25 hover:border-alpine-500'
+                      : 'bg-alpine-50/40 dark:bg-slate-900 text-muted-foreground border-alpine-500/25 hover:border-alpine-500'
                   }`}
                 >
                   PAID TICKETS (STRIPE)
@@ -849,7 +849,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                       {ticketRows.map((row, idx) => (
                         <div
                           key={idx}
-                          className="p-3 rounded-[4px] border border-alpine-500/30 bg-slate-50 dark:bg-slate-900 space-y-2.5"
+                          className="p-3 rounded-[4px] border border-alpine-500/30 bg-alpine-50/40 dark:bg-slate-900 space-y-2.5"
                         >
                           <div className="flex items-center gap-2">
                             <Input
@@ -948,7 +948,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   </label>
                 </div>
               ) : (
-                <div className="p-3.5 rounded-[4px] border border-alpine-500/30 bg-slate-50 dark:bg-slate-900 text-xs font-mono space-y-3">
+                <div className="p-3.5 rounded-[4px] border border-alpine-500/30 bg-alpine-50/40 dark:bg-slate-900 text-xs font-mono space-y-3">
                   <div>
                     <p className="font-semibold text-slate-900 dark:text-slate-100">
                       Free Admission Registration
@@ -1063,7 +1063,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   className={`p-3 rounded-[4px] border text-left transition-all space-y-1.5 ${
                     isEnabled
                       ? 'border-alpine-500 bg-alpine-500/10 dark:bg-alpine-950/40'
-                      : 'border-alpine-500/25 bg-slate-50 dark:bg-slate-900'
+                      : 'border-alpine-500/25 bg-alpine-50/40 dark:bg-slate-900'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -1095,7 +1095,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                   className={`p-3 rounded-[4px] border text-left transition-all space-y-1.5 ${
                     isBookable
                       ? 'border-alpine-500 bg-alpine-500/10 dark:bg-alpine-950/40'
-                      : 'border-alpine-500/25 bg-slate-50 dark:bg-slate-900'
+                      : 'border-alpine-500/25 bg-alpine-50/40 dark:bg-slate-900'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -1203,7 +1203,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
             {/* Buyer Event Card */}
             <div className="rounded-[6px] border border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
               {/* Cover Artwork Container */}
-              <div className="relative aspect-[16/10] bg-slate-100 dark:bg-slate-950 overflow-hidden border-b border-alpine-500/20">
+              <div className="relative aspect-[16/10] bg-alpine-50 dark:bg-slate-950 overflow-hidden border-b border-alpine-500/20">
                 {coverImageUrl ? (
                   <img
                     src={coverImageUrl}
@@ -1294,7 +1294,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
                     className={`px-3 py-1.5 rounded-[4px] text-xs font-mono font-bold select-none pointer-events-none ${
                       isBookable
                         ? 'bg-alpine-600 text-white shadow-xs'
-                        : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                        : 'bg-alpine-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
                     }`}
                   >
                     {isBookable ? 'Get Tickets' : 'Sales Paused'}
@@ -1304,7 +1304,7 @@ export function EventForm({ initial, onSubmit, submitLabel, isTenantVerified = t
             </div>
 
             {/* Configured Ticket Tiers Box */}
-            <div className="rounded-[6px] border border-alpine-500/30 dark:border-alpine-400/30 bg-slate-50 dark:bg-slate-900 p-3.5 space-y-2.5">
+            <div className="rounded-[6px] border border-alpine-500/30 dark:border-alpine-400/30 bg-alpine-50/50 dark:bg-slate-900 p-3.5 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
                   Configured Tiers ({pricingType === 'free' ? 1 : ticketRows.length})

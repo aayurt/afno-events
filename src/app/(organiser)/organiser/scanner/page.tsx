@@ -426,7 +426,7 @@ export default function OrganiserScannerPage() {
           <select
             value={selectedEventId}
             onChange={(e) => setSelectedEventId(e.target.value)}
-            className="h-8 rounded-[4px] border border-alpine-500/30 bg-slate-50 dark:bg-slate-950 px-3 text-xs font-mono w-full sm:w-72"
+            className="h-8 rounded-[4px] border border-alpine-500/30 bg-alpine-50/40 dark:bg-slate-950 px-3 text-xs font-mono w-full sm:w-72"
           >
             <option value="all">Any Event (Automatic Detection)</option>
             {events.map((ev) => (
@@ -536,7 +536,7 @@ export default function OrganiserScannerPage() {
                         value={manualCode}
                         onChange={(e) => setManualCode(e.target.value)}
                         placeholder="Paste code or ticket URL..."
-                        className="pl-8 h-8 rounded-[4px] border-alpine-500/30 text-xs font-mono bg-slate-50 dark:bg-slate-950"
+                        className="pl-8 h-8 rounded-[4px] border-alpine-500/30 text-xs font-mono bg-alpine-50/40 dark:bg-slate-950"
                       />
                     </div>
                     <Button
@@ -616,7 +616,7 @@ export default function OrganiserScannerPage() {
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-[6px] border border-alpine-500/25 bg-slate-50 dark:bg-slate-900 text-center py-6 text-slate-400 font-mono space-y-1.5">
+              <div className="p-4 rounded-[6px] border border-alpine-500/25 bg-alpine-50/40 dark:bg-slate-900 text-center py-6 text-slate-400 font-mono space-y-1.5">
                 <ScanLine size={24} className="mx-auto text-alpine-500 opacity-50" />
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Ready for Next Scan</p>
                 <p className="text-[11px] text-muted-foreground">
