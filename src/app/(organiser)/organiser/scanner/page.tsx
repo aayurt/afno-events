@@ -489,7 +489,7 @@ export default function OrganiserScannerPage() {
                           <div className="absolute -bottom-1 -right-1 w-5 h-5 border-b-3 border-r-3 border-alpine-400" />
 
                           {/* Animated Scanline */}
-                          <div className="absolute left-0 right-0 h-0.5 bg-alpine-400 shadow-[0_0_8px_#38bdf8] animate-pulse" style={{ top: '50%' }} />
+                          <div className="absolute left-0 right-0 h-0.5 bg-alpine-400 shadow-[0_0_8px_#dc153c] animate-pulse" style={{ top: '50%' }} />
                         </div>
                       </div>
 
