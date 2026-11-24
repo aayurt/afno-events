@@ -3,19 +3,20 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { EventForm } from '@/components/organiser/EventForm'
 import { OrganiserHeader } from '@/components/organiser/OrganiserHeader'
 
 export default function NewEventPage() {
   const router = useRouter()
   const [isTenantVerified, setIsTenantVerified] = useState(true)
+  const [checking, setChecking] = useState(true)
 
   useEffect(() => {
     fetch('/api/organiser/me', { credentials: 'include' })
       .then((r) => {
         if (!r.ok) {
-          router.replace('/organiser/login')
+          window.location.href = '/organiser/login'
           return null
         }
         return r.json()
@@ -26,11 +27,12 @@ export default function NewEventPage() {
           const verified = data.tenants.some((t: any) => t.verified || t.status === 'verified')
           setIsTenantVerified(Boolean(verified))
         }
+        setChecking(false)
       })
       .catch(() => {
-        router.replace('/organiser/login')
+        window.location.href = '/organiser/login'
       })
-  }, [router])
+  }, [])
 
   const handleCreate = async (formData: any) => {
     const res = await fetch('/api/organiser/events', {
@@ -46,6 +48,17 @@ export default function NewEventPage() {
     }
 
     router.push('/organiser/dashboard')
+  }
+
+  if (checking) {
+    return (
+      <>
+        <OrganiserHeader title="New Event" />
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader2 className="animate-spin text-alpine-600" size={24} />
+        </div>
+      </>
+    )
   }
 
   return (
