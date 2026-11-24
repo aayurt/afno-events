@@ -13,15 +13,24 @@ export default function NewEventPage() {
 
   useEffect(() => {
     fetch('/api/organiser/me', { credentials: 'include' })
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => {
+        if (!r.ok) {
+          router.replace('/organiser/login')
+          return null
+        }
+        return r.json()
+      })
       .then((data) => {
+        if (!data) return
         if (data?.tenants && Array.isArray(data.tenants)) {
           const verified = data.tenants.some((t: any) => t.verified || t.status === 'verified')
           setIsTenantVerified(Boolean(verified))
         }
       })
-      .catch(() => {})
-  }, [])
+      .catch(() => {
+        router.replace('/organiser/login')
+      })
+  }, [router])
 
   const handleCreate = async (formData: any) => {
     const res = await fetch('/api/organiser/events', {

@@ -19,10 +19,10 @@ export function EventStatusBadge({
   return (
     <span
       className={cn(
-        'text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full backdrop-blur-sm inline-flex items-center gap-1.5',
-        status === 'live' && 'bg-red-500 text-white',
-        status === 'upcoming' && 'bg-blue-500/85 text-white',
-        status === 'past' && 'bg-muted/85 text-muted-foreground',
+        'text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-[4px] backdrop-blur-sm inline-flex items-center gap-1.5 shadow-xs',
+        status === 'live' && 'bg-alpine-600 text-white font-bold',
+        status === 'upcoming' && 'bg-emerald-600 dark:bg-emerald-700 text-white font-medium',
+        status === 'past' && 'bg-slate-900/80 text-slate-200 dark:bg-slate-800/90 dark:text-slate-300 border border-slate-700/50',
         className,
       )}
     >

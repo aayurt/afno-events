@@ -57,6 +57,7 @@ export function OrganiserHeader({
   const isScanner = pathname?.includes('/scanner')
   const isProfile = pathname?.includes('/profile')
   const isNewEvent = pathname?.includes('/events/new')
+  const isAuthView = pathname === '/organiser/login' || pathname === '/organiser/register' || pathname?.includes('/forgot-password') || pathname?.includes('/reset-password')
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-alpine-500/25 dark:border-alpine-400/25 bg-white dark:bg-slate-950 backdrop-blur-md transition-colors duration-150">
@@ -83,7 +84,7 @@ export function OrganiserHeader({
             </div>
           )}
 
-          {tenant?.name && (
+          {!isAuthView && tenant?.name && (
             <div className="hidden md:flex items-center gap-1.5 pl-3 border-l border-alpine-500/25 dark:border-alpine-400/25">
               <span className="text-xs font-medium text-slate-900 dark:text-slate-100 truncate max-w-[140px]">
                 {tenant.name}
@@ -103,7 +104,7 @@ export function OrganiserHeader({
 
         {/* Quick Navigation & Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {!isDashboard && (
+          {!isAuthView && !isDashboard && (
             <Link
               href="/organiser/dashboard"
               title="Dashboard"
@@ -114,31 +115,35 @@ export function OrganiserHeader({
             </Link>
           )}
 
-          <Link
-            href="/scanner"
-            title="Door QR Scanner"
-            className={`h-8 px-2.5 inline-flex items-center gap-1.5 rounded-[4px] border font-mono text-[11px] transition-colors whitespace-nowrap hidden md:inline-flex ${
-              isScanner
-                ? 'border-alpine-500 bg-alpine-500/15 text-alpine-600 dark:text-alpine-400'
-                : 'border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-800 hover:bg-alpine-500/10 text-slate-800 dark:text-slate-200'
-            }`}
-          >
-            <ScanLine className="w-3.5 h-3.5 text-alpine-500" />
-            <span>SCANNER</span>
-          </Link>
+          {!isAuthView && (
+            <Link
+              href="/scanner"
+              title="Door QR Scanner"
+              className={`h-8 px-2.5 inline-flex items-center gap-1.5 rounded-[4px] border font-mono text-[11px] transition-colors whitespace-nowrap hidden md:inline-flex ${
+                isScanner
+                  ? 'border-alpine-500 bg-alpine-500/15 text-alpine-600 dark:text-alpine-400'
+                  : 'border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-800 hover:bg-alpine-500/10 text-slate-800 dark:text-slate-200'
+              }`}
+            >
+              <ScanLine className="w-3.5 h-3.5 text-alpine-500" />
+              <span>SCANNER</span>
+            </Link>
+          )}
 
-          <Link
-            href="/organiser/profile/edit"
-            title="Organiser Profile"
-            className={`h-8 px-2.5 inline-flex items-center gap-1.5 rounded-[4px] border font-mono text-[11px] transition-colors whitespace-nowrap hidden sm:inline-flex ${
-              isProfile
-                ? 'border-alpine-500 bg-alpine-500/15 text-alpine-600 dark:text-alpine-400'
-                : 'border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-800 hover:bg-alpine-500/10 text-slate-800 dark:text-slate-200'
-            }`}
-          >
-            <User className="w-3.5 h-3.5" />
-            <span>PROFILE</span>
-          </Link>
+          {!isAuthView && (
+            <Link
+              href="/organiser/profile/edit"
+              title="Organiser Profile"
+              className={`h-8 px-2.5 inline-flex items-center gap-1.5 rounded-[4px] border font-mono text-[11px] transition-colors whitespace-nowrap hidden sm:inline-flex ${
+                isProfile
+                  ? 'border-alpine-500 bg-alpine-500/15 text-alpine-600 dark:text-alpine-400'
+                  : 'border-alpine-500/35 dark:border-alpine-400/35 bg-white dark:bg-slate-800 hover:bg-alpine-500/10 text-slate-800 dark:text-slate-200'
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>PROFILE</span>
+            </Link>
+          )}
 
           <button
             type="button"
@@ -153,17 +158,19 @@ export function OrganiserHeader({
             )}
           </button>
 
-          <button
-            type="button"
-            className="h-8 w-8 inline-flex items-center justify-center rounded-[4px] text-slate-500 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0 transition-colors"
-            onClick={handleSignOut}
-            aria-label="Sign Out"
-            title="Sign Out"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          {!isAuthView && (
+            <button
+              type="button"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-[4px] text-slate-500 dark:text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0 transition-colors"
+              onClick={handleSignOut}
+              aria-label="Sign Out"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
 
-          {!isNewEvent && (
+          {!isAuthView && !isNewEvent && (
             <Link
               href="/organiser/events/new"
               className="h-8 px-3 inline-flex items-center gap-1.5 rounded-[4px] bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-[11px] shadow-trail transition-colors ml-1 shrink-0 whitespace-nowrap"

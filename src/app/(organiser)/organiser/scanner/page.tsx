@@ -100,14 +100,20 @@ export default function OrganiserScannerPage() {
   // Load events owned by this organiser
   useEffect(() => {
     fetch('/api/organiser/events', { credentials: 'include' })
-      .then((res) => (res.ok ? res.json() : null))
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          router.replace('/organiser/login')
+          return null
+        }
+        return res.ok ? res.json() : null
+      })
       .then((data) => {
         if (data?.docs && Array.isArray(data.docs)) {
           setEvents(data.docs.map((d: any) => ({ id: d.id, title: d.title })))
         }
       })
       .catch(() => {})
-  }, [])
+  }, [router])
 
   // Start Camera Stream
   const startCamera = async () => {

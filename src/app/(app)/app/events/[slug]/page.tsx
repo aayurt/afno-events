@@ -154,17 +154,17 @@ export default async function EventDetailPage({ params: paramsPromise }: Args) {
         </div>
       </div>
 
-      <div className="container -mt-32 relative z-10">
+      <div className="container -mt-32 relative z-10 pb-28 lg:pb-12">
         {/* Mobile sticky buy bar */}
-        <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-border bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3">
+        <div className="lg:hidden fixed bottom-16 inset-x-0 z-40 border-t border-alpine-500/30 bg-background/95 backdrop-blur px-4 py-3 flex items-center gap-3 shadow-lg">
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground truncate">{e.title}</p>
-            <p className="font-bold text-primary">
+            <p className="text-xs text-muted-foreground truncate font-mono">{e.title}</p>
+            <p className="font-bold text-alpine-600 font-mono text-sm">
               {e.pricing?.priceRange || (e.pricing?.type === 'free' ? t('free') : t('na'))}
             </p>
           </div>
           <a href="#ticket-card">
-            <Button size="lg" className="rounded-full px-6 shrink-0">
+            <Button size="default" className="rounded-[4px] px-5 h-9 bg-alpine-600 hover:bg-alpine-700 text-white font-mono text-xs uppercase tracking-wider shadow-sm shrink-0">
               {t('getTickets')}
             </Button>
           </a>
