@@ -9,7 +9,7 @@ import { getCardImageUrl } from '@/utilities/getCardImageUrl'
 import { displayPriceRange } from '@/utilities/pricing'
 import { APP_STORE_URL } from '@/utilities/constants'
 import { NewsletterSection } from '@/components/NewsletterSection'
-import { TiltTicketCard } from './tilt-ticket'
+import { Afno3DPass } from './afno-3d-pass'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
@@ -79,120 +79,105 @@ export default async function HomePage() {
         }
       `}</style>
 
-      {/* 🟢 Split-Hero: Left Brand/Search & Right Spotlight Card */}
+      {/* 🟢 Hero Section: Top Headline & Search + Wide 3D Afno VIP Pass Showcase */}
       <section className="relative border-b border-alpine-500/20 dark:border-alpine-400/20 overflow-hidden pt-8 pb-16 lg:py-20 bg-white dark:bg-slate-950">
         {/* Subtle Ambient Radial Brand Glows */}
         <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-alpine-500/10 rounded-full blur-[150px] pointer-events-none -z-10" />
         <div className="absolute bottom-10 right-10 w-[450px] h-[450px] bg-alpine-500/5 rounded-full blur-[140px] pointer-events-none -z-10" />
 
         <div className="container px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
             
-            {/* Left 7 Cols: Brand Message, Search Bar, Community Stats */}
-            <div className="lg:col-span-7 space-y-8 text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-[4px] bg-alpine-50 dark:bg-alpine-950/50 border border-alpine-500/30 text-alpine-700 dark:text-alpine-300 text-xs font-mono font-bold uppercase tracking-wider">
-                <span className="w-2 h-2 rounded-full bg-alpine-500 animate-pulse" />
-                The Home for UK Nepalese Events
-              </div>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-alpine-50 dark:bg-alpine-950/50 border border-alpine-500/30 text-alpine-700 dark:text-alpine-300 text-xs font-mono font-bold uppercase tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-alpine-500 animate-pulse" />
+              Official Digital Ticketing & Verified Passes
+            </div>
 
-              <div className="space-y-4">
-                <h1 className="text-4xl sm:text-6xl font-sans font-black tracking-tight leading-[1.08] text-slate-900 dark:text-slate-100">
-                  Elevate Your Events. <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-alpine-600 via-rose-500 to-alpine-500">
-                    Connect the Community.
-                  </span>
-                </h1>
-                <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl font-sans">
-                  Bringing Nepali concerts, cultural gatherings, summer festivals, and club nights across Britain into one verified ticketing platform.
-                </p>
-              </div>
+            <div className="space-y-4">
+              <h1 className="text-4xl sm:text-6xl font-sans font-black tracking-tight leading-[1.08] text-slate-900 dark:text-slate-100">
+                Elevate Your Events. <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-alpine-600 via-rose-500 to-alpine-500">
+                  Connect the Community.
+                </span>
+              </h1>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl font-sans mx-auto">
+                Bringing Nepali concerts, cultural festivals, live sports, and community gatherings across the UK into one verified, transparent pass platform.
+              </p>
+            </div>
 
-              {/* Integrated Search Box — light blush background with white inputs */}
-              <div className="space-y-3 max-w-xl">
-                <form action="/app/events" method="GET" className="bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 dark:border-alpine-400/35 p-2 rounded-[8px] shadow-card flex flex-col sm:flex-row gap-2">
-                  <div className="flex-1 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
-                    <Search className="text-alpine-600 dark:text-alpine-400 w-4 h-4 flex-shrink-0" />
-                    <input 
-                      type="text"
-                      name="q" 
-                      placeholder="Search artist, festival, or venue..." 
-                      className="bg-transparent text-xs sm:text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-slate-400 text-slate-900 dark:text-slate-100 shadow-none ring-0 appearance-none font-sans" 
-                    />
-                  </div>
-                  <div className="w-full sm:w-44 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
-                    <MapPin className="text-alpine-600 dark:text-alpine-400 w-3.5 h-3.5 flex-shrink-0" />
-                    <select name="city" className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-slate-800 dark:text-slate-200 cursor-pointer appearance-none shadow-none ring-0 font-sans">
-                      <option value="" className="bg-white dark:bg-slate-900">All UK Cities</option>
-                      <option value="London" className="bg-white dark:bg-slate-900">London</option>
-                      <option value="Aldershot" className="bg-white dark:bg-slate-900">Aldershot</option>
-                      <option value="Reading" className="bg-white dark:bg-slate-900">Reading</option>
-                      <option value="Wembley" className="bg-white dark:bg-slate-900">Wembley</option>
-                      <option value="Farnborough" className="bg-white dark:bg-slate-900">Farnborough</option>
-                      <option value="Ashford" className="bg-white dark:bg-slate-900">Ashford</option>
-                    </select>
-                  </div>
-                  <Button type="submit" className="bg-alpine-600 hover:bg-alpine-700 text-white font-mono font-bold text-xs px-6 py-2.5 rounded-[6px] shadow-trail hover:shadow-card-hover transition-all flex-shrink-0 h-10">
-                    Find Events
-                  </Button>
-                </form>
+            {/* Integrated Search Box — light blush background with white inputs */}
+            <div className="space-y-3 w-full max-w-2xl">
+              <form action="/app/events" method="GET" className="bg-alpine-50/70 dark:bg-slate-900 border border-alpine-500/35 dark:border-alpine-400/35 p-2 rounded-[8px] shadow-card flex flex-col sm:flex-row gap-2">
+                <div className="flex-1 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
+                  <Search className="text-alpine-600 dark:text-alpine-400 w-4 h-4 flex-shrink-0" />
+                  <input 
+                    type="text"
+                    name="q" 
+                    placeholder="Search artist, festival, or venue..." 
+                    className="bg-transparent text-xs sm:text-sm w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 p-0 h-9 placeholder:text-slate-400 text-slate-900 dark:text-slate-100 shadow-none ring-0 appearance-none font-sans" 
+                  />
+                </div>
+                <div className="w-full sm:w-44 flex items-center px-3 gap-2 bg-white dark:bg-slate-800 rounded-[6px] border border-alpine-500/20 py-1.5 sm:py-0">
+                  <MapPin className="text-alpine-600 dark:text-alpine-400 w-3.5 h-3.5 flex-shrink-0" />
+                  <select name="city" className="bg-transparent text-xs w-full border-0 outline-none focus:outline-none focus:ring-0 focus:border-0 text-slate-800 dark:text-slate-200 cursor-pointer appearance-none shadow-none ring-0 font-sans">
+                    <option value="" className="bg-white dark:bg-slate-900">All UK Cities</option>
+                    <option value="London" className="bg-white dark:bg-slate-900">London</option>
+                    <option value="Aldershot" className="bg-white dark:bg-slate-900">Aldershot</option>
+                    <option value="Reading" className="bg-white dark:bg-slate-900">Reading</option>
+                    <option value="Wembley" className="bg-white dark:bg-slate-900">Wembley</option>
+                    <option value="Farnborough" className="bg-white dark:bg-slate-900">Farnborough</option>
+                    <option value="Ashford" className="bg-white dark:bg-slate-900">Ashford</option>
+                  </select>
+                </div>
+                <Button type="submit" className="bg-alpine-600 hover:bg-alpine-700 text-white font-mono font-bold text-xs px-6 py-2.5 rounded-[6px] shadow-trail hover:shadow-card-hover transition-all flex-shrink-0 h-10">
+                  Find Events
+                </Button>
+              </form>
 
-                {/* Interactive Quick City Filter Tag Bar */}
-                <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
-                  <span className="text-[11px] font-mono uppercase text-muted-foreground tracking-wider mr-1">
-                    Popular:
-                  </span>
-                  {[
-                    { name: 'London', query: 'London' },
-                    { name: 'Aldershot', query: 'Aldershot' },
-                    { name: 'Reading', query: 'Reading' },
-                    { name: 'Wembley', query: 'Wembley' },
-                    { name: 'Farnborough', query: 'Farnborough' },
-                  ].map((city) => (
-                    <Link
-                      key={city.name}
-                      href={`/app/events?q=${encodeURIComponent(city.query)}`}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-white/80 dark:bg-slate-800/80 hover:bg-alpine-50 dark:hover:bg-slate-700 border border-alpine-500/25 text-slate-700 dark:text-slate-300 hover:text-alpine-600 dark:hover:text-alpine-400 font-mono text-[11px] tracking-wide transition-all shadow-xs"
-                    >
-                      <MapPin size={10} className="text-alpine-500" />
-                      {city.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* Verified Metrics Strip */}
-              <div className="grid grid-cols-3 gap-6 pt-4 border-t border-alpine-500/20 max-w-xl">
-                <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">{marqueeEvents.length}+</div>
-                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">Live Events</div>
-                </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">8</div>
-                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">UK Cities</div>
-                </div>
-                <div>
-                  <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-alpine-600 dark:text-alpine-400 tabular-nums">0%</div>
-                  <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">Listing Fee</div>
-                </div>
+              {/* Interactive Quick City Filter Tag Bar */}
+              <div className="flex items-center justify-center gap-1.5 flex-wrap pt-0.5">
+                <span className="text-[11px] font-mono uppercase text-muted-foreground tracking-wider mr-1">
+                  Popular:
+                </span>
+                {[
+                  { name: 'London', query: 'London' },
+                  { name: 'Aldershot', query: 'Aldershot' },
+                  { name: 'Reading', query: 'Reading' },
+                  { name: 'Wembley', query: 'Wembley' },
+                  { name: 'Farnborough', query: 'Farnborough' },
+                ].map((city) => (
+                  <Link
+                    key={city.name}
+                    href={`/app/events?q=${encodeURIComponent(city.query)}`}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-white/80 dark:bg-slate-800/80 hover:bg-alpine-50 dark:hover:bg-slate-700 border border-alpine-500/25 text-slate-700 dark:text-slate-300 hover:text-alpine-600 dark:hover:text-alpine-400 font-mono text-[11px] tracking-wide transition-all shadow-xs"
+                  >
+                    <MapPin size={10} className="text-alpine-500" />
+                    {city.name}
+                  </Link>
+                ))}
               </div>
             </div>
 
-            {/* Right 5 Cols: Nearest Bookable Event 3D Tilt Ticket Pass */}
-            {featuredEvent && (
-              <div className="lg:col-span-5 flex justify-center items-center">
-                <TiltTicketCard
-                  event={featuredEvent}
-                  featuredCover={featuredCover}
-                  isBookable={featuredIsBookable}
-                  isExpired={featuredIsExpired}
-                  priceText={
-                    featuredEvent.pricing?.type === 'paid'
-                      ? displayPriceRange(featuredEvent.pricing.ticketTypes, featuredEvent.pricing.priceRange)
-                      : 'Free Entry'
-                  }
-                />
+            {/* Verified Metrics Strip */}
+            <div className="grid grid-cols-3 gap-8 sm:gap-14 pt-4 border-t border-alpine-500/20 w-full max-w-xl">
+              <div>
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">{marqueeEvents.length}+</div>
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">Live Events</div>
               </div>
-            )}
+              <div>
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-slate-900 dark:text-slate-100 tabular-nums">8</div>
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">UK Cities</div>
+              </div>
+              <div>
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-alpine-600 dark:text-alpine-400 tabular-nums">0%</div>
+                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400 uppercase font-semibold mt-0.5">Listing Fee</div>
+              </div>
+            </div>
+
+            {/* 3D Interactive Holographic Brand Pass Showcase */}
+            <div className="w-full pt-4">
+              <Afno3DPass />
+            </div>
 
           </div>
         </div>
