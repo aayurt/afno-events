@@ -5,12 +5,23 @@ import type { Header as HeaderType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { SearchIcon, ExternalLink, Menu, X, Building2, ChevronRight } from 'lucide-react'
+import { SearchIcon, ExternalLink, Menu, X, Building2, ChevronRight, Sun, Moon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTheme } from '@/providers/Theme'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark')
+  }
 
   // Auto-close on route transition
   useEffect(() => {
@@ -77,6 +88,19 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
         >
           <SearchIcon className="w-5 h-5 text-primary" />
         </Link>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label="Toggle Theme"
+        >
+          {mounted ? (
+            theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-700" />
+          ) : (
+            <span className="w-5 h-5 block" />
+          )}
+        </button>
         <Link
           href="/app"
           className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-xs"
@@ -88,6 +112,19 @@ export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
 
       {/* Mobile Controls */}
       <div className="flex md:hidden items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+          title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label="Toggle Theme"
+        >
+          {mounted ? (
+            theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />
+          ) : (
+            <span className="w-4 h-4 block" />
+          )}
+        </button>
         <Link
           href="/search"
           className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"

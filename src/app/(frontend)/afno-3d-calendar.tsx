@@ -214,11 +214,11 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
         }}
       >
         <div
-          className="w-full rounded-[16px] sm:rounded-[20px] bg-slate-950 border border-alpine-500/35 dark:border-alpine-400/35 shadow-2xl p-4 sm:p-6 lg:p-8 relative overflow-hidden"
+          className="w-full rounded-[16px] sm:rounded-[20px] bg-white dark:bg-slate-950 border border-slate-200 dark:border-alpine-400/35 shadow-2xl p-4 sm:p-6 lg:p-8 relative overflow-hidden transition-colors duration-300"
           style={{
             transformStyle: 'preserve-3d',
             transform: `rotateX(${tilt.rx.toFixed(2)}deg) rotateY(${tilt.ry.toFixed(2)}deg)`,
-            boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px -10px rgba(220, 21, 60, 0.25)',
+            boxShadow: '0 25px 60px -15px rgba(0, 0, 0, 0.25), 0 0 40px -10px rgba(220, 21, 60, 0.15)',
           }}
         >
           {/* Subtle Ambient Radial Glow */}
@@ -226,18 +226,18 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-alpine-600/10 rounded-full blur-[90px] pointer-events-none" />
 
           {/* Calendar Header: Month Switcher & Statistics */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-white/10 relative z-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-white/10 relative z-10">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-alpine-500/20 text-alpine-400 border border-alpine-400/30">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-alpine-500/15 dark:bg-alpine-500/20 text-alpine-600 dark:text-alpine-400 border border-alpine-500/30 dark:border-alpine-400/30">
                   <Sparkles size={11} />
                   <span>3D Interactive Calendar</span>
                 </span>
-                <span className="text-xs font-mono text-slate-400">
+                <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                   {activeMonthEventCount} {activeMonthEventCount === 1 ? 'Event' : 'Events'} This Month
                 </span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black font-sans tracking-tight text-white uppercase">
+              <h3 className="text-2xl sm:text-3xl font-black font-sans tracking-tight text-slate-950 dark:text-white uppercase">
                 {monthYearLabel}
               </h3>
             </div>
@@ -247,14 +247,14 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
               <button
                 onClick={prevMonth}
                 aria-label="Previous Month"
-                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/15 active:scale-95"
+                className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-white flex items-center justify-center transition-all border border-slate-300 dark:border-white/15 active:scale-95"
               >
                 <ChevronLeft size={18} />
               </button>
 
               <button
                 onClick={() => setCurrentMonth(new Date(initialDate))}
-                className="px-3 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-mono font-semibold transition-all border border-white/15 active:scale-95"
+                className="px-3 h-9 rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-800 dark:text-white text-xs font-mono font-semibold transition-all border border-slate-300 dark:border-white/15 active:scale-95"
               >
                 Today
               </button>
@@ -262,7 +262,7 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
               <button
                 onClick={nextMonth}
                 aria-label="Next Month"
-                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all border border-white/15 active:scale-95"
+                className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-white flex items-center justify-center transition-all border border-slate-300 dark:border-white/15 active:scale-95"
               >
                 <ChevronRight size={18} />
               </button>
@@ -275,7 +275,7 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
               <div
                 key={day}
                 className={`text-[10px] sm:text-xs font-mono font-bold tracking-wider ${
-                  idx >= 5 ? 'text-alpine-400' : 'text-slate-400'
+                  idx >= 5 ? 'text-alpine-600 dark:text-alpine-400' : 'text-slate-500 dark:text-slate-400'
                 }`}
               >
                 {day}
@@ -289,7 +289,7 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
               const hasEvents = cell.events.length > 0
               const primaryEvent = cell.events[0]
               const coverUrl = primaryEvent ? getCardImageUrl(primaryEvent.coverImage) : null
-              const isSelected = selectedDayEvents?.dateKey === cell.dateKey
+              const isSelected = (selectedDayEvents as any)?.dateKey === cell.dateKey
 
               return (
                 <div
@@ -301,10 +301,10 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
                   }}
                   className={`relative group rounded-[8px] sm:rounded-[10px] aspect-[4/5] sm:aspect-square flex flex-col justify-between p-1.5 sm:p-2 border transition-all duration-300 ${
                     !cell.isCurrentMonth
-                      ? 'opacity-30 border-white/5 bg-slate-900/30'
+                      ? 'opacity-30 border-slate-200 dark:border-white/5 bg-slate-100/40 dark:bg-slate-900/30'
                       : hasEvents
                       ? 'border-alpine-500/50 bg-slate-900/90 cursor-pointer shadow-lg hover:border-alpine-400 hover:scale-[1.04] hover:z-20 hover:shadow-alpine-500/30'
-                      : 'border-white/10 bg-slate-900/40 hover:bg-slate-900/70'
+                      : 'border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/40 hover:bg-slate-100 dark:hover:bg-slate-900/70'
                   } ${isSelected ? 'ring-2 ring-alpine-500 border-alpine-400 z-20 scale-[1.03]' : ''}`}
                   style={{
                     transformStyle: 'preserve-3d',
@@ -331,8 +331,8 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
                           : cell.isCurrentMonth
                           ? hasEvents
                             ? 'text-white font-black drop-shadow-md'
-                            : 'text-slate-300'
-                          : 'text-slate-600'
+                            : 'text-slate-800 dark:text-slate-300'
+                          : 'text-slate-400 dark:text-slate-600'
                       }`}
                     >
                       {cell.date.getDate()}
@@ -367,19 +367,19 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
 
           {/* Quick Date Inspector Drawer / Modal */}
           {selectedDayEvents && selectedDayEvents.events.length > 0 && (
-            <div className="mt-6 p-4 sm:p-5 rounded-[12px] bg-slate-900 border border-alpine-500/40 relative z-20 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+            <div className="mt-6 p-4 sm:p-5 rounded-[12px] bg-slate-50 dark:bg-slate-900 border border-alpine-500/40 relative z-20 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10 mb-4">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-lg bg-alpine-600 text-white flex items-center justify-center">
                     <CalendarIcon size={14} />
                   </div>
-                  <h4 className="text-sm sm:text-base font-sans font-bold text-white">
+                  <h4 className="text-sm sm:text-base font-sans font-bold text-slate-950 dark:text-white">
                     Events on {selectedDayEvents.date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </h4>
                 </div>
                 <button
                   onClick={() => setSelectedDayEvents(null)}
-                  className="w-7 h-7 rounded-md bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+                  className="w-7 h-7 rounded-md bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white flex items-center justify-center transition-colors"
                 >
                   <X size={15} />
                 </button>
@@ -398,13 +398,13 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
                     <Link
                       key={ev.id}
                       href={`/app/events/${ev.slug || ev.id}`}
-                      className="group flex gap-3 p-2.5 rounded-[10px] bg-slate-950/90 border border-white/10 hover:border-alpine-500 transition-all shadow-sm"
+                      className="group flex gap-3 p-2.5 rounded-[10px] bg-white dark:bg-slate-950/90 border border-slate-200 dark:border-white/10 hover:border-alpine-500 transition-all shadow-sm"
                     >
-                      <div className="w-16 h-20 rounded-[6px] overflow-hidden bg-slate-800 shrink-0 relative">
+                      <div className="w-16 h-20 rounded-[6px] overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 relative">
                         {cover ? (
                           <img src={cover} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-slate-500">
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
                             <CalendarIcon size={18} />
                           </div>
                         )}
@@ -412,26 +412,26 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
 
                       <div className="flex flex-col justify-between flex-1 min-w-0">
                         <div>
-                          <span className="text-[9px] font-mono uppercase text-alpine-400 font-bold tracking-wider">
+                          <span className="text-[9px] font-mono uppercase text-alpine-600 dark:text-alpine-400 font-bold tracking-wider">
                             {ev.tags?.[0] || 'Community Event'}
                           </span>
-                          <h5 className="text-xs font-sans font-bold text-white line-clamp-1 group-hover:text-alpine-300 transition-colors">
+                          <h5 className="text-xs font-sans font-bold text-slate-950 dark:text-white line-clamp-1 group-hover:text-alpine-600 dark:group-hover:text-alpine-300 transition-colors">
                             {ev.title}
                           </h5>
                           {ev.location?.location && (
-                            <p className="text-[10px] text-slate-400 flex items-center gap-1 truncate mt-0.5 font-sans">
-                              <MapPin size={10} className="shrink-0 text-slate-500" />
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 truncate mt-0.5 font-sans">
+                              <MapPin size={10} className="shrink-0 text-slate-400 dark:text-slate-500" />
                               <span className="truncate">{ev.location.location.split(',')[0]}</span>
                             </p>
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between pt-1 border-t border-white/10">
-                          <span className="text-[10px] font-mono font-bold text-white flex items-center gap-1">
-                            <Ticket size={10} className="text-alpine-400" />
+                        <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-white/10">
+                          <span className="text-[10px] font-mono font-bold text-slate-900 dark:text-white flex items-center gap-1">
+                            <Ticket size={10} className="text-alpine-600 dark:text-alpine-400" />
                             {price}
                           </span>
-                          <span className="text-[10px] font-mono font-bold text-alpine-400 flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                          <span className="text-[10px] font-mono font-bold text-alpine-600 dark:text-alpine-400 flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
                             Book <ArrowRight size={10} />
                           </span>
                         </div>
@@ -444,21 +444,21 @@ export function Afno3DCalendar({ events }: Afno3DCalendarProps) {
           )}
 
           {/* Calendar Bottom Strip */}
-          <div className="mt-5 pt-3 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 font-mono">
+          <div className="mt-5 pt-3 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400 font-mono">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-alpine-500" />
                 Featured UK Events
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 Confirmed Dates
               </span>
             </div>
 
             <Link
               href="/app/events"
-              className="inline-flex items-center gap-1 text-alpine-400 hover:text-alpine-300 font-semibold"
+              className="inline-flex items-center gap-1 text-alpine-600 dark:text-alpine-400 hover:text-alpine-700 dark:hover:text-alpine-300 font-semibold"
             >
               <span>Explore Complete Event Directory</span>
               <ExternalLink size={12} />

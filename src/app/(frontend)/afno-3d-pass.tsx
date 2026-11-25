@@ -26,51 +26,51 @@ const TIER_CONFIG: Record<string, TierConfig> = {
   vip: {
     name: 'VIP All-Access',
     badgeText: 'AFNO VIP ALL-ACCESS PASS',
-    badgeClasses: 'bg-alpine-500/20 text-alpine-400 border-alpine-400/40 shadow-[0_0_15px_rgba(220,21,60,0.35)]',
+    badgeClasses: 'bg-alpine-500/15 dark:bg-alpine-500/20 text-alpine-600 dark:text-alpine-300 border-alpine-500/30 dark:border-alpine-400/40 shadow-sm dark:shadow-[0_0_15px_rgba(220,21,60,0.35)]',
     stubTag: 'VIP-PASS',
-    stubClasses: 'bg-alpine-500/20 text-alpine-300 border-alpine-400/40',
+    stubClasses: 'bg-alpine-500/15 dark:bg-alpine-500/20 text-alpine-700 dark:text-alpine-300 border-alpine-500/30 dark:border-alpine-400/40',
     gate: 'GATE A • VIP LOUNGE',
-    gateColor: 'text-alpine-400',
+    gateColor: 'text-alpine-600 dark:text-alpine-400',
     seat: 'ROYAL TIER • A-01',
     serial: 'AFNO-8848-VIP',
     accent1: '#dc153c',
     accent2: '#f59e0b',
     accent3: '#ec4899',
-    glow: 'rgba(220, 21, 60, 0.45)',
+    glow: 'rgba(220, 21, 60, 0.35)',
     perks: 'Priority express entry at Gate A, complimentary backstage lounge refreshments, dedicated meet & greet access, and commemorative Afno NFC wristband.',
     price: '£45.00',
   },
   artist: {
     name: 'Artist & Guest',
     badgeText: 'AFNO ARTIST & CREW PASS',
-    badgeClasses: 'bg-amber-500/20 text-amber-300 border-amber-400/40 shadow-[0_0_15px_rgba(245,158,11,0.35)]',
+    badgeClasses: 'bg-amber-500/15 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 dark:border-amber-400/40 shadow-sm dark:shadow-[0_0_15px_rgba(245,158,11,0.35)]',
     stubTag: 'BACKSTAGE',
-    stubClasses: 'bg-amber-500/20 text-amber-300 border-amber-400/40',
+    stubClasses: 'bg-amber-500/15 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/30 dark:border-amber-400/40',
     gate: 'STAGE DOOR • NORTH',
-    gateColor: 'text-amber-300',
+    gateColor: 'text-amber-600 dark:text-amber-300',
     seat: 'GREENROOM • B-04',
     serial: 'AFNO-9920-ART',
     accent1: '#f59e0b',
     accent2: '#dc153c',
     accent3: '#06b6d4',
-    glow: 'rgba(245, 158, 11, 0.4)',
+    glow: 'rgba(245, 158, 11, 0.35)',
     perks: 'Full backstage & production access, artist hospitality suite, direct stage-wing viewing, and soundcheck early entry.',
     price: 'Guest Pass',
   },
   general: {
     name: 'General Entry',
     badgeText: 'AFNO GENERAL ADMISSION',
-    badgeClasses: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/40 shadow-[0_0_15px_rgba(6,182,212,0.3)]',
+    badgeClasses: 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500/30 dark:border-cyan-400/40 shadow-sm dark:shadow-[0_0_15px_rgba(6,182,212,0.3)]',
     stubTag: 'GA-2026',
-    stubClasses: 'bg-cyan-500/20 text-cyan-300 border-cyan-400/40',
+    stubClasses: 'bg-cyan-500/15 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border-cyan-500/30 dark:border-cyan-400/40',
     gate: 'MAIN PLAZA • SOUTH',
-    gateColor: 'text-cyan-300',
+    gateColor: 'text-cyan-600 dark:text-cyan-300',
     seat: 'MAIN ARENA • STANDING',
     serial: 'AFNO-2026-GEN',
     accent1: '#06b6d4',
     accent2: '#3b82f6',
     accent3: '#dc153c',
-    glow: 'rgba(6, 182, 212, 0.35)',
+    glow: 'rgba(6, 182, 212, 0.3)',
     perks: 'Unrestricted access to Main Arena cultural performances, food & artisan night market, community music stage, and live festival celebrations.',
     price: '£20.00',
   },
@@ -259,8 +259,8 @@ export function Afno3DPass() {
     <div className="w-full flex flex-col items-center px-1 sm:px-0">
       {/* Controls Bar: Tiers and Flip Pass */}
       <div className="flex flex-wrap items-center justify-center gap-3 mb-5 z-20">
-        {/* Tier Selector Pills with dedicated dark backgrounds and clear hover states */}
-        <div className="inline-flex p-1 rounded-xl bg-slate-900 border border-slate-700/80 shadow-md">
+        {/* Tier Selector Pills with Light & Dark Mode adaptation */}
+        <div className="inline-flex p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700/80 shadow-md">
           {Object.entries(TIER_CONFIG).map(([key, item]) => (
             <button
               key={key}
@@ -268,7 +268,7 @@ export function Afno3DPass() {
               className={`px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                 activeTier === key
                   ? 'bg-alpine-600 text-white shadow-sm font-bold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
             >
               {item.name}
@@ -279,7 +279,7 @@ export function Afno3DPass() {
         {/* Flip Action Button */}
         <button
           onClick={() => setIsFlipped(!isFlipped)}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium bg-alpine-600 hover:bg-alpine-700 text-white border border-alpine-500/50 transition-all active:scale-95 shadow-md"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-alpine-600 hover:bg-alpine-700 text-white border border-alpine-500/50 transition-all active:scale-95 shadow-md"
         >
           <RotateCw size={14} className={isFlipped ? 'rotate-180 transition-transform duration-300' : 'transition-transform duration-300'} />
           <span>{isFlipped ? 'View Front' : 'Flip Ticket Pass'}</span>
@@ -340,11 +340,11 @@ export function Afno3DPass() {
           >
             {/* ================= FRONT FACE ================= */}
             <div
-              className="relative w-full rounded-[20px] overflow-hidden bg-slate-950 border border-white/15 shadow-2xl"
+              className="relative w-full rounded-[20px] overflow-hidden bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/15 shadow-2xl transition-colors duration-300"
               style={{
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
-                boxShadow: `0 30px 60px -15px rgba(0, 0, 0, 0.85), 0 0 35px -8px ${tier.glow}`,
+                boxShadow: `0 30px 60px -15px rgba(0, 0, 0, 0.4), 0 0 35px -8px ${tier.glow}`,
               }}
             >
               {/* Dynamic Holographic Foil Overlay */}
@@ -386,22 +386,22 @@ export function Afno3DPass() {
 
               {/* Perforation Cutouts - Desktop: Vertical; Mobile: Horizontal */}
               {/* Desktop Perforations */}
-              <div className="hidden md:block absolute -top-3.5 right-[29%] w-7 h-7 rounded-full bg-slate-950 border-b border-white/15 z-30 shadow-inner translate-x-1/2" />
-              <div className="hidden md:block absolute -bottom-3.5 right-[29%] w-7 h-7 rounded-full bg-slate-950 border-t border-white/15 z-30 shadow-inner translate-x-1/2" />
-              <div className="hidden md:block absolute top-4 bottom-4 right-[29%] w-px border-r-2 border-dashed border-white/20 z-25" />
+              <div className="hidden md:block absolute -top-3.5 right-[29%] w-7 h-7 rounded-full bg-background border-b border-slate-300 dark:border-white/15 z-30 shadow-inner translate-x-1/2" />
+              <div className="hidden md:block absolute -bottom-3.5 right-[29%] w-7 h-7 rounded-full bg-background border-t border-slate-300 dark:border-white/15 z-30 shadow-inner translate-x-1/2" />
+              <div className="hidden md:block absolute top-4 bottom-4 right-[29%] w-px border-r-2 border-dashed border-slate-300 dark:border-white/20 z-25" />
 
               {/* Mobile Perforations */}
-              <div className="md:hidden absolute top-[68%] -left-3.5 w-7 h-7 rounded-full bg-slate-950 border-r border-white/15 z-30 shadow-inner -translate-y-1/2" />
-              <div className="md:hidden absolute top-[68%] -right-3.5 w-7 h-7 rounded-full bg-slate-950 border-l border-white/15 z-30 shadow-inner -translate-y-1/2" />
-              <div className="md:hidden absolute left-4 right-4 top-[68%] h-px border-b-2 border-dashed border-white/20 z-25 -translate-y-1/2" />
+              <div className="md:hidden absolute top-[68%] -left-3.5 w-7 h-7 rounded-full bg-background border-r border-slate-300 dark:border-white/15 z-30 shadow-inner -translate-y-1/2" />
+              <div className="md:hidden absolute top-[68%] -right-3.5 w-7 h-7 rounded-full bg-background border-l border-slate-300 dark:border-white/15 z-30 shadow-inner -translate-y-1/2" />
+              <div className="md:hidden absolute left-4 right-4 top-[68%] h-px border-b-2 border-dashed border-slate-300 dark:border-white/20 z-25 -translate-y-1/2" />
 
               {/* Pass Body (Left: 71%, Right: 29% on desktop; vertical stack on mobile) */}
               <div className="relative z-10 flex flex-col md:flex-row min-h-[360px]">
                 {/* Left: Main Event Body */}
-                <div className="w-full md:w-[71%] p-5 sm:p-7 md:p-8 flex flex-col justify-between relative bg-gradient-to-br from-slate-900/95 via-slate-950 to-slate-900/95 backdrop-blur-md">
+                <div className="w-full md:w-[71%] p-5 sm:p-7 md:p-8 flex flex-col justify-between relative bg-gradient-to-br from-white via-slate-50 to-white dark:from-slate-900/95 dark:via-slate-950 dark:to-slate-900/95 backdrop-blur-md">
                   {/* Subtle Geometric Background */}
-                  <div className="absolute inset-0 pointer-events-none opacity-5">
-                    <svg className="w-full h-full" viewBox="0 0 600 400" fill="none">
+                  <div className="absolute inset-0 pointer-events-none opacity-5 dark:opacity-10">
+                    <svg className="w-full h-full text-slate-900 dark:text-white" viewBox="0 0 600 400" fill="none">
                       <circle cx="300" cy="200" r="180" stroke="currentColor" strokeWidth="2" strokeDasharray="6 6" />
                       <circle cx="300" cy="200" r="120" stroke="currentColor" strokeWidth="1.5" />
                       <path d="M50 350 L300 50 L550 350 Z" stroke="currentColor" strokeWidth="2" />
@@ -416,67 +416,67 @@ export function Afno3DPass() {
                           <Crown size={12} />
                           <span>{tier.badgeText}</span>
                         </span>
-                        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest hidden sm:inline">
+                        <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 uppercase tracking-widest hidden sm:inline">
                           VERIFIED CREDENTIAL
                         </span>
                       </div>
-                      <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] sm:tracking-[0.2em] text-slate-400">
+                      <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] sm:tracking-[0.2em] text-slate-500 dark:text-slate-400">
                         AFNO EVENTS • UK NEPALI FESTIVAL 2026
                       </p>
                     </div>
 
                     {/* Iridescent Hologram Seal */}
                     <div className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-full p-[2px] shadow-lg shrink-0" style={{ background: `conic-gradient(from 0deg, ${tier.accent1}, ${tier.accent2}, ${tier.accent3}, ${tier.accent1})` }}>
-                      <div className="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center text-center border border-white/20">
-                        <ShieldCheck size={14} className="text-white mb-0.5" />
-                        <span className="text-[7px] font-mono font-bold tracking-tighter text-white leading-none">AFNO</span>
-                        <span className="text-[6px] font-mono text-alpine-400 leading-none mt-0.5">VERIFIED</span>
+                      <div className="w-full h-full rounded-full bg-white dark:bg-slate-950 flex flex-col items-center justify-center text-center border border-slate-200 dark:border-white/20">
+                        <ShieldCheck size={14} className="text-slate-900 dark:text-white mb-0.5" />
+                        <span className="text-[7px] font-mono font-bold tracking-tighter text-slate-900 dark:text-white leading-none">AFNO</span>
+                        <span className="text-[6px] font-mono text-alpine-600 dark:text-alpine-400 leading-none mt-0.5 font-bold">VERIFIED</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Middle Title */}
                   <div className="my-4 sm:my-5 relative z-10">
-                    <div className="text-xs font-mono font-bold tracking-widest text-alpine-400 uppercase mb-1 flex items-center gap-1.5">
+                    <div className="text-xs font-mono font-bold tracking-widest text-alpine-600 dark:text-alpine-400 uppercase mb-1 flex items-center gap-1.5">
                       <Sparkles size={13} />
                       <span>OFFICIAL DIGITAL PASS</span>
                     </div>
-                    <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-sans tracking-tight text-white leading-none">
-                      AFNO <span className="text-alpine-500">EVENTS</span>
+                    <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black font-sans tracking-tight text-slate-950 dark:text-white leading-none">
+                      AFNO <span className="text-alpine-600 dark:text-alpine-500">EVENTS</span>
                     </h2>
-                    <p className="text-xs sm:text-sm text-slate-300 mt-2 font-normal max-w-md">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2 font-normal max-w-md">
                       Live Headline Concerts • Traditional Folk & Fusion • Nepalese Street Food & Cultural Village
                     </p>
                   </div>
 
                   {/* Bottom Metadata Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3.5 sm:pt-4 border-t border-white/10 relative z-10">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3.5 sm:pt-4 border-t border-slate-200 dark:border-white/10 relative z-10">
                     <div>
-                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-400 mb-0.5">DATE</span>
-                      <span className="block font-sans font-bold text-xs sm:text-sm text-white">28 NOV 2026</span>
+                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5 font-semibold">DATE</span>
+                      <span className="block font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-white">28 NOV 2026</span>
                     </div>
                     <div>
-                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-400 mb-0.5">DOORS OPEN</span>
-                      <span className="block font-sans font-bold text-xs sm:text-sm text-white">18:00 GMT</span>
+                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5 font-semibold">DOORS OPEN</span>
+                      <span className="block font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-white">18:00 GMT</span>
                     </div>
                     <div>
-                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-400 mb-0.5">LOCATION</span>
-                      <span className="block font-sans font-bold text-xs sm:text-sm text-white truncate">LONDON O2 ARENA</span>
+                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5 font-semibold">LOCATION</span>
+                      <span className="block font-sans font-bold text-xs sm:text-sm text-slate-900 dark:text-white truncate">LONDON O2 ARENA</span>
                     </div>
                     <div>
-                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-400 mb-0.5">GATE / ZONE</span>
+                      <span className="block text-[9px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5 font-semibold">GATE / ZONE</span>
                       <span className={`block font-mono font-bold text-xs sm:text-sm ${tier.gateColor}`}>{tier.gate}</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Right: Tear-off Stub (Mobile: bottom section) */}
-                <div className="w-full md:w-[29%] p-5 sm:p-6 bg-slate-900/95 flex flex-col justify-between items-center text-center relative border-t md:border-t-0 md:border-l border-white/10">
+                <div className="w-full md:w-[29%] p-5 sm:p-6 bg-slate-50 dark:bg-slate-900/95 flex flex-col justify-between items-center text-center relative border-t md:border-t-0 md:border-l border-slate-200 dark:border-white/10">
                   {/* Stub Header */}
-                  <div className="w-full flex items-center justify-between md:justify-center md:flex-col gap-1 pb-2 border-b border-white/10">
+                  <div className="w-full flex items-center justify-between md:justify-center md:flex-col gap-1 pb-2 border-b border-slate-200 dark:border-white/10">
                     <div className="text-left md:text-center">
-                      <span className="block text-[9px] font-mono uppercase tracking-widest text-slate-400">SEAT / ADMIT</span>
-                      <span className="font-sans font-black text-sm sm:text-base text-white">{tier.seat}</span>
+                      <span className="block text-[9px] font-mono uppercase tracking-widest text-slate-500 dark:text-slate-400 font-semibold">SEAT / ADMIT</span>
+                      <span className="font-sans font-black text-sm sm:text-base text-slate-950 dark:text-white">{tier.seat}</span>
                     </div>
                     <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider border ${tier.stubClasses}`}>
                       {tier.stubTag}
@@ -484,7 +484,7 @@ export function Afno3DPass() {
                   </div>
 
                   {/* High Density QR Code */}
-                  <div className="my-3 p-2 rounded-xl bg-white shadow-xl group relative">
+                  <div className="my-3 p-2 rounded-xl bg-white shadow-md group relative border border-slate-200 dark:border-transparent">
                     <svg
                       className="w-20 h-20 sm:w-24 sm:h-24 text-slate-950"
                       viewBox="0 0 29 29"
@@ -496,15 +496,15 @@ export function Afno3DPass() {
                   {/* Barcode & Serial */}
                   <div className="w-full">
                     <svg
-                      className="w-full h-7 sm:h-8 text-white/90 mx-auto mb-1"
+                      className="w-full h-7 sm:h-8 text-slate-900 dark:text-white/90 mx-auto mb-1"
                       viewBox="0 0 220 40"
                       preserveAspectRatio="none"
                       shapeRendering="crispEdges"
                       dangerouslySetInnerHTML={{ __html: barcodeBars }}
                     />
-                    <div className="flex items-center justify-between text-[9px] font-mono tracking-widest text-slate-400 px-0.5">
+                    <div className="flex items-center justify-between text-[9px] font-mono tracking-widest text-slate-500 dark:text-slate-400 px-0.5 font-medium">
                       <span>{tier.serial}</span>
-                      <span className="text-emerald-400">● VALID</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">● VALID</span>
                     </div>
                   </div>
                 </div>
@@ -513,12 +513,12 @@ export function Afno3DPass() {
 
             {/* ================= BACK FACE ================= */}
             <div
-              className="absolute inset-0 w-full h-full rounded-[20px] overflow-hidden bg-slate-950 border border-white/15 p-6 sm:p-8 flex flex-col justify-between"
+              className="absolute inset-0 w-full h-full rounded-[20px] overflow-hidden bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/15 p-6 sm:p-8 flex flex-col justify-between transition-colors duration-300"
               style={{
                 backfaceVisibility: 'hidden',
                 WebkitBackfaceVisibility: 'hidden',
                 transform: 'rotateY(180deg)',
-                boxShadow: `0 30px 60px -15px rgba(0, 0, 0, 0.85), 0 0 35px -8px ${tier.glow}`,
+                boxShadow: `0 30px 60px -15px rgba(0, 0, 0, 0.4), 0 0 35px -8px ${tier.glow}`,
               }}
             >
               {/* Holographic foil sheen on back */}
@@ -530,64 +530,64 @@ export function Afno3DPass() {
               />
 
               {/* Watermark text */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] select-none">
-                <span className="font-sans font-black text-[120px] sm:text-[160px] tracking-tighter text-white">AFNO</span>
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.03] dark:opacity-[0.04] select-none">
+                <span className="font-sans font-black text-[120px] sm:text-[160px] tracking-tighter text-slate-900 dark:text-white">AFNO</span>
               </div>
 
               {/* Back Header */}
-              <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="relative z-10 flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center">
-                    <Ticket className="w-5 h-5 text-alpine-400" />
+                  <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 flex items-center justify-center">
+                    <Ticket className="w-5 h-5 text-alpine-600 dark:text-alpine-400" />
                   </div>
                   <div>
-                    <h3 className="font-sans font-bold text-sm sm:text-base text-white tracking-wide">
+                    <h3 className="font-sans font-bold text-sm sm:text-base text-slate-900 dark:text-white tracking-wide">
                       PASS SPECIFICATIONS & ENTRY PROTOCOL
                     </h3>
-                    <p className="text-[10px] font-mono text-slate-400">CRYPTOGRAPHICALLY SIGNED • NON-DUPLICABLE</p>
+                    <p className="text-[10px] font-mono text-slate-500 dark:text-slate-400">CRYPTOGRAPHICALLY SIGNED • NON-DUPLICABLE</p>
                   </div>
                 </div>
                 <div className="text-right font-mono">
-                  <span className="block text-[9px] text-slate-400">PASS TIER</span>
-                  <span className="text-xs font-bold text-alpine-400">{tier.price}</span>
+                  <span className="block text-[9px] text-slate-500 dark:text-slate-400 font-semibold">PASS TIER</span>
+                  <span className="text-xs font-bold text-alpine-600 dark:text-alpine-400">{tier.price}</span>
                 </div>
               </div>
 
               {/* Terms / Entitlements Grid */}
-              <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 my-3 text-xs text-slate-300">
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                  <div className="flex items-center gap-1.5 text-white font-semibold mb-1 text-xs">
-                    <Crown size={13} className="text-alpine-400" />
+              <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-4 my-3 text-xs text-slate-600 dark:text-slate-300">
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10">
+                  <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-semibold mb-1 text-xs">
+                    <Crown size={13} className="text-alpine-600 dark:text-alpine-400" />
                     <span>Tier Entitlements</span>
                   </div>
-                  <p className="text-slate-400 leading-relaxed text-[11px]">{tier.perks}</p>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-[11px]">{tier.perks}</p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                  <div className="flex items-center gap-1.5 text-white font-semibold mb-1 text-xs">
-                    <ShieldCheck size={13} className="text-emerald-400" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10">
+                  <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-semibold mb-1 text-xs">
+                    <ShieldCheck size={13} className="text-emerald-600 dark:text-emerald-400" />
                     <span>Smart Gate Access</span>
                   </div>
-                  <p className="text-slate-400 leading-relaxed text-[11px]">
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-[11px]">
                     Present this dynamic pass directly on your mobile device at turnstiles. Screen brightness automatically optimizes on tap.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10">
-                  <div className="flex items-center gap-1.5 text-white font-semibold mb-1 text-xs">
-                    <Sparkles size={13} className="text-amber-400" />
+                <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10">
+                  <div className="flex items-center gap-1.5 text-slate-900 dark:text-white font-semibold mb-1 text-xs">
+                    <Sparkles size={13} className="text-amber-600 dark:text-amber-400" />
                     <span>Community Guarantee</span>
                   </div>
-                  <p className="text-slate-400 leading-relaxed text-[11px]">
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-[11px]">
                     Protected by Afno Events zero-fee verified credential protocol. Non-transferable within 2 hours of gate opening.
                   </p>
                 </div>
               </div>
 
               {/* Bottom Strip */}
-              <div className="relative z-10 pt-2 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2">
-                <div className="w-full sm:w-2/3 h-6 rounded bg-slate-900 border border-white/10 flex items-center px-3 overflow-hidden">
-                  <span className="font-mono text-[9px] tracking-[0.25em] text-white/30 truncate">
+              <div className="relative z-10 pt-2 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div className="w-full sm:w-2/3 h-6 rounded bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-white/10 flex items-center px-3 overflow-hidden">
+                  <span className="font-mono text-[9px] tracking-[0.25em] text-slate-400 dark:text-white/30 truncate">
                     &lt;&lt;AFNO2026&lt;&lt;LONDON&lt;&lt;VERIFIED&lt;&lt;{tier.serial}&lt;&lt;
                   </span>
                 </div>
@@ -597,12 +597,12 @@ export function Afno3DPass() {
                       e.stopPropagation()
                       copySerial()
                     }}
-                    className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-300 hover:text-white transition-colors"
+                    className="inline-flex items-center gap-1 text-[11px] font-mono text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
                   >
-                    {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+                    {copied ? <Check size={12} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={12} />}
                     <span>{copied ? 'Copied' : tier.serial}</span>
                   </button>
-                  <span className="text-[10px] font-mono text-slate-500">SUPPORT@AFNOEVENTS.CO.UK</span>
+                  <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500">SUPPORT@AFNOEVENTS.CO.UK</span>
                 </div>
               </div>
             </div>
